@@ -18,13 +18,14 @@
 
 import socket
 from struct import *
+
+import knock_common.modules.KnockProtocolDefinitions
 from PortOpenerThread import PortOpenerThread
-from PlatformUtils import PlatformUtils
-from Connection import Connection
+from knock_common.modules import KnockProtocolDefinitions
+from knock_common.modules.PlatformUtils import PlatformUtils
+
 
 class KnockListener:
-
-    KNOCKPACKET_LENGTH = 4
 
     def __init__(self, cryptoEngine, firewallHandler):
         self.cryptoEngine = cryptoEngine
@@ -52,7 +53,7 @@ class KnockListener:
             lengthByte = unpack('!H', udpHeader[4:6])
             payloadLength = lengthByte[0] - udpHeaderLength
 
-            if payloadLength == KnockListener.KNOCKPACKET_LENGTH:
+            if payloadLength == KnockProtocolDefinitions.KNOCKPACKET_LENGTH:
                 payload = packet[ipHeaderLength + udpHeaderLength : ipHeaderLength + udpHeaderLength + payloadLength]
                 yield source, payload
 

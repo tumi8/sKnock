@@ -17,7 +17,7 @@
 #
 
 import subprocess
-from  PlatformUtils import PlatformUtils
+from  knock_common.modules.PlatformUtils import PlatformUtils
 
 class Firewall:
 
