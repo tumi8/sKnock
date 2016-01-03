@@ -26,7 +26,7 @@ class PortOpenerThread(Thread):
         self.protocol = protocol
         self.port = port
         self.addr = addr
-        Thread.__init__()
+        Thread.__init__(self)
 
 
     def run(self):

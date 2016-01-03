@@ -32,7 +32,7 @@ class Firewall:
     def setupDefaultFirewallState(self):
         if(self.platform == PlatformUtils.LINUX):
             subprocess.call('iptables -D INPUT -j knockknock', shell=True)
-            subprocess.call('iptables -P INPUT DROP', shell=True)
+            subprocess.call('iptables -P INPUT ACCEPT', shell=True)
             subprocess.call('iptables -I INPUT -j knockknock', shell=True)
             subprocess.call('iptables -F knockknock', shell=True)
             subprocess.call('iptables -X knockknock', shell=True)

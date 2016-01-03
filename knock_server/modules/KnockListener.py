@@ -19,10 +19,10 @@
 import socket
 from struct import *
 
-import knock_common.modules.KnockProtocolDefinitions
-from PortOpenerThread import PortOpenerThread
 from knock_common.modules import KnockProtocolDefinitions
 from knock_common.modules.PlatformUtils import PlatformUtils
+
+from PortOpenerThread import PortOpenerThread
 
 
 class KnockListener:
@@ -34,10 +34,9 @@ class KnockListener:
         print 'socket initialized'
 
     def capturePossibleKnockPackets(self):
-        udpsocket = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_UDP)
-        print 'socket initialized'
         while True:
-            source, packet = udpsocket.recvfrom(2048)
+            packet, source = self.udpsocket.recvfrom(2048)
+            source_ip = source[0]
 
             ipVersionLengthByte = unpack('!B', packet[0])
             ipVersion = ipVersionLengthByte[0] >> 4
@@ -55,14 +54,14 @@ class KnockListener:
 
             if payloadLength == KnockProtocolDefinitions.KNOCKPACKET_LENGTH:
                 payload = packet[ipHeaderLength + udpHeaderLength : ipHeaderLength + udpHeaderLength + payloadLength]
-                yield source, payload
+                yield source_ip, payload
 
 
     def processIncomingPackets(self):
-        for source, request in KnockListener.capturePossibleKnockPackets():
+        for source, request in self.capturePossibleKnockPackets():
             success, protocol, port = self.cryptoEngine.decryptAndVerifyRequest(request)
 
             if success:
-                print 'Got request For ' + protocol + ' Port: ' + port + ' from host: ' + source
+                print 'Got request for ' + protocol + ' Port: ' + port + ' from host: ' + source
 
                 PortOpenerThread(self.firewallHandler, protocol, port, source).start()

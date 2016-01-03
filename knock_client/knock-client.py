@@ -22,11 +22,10 @@ USA
 
 """
 
-import os
-import getopt
-import logging
+import os, sys, getopt, logging
 
 from struct import *
+
 from modules.Connection import Connection
 
 def usage():
