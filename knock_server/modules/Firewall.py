@@ -16,30 +16,57 @@
 # USA
 #
 
-import subprocess
+import os, subprocess
 from  knock_common.modules.PlatformUtils import PlatformUtils
 
 class Firewall:
 
     def __init__(self):
         self.platform = PlatformUtils.detectPlatform()
+        self.backupFirewallState()
         self.setupDefaultFirewallState()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.restoreFirewallState()
 
     def setupEmergencyAccessFirewallRules(self):
         if(self.platform == PlatformUtils.LINUX):
+            subprocess.call('iptables -D INPUT -p tcp --dport 22 -j ACCEPT', shell=True, stderr=open(os.devnull,'w'))
             subprocess.call('iptables -I INPUT -p tcp --dport 22 -j ACCEPT', shell=True)
 
     def setupDefaultFirewallState(self):
         if(self.platform == PlatformUtils.LINUX):
-            subprocess.call('iptables -D INPUT -j knockknock', shell=True)
+            subprocess.call('iptables -D INPUT -j knockknock', shell=True, stderr=open(os.devnull,'w'))
+            subprocess.call('iptables -F knockknock', shell=True, stderr=open(os.devnull,'w'))
+            subprocess.call('iptables -X knockknock', shell=True, stderr=open(os.devnull,'w'))
+            subprocess.call('iptables -N knockknock', shell=True)
             subprocess.call('iptables -P INPUT ACCEPT', shell=True)
             subprocess.call('iptables -I INPUT -j knockknock', shell=True)
-            subprocess.call('iptables -F knockknock', shell=True)
-            subprocess.call('iptables -X knockknock', shell=True)
-            subprocess.call('iptables -N knockknock', shell=True)
 
         self.setupEmergencyAccessFirewallRules()
 
+
+    def backupFirewallState(self):
+        subprocess.call('iptables-save > /tmp/iptables.bak', shell=True)
+
+
+    def restoreFirewallState(self):
+        subprocess.call('iptables-restore < /tmp/iptables.bak', shell=True)
+
     def openPortForClient(self, port, protocol, addr):
+        self.closePortForClient(port, protocol, addr)
+
         if(self.platform == PlatformUtils.LINUX):
-            subprocess.call('iptables -A knockknock -s ' + addr + ' -p' + protocol + ' --dport ' + port, shell=True)
+            subprocess.call('iptables -A knockknock -s ' + addr + ' -p' + protocol + ' --dport ' + port + ' -j RETURN', shell=True)
+
+
+    def closePortForClient(self, port, protocol, addr):
+        if(self.platform == PlatformUtils.LINUX):
+            subprocess.call('iptables -D knockknock -s ' + addr + ' -p' + protocol + ' --dport ' + port + ' -j RETURN', shell=True, stderr=open(os.devnull,'w'))
+
+
+    def __del__(self):
+        print 'suicide'

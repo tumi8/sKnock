@@ -16,6 +16,7 @@
 # USA
 #
 
+import time
 from threading import Thread
 
 
@@ -31,3 +32,5 @@ class PortOpenerThread(Thread):
 
     def run(self):
         self.firewallHandler.openPortForClient(self.port, self.protocol, self.addr)
+        time.sleep(10)
+        self.firewallHandler.closePortForClient(self.port, self.protocol, self.addr)

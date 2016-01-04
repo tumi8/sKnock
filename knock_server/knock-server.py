@@ -52,12 +52,13 @@ def main(argv):
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
 
     cryptoEngine = CryptoEngine()
-    firewallHandler = Firewall()
-    knockListener = KnockListener(cryptoEngine, firewallHandler)
+    #firewallHandler = Firewall()
+    with Firewall() as firewallHandler:
+        knockListener = KnockListener(cryptoEngine, firewallHandler)
 
-    # knockknock.daemonize.createDaemon()
+        # knockknock.daemonize.createDaemon()
 
-    knockListener.processIncomingPackets()
+        knockListener.processIncomingPackets()
                 
 if __name__ == '__main__':
     main(sys.argv[1:])
