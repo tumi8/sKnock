@@ -1,0 +1,11 @@
+KNOCKPACKET_LENGTH = 4
+PORT_OPEN_DURATION_IN_SECONDS = 15
+
+
+class IP_VERSION:
+    V4=4
+    V6=6
+
+class PROTOCOL:
+    TCP = 'tcp'
+    UDP = 'udp'

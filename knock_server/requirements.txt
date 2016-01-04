@@ -1,2 +1,3 @@
 pyOpenSSL ;sys_platform!='win32'
 pycrypto ;sys_platform!='win32'
+python-iptables ;sys_platform!='win32'

@@ -28,7 +28,7 @@ import lib.daemonize
 
 from knock_common.modules.CryptoEngine import CryptoEngine
 
-from modules.Firewall import Firewall
+from modules.Firewall.Firewall import Firewall
 from modules.KnockListener import KnockListener
 
 

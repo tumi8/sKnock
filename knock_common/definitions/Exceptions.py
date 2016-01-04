@@ -1,0 +1,2 @@
+class PortAlreadyOpenException(Exception):
+    pass

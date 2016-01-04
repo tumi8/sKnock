@@ -16,14 +16,14 @@
 # USA
 #
 
+import logging
 import socket
 from struct import *
 
-from knock_common.modules import KnockProtocolDefinitions
-from knock_common.modules.PlatformUtils import PlatformUtils
-
 from PortOpenerThread import PortOpenerThread
+from knock_common.definitions import KnockProtocolDefinitions
 
+logger = logging.getLogger(__name__)
 
 class KnockListener:
 
@@ -42,10 +42,12 @@ class KnockListener:
             ipVersion = ipVersionLengthByte[0] >> 4
             udpHeaderLength = 8;
 
-            if ipVersion == 4:
+            if ipVersion == KnockProtocolDefinitions.IP_VERSION.V4:
                 ipHeaderLength = (ipVersionLengthByte[0] & 0xF) * 4
-            elif ipVersion == 6:
+            elif ipVersion == KnockProtocolDefinitions.IP_VERSION.V6:
                 ipHeaderLength = 40
+            else:
+                continue
 
             udpHeader = packet[ipHeaderLength:ipHeaderLength + udpHeaderLength]
 
@@ -54,14 +56,14 @@ class KnockListener:
 
             if payloadLength == KnockProtocolDefinitions.KNOCKPACKET_LENGTH:
                 payload = packet[ipHeaderLength + udpHeaderLength : ipHeaderLength + udpHeaderLength + payloadLength]
-                yield source_ip, payload
+                yield ipVersion, source_ip, payload
 
 
     def processIncomingPackets(self):
-        for source, request in self.capturePossibleKnockPackets():
+        for ipVersion, source, request in self.capturePossibleKnockPackets():
             success, protocol, port = self.cryptoEngine.decryptAndVerifyRequest(request)
 
             if success:
-                print 'Got request for ' + protocol + ' Port: ' + port + ' from host: ' + source
-
-                PortOpenerThread(self.firewallHandler, protocol, port, source).start()
+                #logger.info('Got request for ' + protocol + ' Port: ' + port + ' from host: ' + source)
+                logger.info('Got request for %s Port: %s from host: %s', protocol, port, source)
+                PortOpenerThread(self.firewallHandler, ipVersion, protocol, port, source).start()

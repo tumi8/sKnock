@@ -19,11 +19,15 @@
 import time
 from threading import Thread
 
+from knock_common.definitions.Exceptions import *
+from knock_common.definitions import KnockProtocolDefinitions
+
 
 class PortOpenerThread(Thread):
 
-    def __init__(self, firewallHandler, protocol, port, addr):
+    def __init__(self, firewallHandler, ipVersion, protocol, port, addr):
         self.firewallHandler = firewallHandler
+        self.ipVersion = ipVersion
         self.protocol = protocol
         self.port = port
         self.addr = addr
@@ -31,6 +35,9 @@ class PortOpenerThread(Thread):
 
 
     def run(self):
-        self.firewallHandler.openPortForClient(self.port, self.protocol, self.addr)
-        time.sleep(10)
-        self.firewallHandler.closePortForClient(self.port, self.protocol, self.addr)
+        try:
+            self.firewallHandler.openPortForClient(self.port, self.ipVersion, self.protocol, self.addr)
+        except PortAlreadyOpenException:
+            return
+        time.sleep(KnockProtocolDefinitions.PORT_OPEN_DURATION_IN_SECONDS)
+        self.firewallHandler.closePortForClient(self.port, self.ipVersion, self.protocol, self.addr)

@@ -16,13 +16,14 @@
 # USA
 #
 
-import KnockProtocolDefinitions
+from knock_common.definitions import KnockProtocolDefinitions
+
 
 class CryptoEngine:
 
     def decryptAndVerifyRequest(self, request):
         success = True
-        protocol = KnockProtocolDefinitions.PROTOCOL_TCP
+        protocol = KnockProtocolDefinitions.PROTOCOL.TCP
         port = request
 
         return success, protocol, port
