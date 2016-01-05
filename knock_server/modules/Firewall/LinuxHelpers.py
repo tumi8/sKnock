@@ -79,6 +79,13 @@ def setupIPTabkesPortKnockingChainAndRedirectTraffic():
         deleteIPTablesRuleIgnoringError(redirectRuleV4, inputChainV4)
         inputChainV4.insert_rule(redirectRuleV4)
 
+        establishedRuleV4 = iptc.Rule()
+        establishedRuleV4.create_match('state').state = "RELATED,ESTABLISHED"
+        establishedRuleV4.target = iptc.Target(establishedRuleV4, 'ACCEPT')
+
+        deleteIPTablesRuleIgnoringError(establishedRuleV4, inputChainV4)
+        inputChainV4.insert_rule(establishedRuleV4)
+
         logger.debug("Setup Port-knocking IPTables Configuration for IPv4")
 
     if iptc.is_table_available(iptc.Table6.FILTER):
@@ -96,6 +103,13 @@ def setupIPTabkesPortKnockingChainAndRedirectTraffic():
 
         deleteIPTablesRuleIgnoringError(redirectRuleV6, inputChainV6)
         inputChainV6.insert_rule(redirectRuleV6)
+
+        establishedRuleV6 = iptc.Rule6()
+        establishedRuleV6.create_match('state').state = "RELATED,ESTABLISHED"
+        establishedRuleV6.target = iptc.Target(establishedRuleV6, 'ACCEPT')
+
+        deleteIPTablesRuleIgnoringError(establishedRuleV6, inputChainV6)
+        inputChainV6.insert_rule(establishedRuleV6)
 
         logger.debug("Setup Port-knocking IPTables Configuration for IPv6")
 
@@ -129,15 +143,25 @@ def insertEmergencySSHAccessRule():
 
 
 def backupIPTablesState():
-    subprocess.call('iptables-save > /tmp/iptables.bak', shell=True)
-    logger.debug("Backed up current IPTables Rules to /tmp/iptables.bak")
+    if iptc.is_table_available(iptc.Table.FILTER):
+        subprocess.call('iptables-save > /tmp/iptables.bak', shell=True)
+        logger.debug("Backed up current IPTables Rules to /tmp/iptables.bak")
+    if iptc.is_table_available(iptc.Table6.FILTER):
+        subprocess.call('ip6tables-save > /tmp/ip6tables.bak', shell=True)
+        logger.debug("Backed up current IPTables Rules to /tmp/ip6tables.bak")
 
 
 def restoreIPTablesState():
-    subprocess.call('iptables-restore < /tmp/iptables.bak', shell=True)
-    logger.debug("Restored IPTables Rules from /tmp/iptables.bak")
-    subprocess.call('rm /tmp/iptables.bak', shell=True)
-    logger.debug("Cleaned up backup file /tmp/iptables.bak")
+    if iptc.is_table_available(iptc.Table.FILTER):
+        subprocess.call('iptables-restore < /tmp/iptables.bak', shell=True)
+        logger.debug("Restored IPTables Rules from /tmp/iptables.bak")
+        subprocess.call('rm /tmp/iptables.bak', shell=True)
+        logger.debug("Cleaned up backup file /tmp/iptables.bak")
+    if iptc.is_table_available(iptc.Table6.FILTER):
+        subprocess.call('ip6tables-restore < /tmp/ip6tables.bak', shell=True)
+        logger.debug("Restored IPTables Rules from /tmp/ip6tables.bak")
+        subprocess.call('rm /tmp/iptables.bak', shell=True)
+        logger.debug("Cleaned up backup file /tmp/ip6tables.bak")
 
 def deleteIPTablesRuleIgnoringError(rule, chain):
     try:
