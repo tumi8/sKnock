@@ -30,8 +30,9 @@ class KnockListener:
     def __init__(self, cryptoEngine, firewallHandler):
         self.cryptoEngine = cryptoEngine
         self.firewallHandler = firewallHandler
+        self.runningPortOpenTasks = list()
         self.udpsocket = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_UDP)
-        print 'socket initialized'
+        logger.debug("Socket initialized")
 
     def capturePossibleKnockPackets(self):
         while True:
@@ -64,6 +65,8 @@ class KnockListener:
             success, protocol, port = self.cryptoEngine.decryptAndVerifyRequest(request)
 
             if success:
-                #logger.info('Got request for ' + protocol + ' Port: ' + port + ' from host: ' + source)
                 logger.info('Got request for %s Port: %s from host: %s', protocol, port, source)
-                PortOpenerThread(self.firewallHandler, ipVersion, protocol, port, source).start()
+                if not hash(str(port) + str(ipVersion) + protocol + source) in self.runningPortOpenTasks:
+                    PortOpenerThread(self.runningPortOpenTasks, self.firewallHandler, ipVersion, protocol, port, source).start()
+                else:
+                    logger.info('%s Port: %s for host: %s is already open!', protocol, port, source)

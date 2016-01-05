@@ -25,7 +25,8 @@ from knock_common.definitions import KnockProtocolDefinitions
 
 class PortOpenerThread(Thread):
 
-    def __init__(self, firewallHandler, ipVersion, protocol, port, addr):
+    def __init__(self, runningOpenPortTasks, firewallHandler, ipVersion, protocol, port, addr):
+        self.runningOpenPortTasks = runningOpenPortTasks
         self.firewallHandler = firewallHandler
         self.ipVersion = ipVersion
         self.protocol = protocol
@@ -35,9 +36,16 @@ class PortOpenerThread(Thread):
 
 
     def run(self):
+        threadTaskHash = hash(str(self.port) + str(self.ipVersion) + self.protocol + self.addr)
+        self.runningOpenPortTasks.append(threadTaskHash)
+
         try:
             self.firewallHandler.openPortForClient(self.port, self.ipVersion, self.protocol, self.addr)
+            time.sleep(KnockProtocolDefinitions.PORT_OPEN_DURATION_IN_SECONDS)
+            self.firewallHandler.closePortForClient(self.port, self.ipVersion, self.protocol, self.addr)
+
         except PortAlreadyOpenException:
             return
-        time.sleep(KnockProtocolDefinitions.PORT_OPEN_DURATION_IN_SECONDS)
-        self.firewallHandler.closePortForClient(self.port, self.ipVersion, self.protocol, self.addr)
+
+        finally:
+            self.runningOpenPortTasks.remove(threadTaskHash)
