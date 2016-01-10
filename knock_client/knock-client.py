@@ -26,6 +26,10 @@ import os, sys, getopt, logging
 
 from struct import *
 
+from knock_common.modules.Configuration import Configuration
+from knock_common.modules.CertUtil import CertUtil
+from knock_common.modules.CryptoEngine import CryptoEngine
+
 from modules.Connection import Connection
 
 def usage():
@@ -72,6 +76,12 @@ def main(argv):
 
 
     logger = logging.getLogger(__name__)
+
+    config = Configuration()
+
+    certUtil = CertUtil(config)
+    cryptoEngine = certUtil.initializeCryptoEngineForServer()
+
 
     logger.debug('Knocking %s on port %s', host, port)
     connectionHandler = Connection(10, 3)

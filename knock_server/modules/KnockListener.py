@@ -69,4 +69,5 @@ class KnockListener:
                 if not hash(str(port) + str(ipVersion) + protocol + source) in self.runningPortOpenTasks:
                     PortOpenerThread(self.runningPortOpenTasks, self.firewallHandler, ipVersion, protocol, port, source).start()
                 else:
-                    logger.info('%s Port: %s for host: %s is already open!', protocol, port, source)
+                    logger.info('There is already a Port-open process running for %s Port: %s for host: %s!',
+                                protocol, port, source)

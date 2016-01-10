@@ -72,8 +72,11 @@ class Firewall:
             chain.append_rule(rule)
 
         self.openPortsList.append(openPort)
-        logger.info('%s Port: %s opened for host: %s from: %s until: %s', protocol, port, addr, datetime.datetime.now(), datetime.datetime.now() + datetime.timedelta(0,
-                                                                                                                                                                      KnockProtocolDefinitions.PORT_OPEN_DURATION_IN_SECONDS))
+        logger.info('%s Port: %s opened for host: %s from: %s until: %s',
+                    protocol, port, addr,
+                    datetime.datetime.now(),
+                    datetime.datetime.now() +
+                    datetime.timedelta(0, KnockProtocolDefinitions.PORT_OPEN_DURATION_IN_SECONDS))
 
 
 

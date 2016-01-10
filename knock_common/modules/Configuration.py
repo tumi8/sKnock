@@ -16,25 +16,12 @@
 # USA
 #
 
-import OpenSSL
+import logging, os
 
-from knock_common.definitions import KnockProtocolDefinitions
+class Configuration:
 
+    def __init__(self):
+        self.datadir = os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, 'knock_data')
+        self.certdir = os.path.join(self.datadir, 'certificates')
 
-class CryptoEngine:
-
-    def __init__(self, sk, pk):
-        self.sk = sk
-        self.pk = pk
-
-
-    def decryptAndVerifyRequest(self, request):
-        success = True
-        protocol = KnockProtocolDefinitions.PROTOCOL.TCP
-        port = request
-
-        return success, protocol, port
-
-
-
-    
+        self.pfxPasswd = 'portknocking'
