@@ -5,8 +5,8 @@
 pyOpenSSL - A simple wrapper around the OpenSSL library
 """
 
-from knock_common.lib.OpenSSL import rand, crypto, SSL
-from knock_common.lib.OpenSSL.version import (
+import rand, crypto, SSL
+from version import (
     __author__, __copyright__, __email__, __license__, __summary__, __title__,
     __uri__, __version__,
 )

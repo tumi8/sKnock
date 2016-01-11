@@ -9,7 +9,7 @@ from functools import partial
 
 from six import integer_types as _integer_types
 
-from OpenSSL._util import (
+from _util import (
     ffi as _ffi,
     lib as _lib,
     exception_from_error_queue as _exception_from_error_queue,

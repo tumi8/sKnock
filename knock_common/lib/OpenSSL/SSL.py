@@ -10,7 +10,7 @@ from six import binary_type as _binary_type
 from six import integer_types as integer_types
 from six import int2byte, indexbytes
 
-from OpenSSL._util import (
+from _util import (
     ffi as _ffi,
     lib as _lib,
     exception_from_error_queue as _exception_from_error_queue,

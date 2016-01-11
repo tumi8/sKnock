@@ -11,7 +11,7 @@ from six import (
     text_type as _text_type,
     PY3 as _PY3)
 
-from OpenSSL._util import (
+from _util import (
     ffi as _ffi,
     lib as _lib,
     exception_from_error_queue as _exception_from_error_queue,
