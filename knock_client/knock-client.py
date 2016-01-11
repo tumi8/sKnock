@@ -80,11 +80,11 @@ def main(argv):
     config = Configuration()
 
     certUtil = CertUtil(config)
-    cryptoEngine = certUtil.initializeCryptoEngineForServer()
+    cryptoEngine = certUtil.initializeCryptoEngineForClient()
 
 
     logger.debug('Knocking %s on port %s', host, port)
-    connectionHandler = Connection(10, 3)
+    connectionHandler = Connection(cryptoEngine, 10, 3)
     connectionHandler.knockOnPort(host, port)
 
 

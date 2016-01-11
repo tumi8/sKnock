@@ -15,7 +15,8 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
 # USA
 #
-import logging, os, OpenSSL
+import logging, os
+from knock_common.lib.OpenSSL import crypto, SSL
 from knock_common.definitions.Exceptions import *
 from PlatformUtils import PlatformUtils
 from CryptoEngine import CryptoEngine
@@ -32,35 +33,40 @@ class CertUtil:
     def __init__(self, config):
         self.config = config
         self.platform = PlatformUtils.detectPlatform()
-
+        SSL
 
     def initializeCryptoEngineForClient(self):
         if(self.platform == PlatformUtils.LINUX):
-            pfx = OpenSSL.crypto.load_pkcs12(file(os.path.join(self.config.certdir, 'devclient1.pfx'), 'rb').read(), self.config.pfxPasswd)
+            pfx = crypto.load_pkcs12(file(os.path.join(self.config.certdir, 'devclient1.pfx'), 'rb').read(), self.config.pfxPasswd)
 
             self.loadCAFromPFX(pfx)
             self.clientCert = pfx.get_certificate()
             self.clientKey = pfx.get_privatekey()
 
-            serverCert = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_ASN1, file(os.path.join(self.config.certdir, 'devserver.cer'), 'rb').read())
+            serverCert = crypto.load_certificate(crypto.FILETYPE_ASN1, file(os.path.join(self.config.certdir, 'devserver.cer'), 'rb').read())
             serverPubKey = serverCert.get_pubkey()
 
-            return CryptoEngine(self.clientKey, serverPubKey)
+            serializedClientPrivKey = crypto.dump_privatekey(crypto.FILETYPE_PEM, self.clientKey)
+            serializedServerPubKey = crypto.dump_publickey(crypto.FILETYPE_PEM, serverPubKey)
+
+            return CryptoEngine(serializedClientPrivKey, serializedServerPubKey, certUtil=self)
 
 
     def initializeCryptoEngineForServer(self):
         if(self.platform == PlatformUtils.LINUX):
-            pfx = OpenSSL.crypto.load_pkcs12(file(os.path.join(self.config.certdir, 'devserver.pfx'), 'rb').read(), self.config.pfxPasswd)
+            pfx = crypto.load_pkcs12(file(os.path.join(self.config.certdir, 'devserver.pfx'), 'rb').read(), self.config.pfxPasswd)
 
             self.loadCAFromPFX(pfx)
             serverKey = pfx.get_privatekey()
 
-            return CryptoEngine(serverKey, None)
+            serializedServerPrivKey = crypto.dump_privatekey(crypto.FILETYPE_PEM, serverKey)
+
+            return CryptoEngine(serializedServerPrivKey, None, certUtil=self)
 
 
     def sign(self, message):
-        messageWithCert = message + OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_ASN1, self.clientCert)
-        signedMessageWithCert = messageWithCert + OpenSSL.crypto.sign(self.clientKey, messageWithCert, self.hashAlgorithm)
+        messageWithCert = message + crypto.dump_certificate(crypto.FILETYPE_ASN1, self.clientCert)
+        signedMessageWithCert = messageWithCert + crypto.sign(self.clientKey, messageWithCert, self.hashAlgorithm)
         return signedMessageWithCert
 
 
@@ -68,7 +74,7 @@ class CertUtil:
 
     def verifyCertificate(self, cert):
         if(self.platform == PlatformUtils.LINUX):
-            CAContext = OpenSSL.crypto.X509StoreContext(self.CA, cert)
+            CAContext = crypto.X509StoreContext(self.CA, cert)
             if(CAContext.verify_certificate()):
                 # TODO revocation check
                 return True
@@ -81,7 +87,7 @@ class CertUtil:
 
     def verifySignature(self, cert, payloadSignature, payload):
         if(self.platform == PlatformUtils.LINUX):
-            OpenSSL.crypto.verify(cert, payloadSignature, payload, self.hashAlgorithm)
+            crypto.verify(cert, payloadSignature, payload, self.hashAlgorithm)
 
 
 

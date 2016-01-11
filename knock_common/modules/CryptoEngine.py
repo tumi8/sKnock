@@ -16,16 +16,19 @@
 # USA
 #
 
-import OpenSSL
+import logging, os, binascii, hashlib, base64
+
+from M2Crypto import *
+from hkdf import hkdf_expand, hkdf_extract
 
 from knock_common.definitions import KnockProtocolDefinitions
 
-
 class CryptoEngine:
 
-    def __init__(self, sk, pk):
-        self.sk = sk
-        self.pk = pk
+    def __init__(self, sk, pk, certUtil):
+        self.pk = EC.load_pub_key_bio(BIO.MemoryBuffer(pk))
+        self.sk = None if sk == None else EC.load_key_bio(BIO.MemoryBuffer(sk))
+        self.certUtil = certUtil
 
 
     def decryptAndVerifyRequest(self, request):
@@ -36,5 +39,39 @@ class CryptoEngine:
         return success, protocol, port
 
 
+    def signAndEncryptRequest(self, request):
+        signedMessage = self.certUtil.sign(request)
+        signedAndEncryptedMessage, ephPubKey = self.encryptWithECIES(signedMessage, self.pk)
+        signedAndEncryptedMessage += ephPubKey
+        return signedAndEncryptedMessage
 
-    
+
+
+    def encryptWithECIES(self, message, pk):
+        ephermal = EC.gen_params(EC.NID_X9_62_prime256v1)
+        ephermal.gen_key()
+        ecdhSecret = ephermal.compute_dh_key(pk)
+        aesKey = self.hkdf(ecdhSecret)
+
+        encrypt = EVP.Cipher(alg='aes_128_cbc', key=aesKey, iv = '\0' * 16, padding=1, op=1)
+
+        encryptedMessage = encrypt.update(message)
+        encryptedMessage += encrypt.final()
+
+        ephPubKeyBIO = BIO.MemoryBuffer()
+        ephermal.save_pub_key_bio(ephPubKeyBIO)
+
+        ephPubKey = ''.join(ephPubKeyBIO.read_all().split('\n')[1:-2]) # Remove BEGIN & END Lines
+        ephPubKey = base64.b64decode(ephPubKey)
+
+        return encryptedMessage, ephPubKey
+
+
+    def hkdf(self, ecdhSecret):
+        prk = hkdf_extract(salt=b"54686579206c6976696e272069742075702061742074686520486f74656c2043616c69666f726e69610a576861742061206e6963652073757270726973652028776861742061206e696365207375727072697365290a4272696e6720796f757220616c69626973",
+                           hash=hashlib.sha256,
+                           input_key_material=ecdhSecret)
+
+        return hkdf_expand(pseudo_random_key=prk,
+                           info=b"knock",
+                           length=16)

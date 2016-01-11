@@ -16,9 +16,7 @@
 # USA
 #
 
-import random
-import socket
-import logging
+import logging, socket, random, struct, datetime, time
 
 logger = logging.getLogger(__name__)
 
@@ -29,9 +27,10 @@ class Connection:
     MIN_PORT = 10000
     MAX_PORT = 60000
 
-    def __init__(self, timeout, numberOfRetries):
+    def __init__(self, cryptoEngine, timeout, numberOfRetries):
         self.timeout = timeout
         self.numberOfRetries = numberOfRetries
+        self.cryptoEngine = cryptoEngine
 
     def knockOnPort(self, targetHost, requestedPort):
         randomPort = random.randint(Connection.MIN_PORT, Connection.MAX_PORT)
@@ -49,11 +48,14 @@ class Connection:
 
         logger.debug('Knock Target Port: %s, Requested Application Port: %s', knockPort, requestedPort)
 
-        # TODO: implement real stuff
-        encryptedMessage = requestedPort;
+        # TODO: implement protocol
+        protocol = 1    # 1 = TCP, 0 = UDP
+        timestamp = time.mktime(datetime.datetime.now().timetuple())
+        request = struct.pack('!B?HL', 0, protocol, int(requestedPort), timestamp)
+        encryptedRequest = self.cryptoEngine.signAndEncryptRequest(request)
 
         socketToServer = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        socketToServer.sendto(encryptedMessage, (targetHost, knockPort))
+        socketToServer.sendto(encryptedRequest, (targetHost, knockPort))
 
         logger.info('Knock Packet sent to %s:%s', targetHost, knockPort)
 
