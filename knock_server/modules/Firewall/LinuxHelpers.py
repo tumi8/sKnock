@@ -34,7 +34,7 @@ def getIPTablesRuleForClient(port, ipVersion, protocol, addr):
         rule.target = iptc.Target(rule, 'RETURN')
         rule.src = addr
         rule.protocol = protocol
-        rule.create_match(protocol).dport = port
+        rule.create_match(protocol).dport = str(port)
         logger.debug("Created Rule For IPv%s Request: PORT=%s, HOST=%s PROTOCOL=%s", ipVersion, port, addr, protocol)
 
     elif ipVersion == KnockProtocolDefinitions.IP_VERSION.V6 and iptc.is_table_available(iptc.Table6.FILTER):
@@ -42,7 +42,7 @@ def getIPTablesRuleForClient(port, ipVersion, protocol, addr):
         rule.target = iptc.Target(rule, 'RETURN')
         rule.src = addr
         rule.protocol = protocol
-        rule.create_match(protocol).dport = port
+        rule.create_match(protocol).dport = str(port)
         logger.debug("Created Rule For IPv%s Request: PORT=%s, HOST=%s PROTOCOL=%s", ipVersion, port, addr, protocol)
 
     else:

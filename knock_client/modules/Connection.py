@@ -16,7 +16,7 @@
 # USA
 #
 
-import logging, socket, random, struct, datetime, time
+import logging, socket, random
 
 logger = logging.getLogger(__name__)
 
@@ -50,9 +50,7 @@ class Connection:
 
         # TODO: implement protocol
         protocol = 1    # 1 = TCP, 0 = UDP
-        timestamp = time.mktime(datetime.datetime.now().timetuple())
-        request = struct.pack('!B?HL', 0, protocol, int(requestedPort), timestamp)
-        encryptedRequest = self.cryptoEngine.signAndEncryptRequest(request)
+        encryptedRequest = self.cryptoEngine.signAndEncryptRequest(protocol, requestedPort)
 
         socketToServer = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         socketToServer.sendto(encryptedRequest, (targetHost, knockPort))

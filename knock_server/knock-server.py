@@ -26,7 +26,8 @@ import os, sys, pwd, grp, logging
 
 import lib.daemonize
 
-from knock_common.modules.CryptoEngine import CryptoEngine
+from knock_common.modules.Configuration import Configuration
+from knock_common.modules.CertUtil import CertUtil
 
 from modules.Firewall.Firewall import Firewall
 from modules.KnockListener import KnockListener
@@ -51,8 +52,10 @@ def main(argv):
 
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
 
-    cryptoEngine = CryptoEngine()
-    #firewallHandler = Firewall()
+    config = Configuration()
+
+    certUtil = CertUtil(config)
+    cryptoEngine = certUtil.initializeCryptoEngineForServer()
     with Firewall() as firewallHandler:
         knockListener = KnockListener(cryptoEngine, firewallHandler)
 

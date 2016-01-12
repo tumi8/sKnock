@@ -15,8 +15,8 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
 # USA
 #
-import logging, os
-from knock_common.lib.OpenSSL import crypto, SSL
+import logging, os, struct
+from knock_common.lib.OpenSSL import crypto
 from knock_common.definitions.Exceptions import *
 from PlatformUtils import PlatformUtils
 from CryptoEngine import CryptoEngine
@@ -33,7 +33,6 @@ class CertUtil:
     def __init__(self, config):
         self.config = config
         self.platform = PlatformUtils.detectPlatform()
-        SSL
 
     def initializeCryptoEngineForClient(self):
         if(self.platform == PlatformUtils.LINUX):
@@ -64,30 +63,37 @@ class CertUtil:
             return CryptoEngine(serializedServerPrivKey, None, certUtil=self)
 
 
-    def sign(self, message):
+    def signIncludingCertificate(self, message):
         messageWithCert = message + crypto.dump_certificate(crypto.FILETYPE_ASN1, self.clientCert)
-        signedMessageWithCert = messageWithCert + crypto.sign(self.clientKey, messageWithCert, self.hashAlgorithm)
+        signature = crypto.sign(self.clientKey, messageWithCert, self.hashAlgorithm)
+        signedMessageWithCert = messageWithCert + signature + struct.pack('!B', len(signature))
+
         return signedMessageWithCert
 
 
+    def verifyCertificateAndSignature(self, rawCert, payloadSignature, payload):
+        cert = crypto.load_certificate(crypto.FILETYPE_ASN1, rawCert)
+        return self.verifyCertificate(cert) and self.verifySignature(cert, payloadSignature, payload)
 
 
     def verifyCertificate(self, cert):
         if(self.platform == PlatformUtils.LINUX):
             CAContext = crypto.X509StoreContext(self.CA, cert)
-            if(CAContext.verify_certificate()):
-                # TODO revocation check
+            try:
+                CAContext.verify_certificate()
+                #TODO: Revocation check
                 return True
-            else:
+            except:
                 return False
 
 
-
-
-
-    def verifySignature(self, cert, payloadSignature, payload):
+    def verifySignature(self, cert, signature, message):
         if(self.platform == PlatformUtils.LINUX):
-            crypto.verify(cert, payloadSignature, payload, self.hashAlgorithm)
+            try:
+                crypto.verify(cert, signature, message, self.hashAlgorithm)
+                return True
+            except:
+                return False
 
 
 
@@ -107,15 +113,24 @@ class CertUtil:
 
 
     def loadCAFromPFX(self, pfx):
-        CAstore = pfx.get_ca_certificates()
-        if len(CAstore) != 1:
+        CAcerts = pfx.get_ca_certificates()
+        if len(CAcerts) != 1:
             logger.error("Incompatible Root CA structure!")
             raise IncompatibleRootCAException
 
-        self.CA = CAstore[0]
-
-        if (self.CA.get_signature_algorithm() != 'ecdsa-with-SHA256'):
+        if (CAcerts[0].get_signature_algorithm() != 'ecdsa-with-SHA256'):
             logger.error("Incompatible Signature Algorithm!")
             raise IncompatibleRootCAException
 
         self.hashAlgorithm = 'sha256'
+
+        self.CA = crypto.X509Store()
+        self.CA.add_cert(CAcerts[0])
+
+
+    def convertDERtoPEM(self, key):
+        return crypto.dump_publickey(crypto.FILETYPE_PEM, crypto.load_publickey(crypto.FILETYPE_ASN1, key))
+
+
+    def convertPEMtoDER(self, key):
+        return crypto.dump_publickey(crypto.FILETYPE_ASN1, crypto.load_publickey(crypto.FILETYPE_PEM, key))
