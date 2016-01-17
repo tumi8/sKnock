@@ -30,21 +30,23 @@ class CertUtil:
 
 
 
-    def __init__(self, config):
-        self.config = config
+    def __init__(self, serverCertFile, pfxFile, pfxPasswd):
+        self.serverCertFile = serverCertFile
+        self.pfxFile = pfxFile
+        self.pfxPasswd = pfxPasswd
         self.platform = PlatformUtils.detectPlatform()
 
-    def initializeCryptoEngineForClient(self):
+    def initializeCryptoEngine(self):
         if(self.platform == PlatformUtils.LINUX):
             logger.debug("Loading certificates...")
             try:
-                pfx = crypto.load_pkcs12(file(os.path.join(self.config.certdir, 'devclient1.pfx'), 'rb').read(), self.config.pfxPasswd)
+                pfx = crypto.load_pkcs12(file(os.path.join(self.pfxFile), 'rb').read(), self.pfxPasswd)
 
                 self.loadCAFromPFX(pfx)
                 self.clientCert = pfx.get_certificate()
                 self.clientKey = pfx.get_privatekey()
 
-                serverCert = crypto.load_certificate(crypto.FILETYPE_ASN1, file(os.path.join(self.config.certdir, 'devserver.cer'), 'rb').read())
+                serverCert = crypto.load_certificate(crypto.FILETYPE_ASN1, file(self.serverCertFile, 'rb').read())
                 serverPubKey = serverCert.get_pubkey()
 
                 serializedClientPrivKey = crypto.dump_privatekey(crypto.FILETYPE_PEM, self.clientKey)
@@ -53,23 +55,6 @@ class CertUtil:
                 return CryptoEngine(serializedClientPrivKey, serializedServerPubKey, certUtil=self)
             except:
                 logger.error("Failed to load certificates!")
-
-
-    def initializeCryptoEngineForServer(self):
-        if(self.platform == PlatformUtils.LINUX):
-            logger.debug("Loading certificates...")
-            try:
-                pfx = crypto.load_pkcs12(file(os.path.join(self.config.certdir, 'devserver.pfx'), 'rb').read(), self.config.pfxPasswd)
-
-                self.loadCAFromPFX(pfx)
-                serverKey = pfx.get_privatekey()
-
-                serializedServerPrivKey = crypto.dump_privatekey(crypto.FILETYPE_PEM, serverKey)
-
-                return CryptoEngine(serializedServerPrivKey, None, certUtil=self)
-            except:
-                logger.error("Failed to load certificates!")
-
 
     def signIncludingCertificate(self, message):
         messageWithCert = message + crypto.dump_certificate(crypto.FILETYPE_ASN1, self.clientCert)
@@ -80,56 +65,6 @@ class CertUtil:
         signedMessageWithCert = messageWithCert + struct.pack('!B' + padding, len(signature)) + signature
 
         return signedMessageWithCert
-
-
-    def verifyCertificateAndSignature(self, rawCert, payloadSignature, payload):
-        try:
-            cert = crypto.load_certificate(crypto.FILETYPE_ASN1, rawCert)
-        except:
-            logger.error("Invalid Certificate data!")
-            return False
-
-        return self.verifyCertificate(cert) and self.verifySignature(cert, payloadSignature, payload)
-
-
-    def verifyCertificate(self, cert):
-        if(self.platform == PlatformUtils.LINUX):
-            CAContext = crypto.X509StoreContext(self.CA, cert)
-            try:
-                CAContext.verify_certificate()
-                logger.debug("Certificate OK!")
-                #TODO: Revocation check
-                return True
-            except:
-                logger.debug("Certificate check failed!")
-                return False
-
-
-    def verifySignature(self, cert, signature, message):
-        if(self.platform == PlatformUtils.LINUX):
-            try:
-                crypto.verify(cert, signature, message, self.hashAlgorithm)
-                logger.debug("Signature OK!")
-                return True
-            except:
-                logger.debug("Invalid Signature!")
-                return False
-
-
-
-    def extractEncryptedAuthorizationStringFromCertificate(self, cert):
-
-        try:
-            extension = cert.get_extension(CertUtil.PROBABLE_INDEX_FOR_SUBJECTALTNAME)
-            if extension.get_short_name() != 'subjectAltName':
-                raise Exception
-        except:
-            for i in range (0, cert.get_extension_count()):
-                extension = cert.get_extension(i)
-                if extension.get_short_name() == 'subjectAltName':
-                    break
-
-        return None if extension == None else extension.get_data()
 
 
     def loadCAFromPFX(self, pfx):

@@ -16,12 +16,21 @@
 # USA
 #
 
-import logging, os
+import platform
 
-class Configuration:
+class PlatformUtils:
+    UNDEFINED = 0
+    WINDOWS = 1
+    LINUX = 2
 
-    def __init__(self):
-        self.datadir = os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, 'knock_data')
-        self.certdir = os.path.join(self.datadir, 'certificates')
+    @staticmethod
+    def detectPlatform():
+        platformString = platform.system();
+        if(platformString == "Windows"):
+            return PlatformUtils.WINDOWS
+        elif (platformString == "Linux"):
+            return PlatformUtils.LINUX
+        else:
+            return PlatformUtils.UNDEFINED
 
-        self.pfxPasswd = 'portknocking'
+

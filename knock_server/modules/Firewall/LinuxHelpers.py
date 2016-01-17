@@ -21,7 +21,7 @@ import subprocess
 
 import iptc
 
-from knock_common.definitions import KnockProtocolDefinitions
+from knock_server.definitions import Constants
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ IPTABLES_CHAIN_KNOCK = 'knock'
 IPTABLES_CHAIN_INPUT = 'INPUT'
 
 def getIPTablesRuleForClient(port, ipVersion, protocol, addr):
-    if ipVersion == KnockProtocolDefinitions.IP_VERSION.V4 and iptc.is_table_available(iptc.Table.FILTER):
+    if ipVersion == Constants.IP_VERSION.V4 and iptc.is_table_available(iptc.Table.FILTER):
         rule = iptc.Rule()
         rule.target = iptc.Target(rule, 'RETURN')
         rule.src = addr
@@ -37,7 +37,7 @@ def getIPTablesRuleForClient(port, ipVersion, protocol, addr):
         rule.create_match(protocol).dport = str(port)
         logger.debug("Created Rule For IPv%s Request: PORT=%s, HOST=%s PROTOCOL=%s", ipVersion, port, addr, protocol)
 
-    elif ipVersion == KnockProtocolDefinitions.IP_VERSION.V6 and iptc.is_table_available(iptc.Table6.FILTER):
+    elif ipVersion == Constants.IP_VERSION.V6 and iptc.is_table_available(iptc.Table6.FILTER):
         rule = iptc.Rule6()
         rule.target = iptc.Target(rule, 'RETURN')
         rule.src = addr
@@ -51,9 +51,9 @@ def getIPTablesRuleForClient(port, ipVersion, protocol, addr):
     return rule
 
 def getIPTablesChainForVersion(ipVersion, chain):
-    if ipVersion == KnockProtocolDefinitions.IP_VERSION.V4 and iptc.is_table_available(iptc.Table.FILTER):
+    if ipVersion == Constants.IP_VERSION.V4 and iptc.is_table_available(iptc.Table.FILTER):
         chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), chain)
-    elif ipVersion == KnockProtocolDefinitions.IP_VERSION.V6 and iptc.is_table_available(iptc.Table6.FILTER):
+    elif ipVersion == Constants.IP_VERSION.V6 and iptc.is_table_available(iptc.Table6.FILTER):
         chain = iptc.Chain(iptc.Table6(iptc.Table6.FILTER), chain)
     else:
         logger.error("Could not find chain \'%s\' for IPv%s IPTables", chain, ipVersion)
@@ -66,12 +66,12 @@ def setupIPTabkesPortKnockingChainAndRedirectTraffic():
     if iptc.is_table_available(iptc.Table.FILTER):
         tableV4 = iptc.Table(iptc.Table.FILTER)
         try:
-            knockChainV4 = getIPTablesChainForVersion(KnockProtocolDefinitions.IP_VERSION.V4, IPTABLES_CHAIN_KNOCK)
+            knockChainV4 = getIPTablesChainForVersion(Constants.IP_VERSION.V4, IPTABLES_CHAIN_KNOCK)
             knockChainV4.flush()
         except iptc.IPTCError:
             knockChainV4 = tableV4.create_chain(IPTABLES_CHAIN_KNOCK)
 
-        inputChainV4 = getIPTablesChainForVersion(KnockProtocolDefinitions.IP_VERSION.V4, IPTABLES_CHAIN_INPUT)
+        inputChainV4 = getIPTablesChainForVersion(Constants.IP_VERSION.V4, IPTABLES_CHAIN_INPUT)
 
         redirectRuleV4 = iptc.Rule()
         redirectRuleV4.target = iptc.Target(redirectRuleV4, IPTABLES_CHAIN_KNOCK)
@@ -91,12 +91,12 @@ def setupIPTabkesPortKnockingChainAndRedirectTraffic():
     if iptc.is_table_available(iptc.Table6.FILTER):
         tableV6 = iptc.Table6(iptc.Table6.FILTER)
         try:
-            knockChainV6 = getIPTablesChainForVersion(KnockProtocolDefinitions.IP_VERSION.V6, IPTABLES_CHAIN_KNOCK)
+            knockChainV6 = getIPTablesChainForVersion(Constants.IP_VERSION.V6, IPTABLES_CHAIN_KNOCK)
             knockChainV6.flush()
         except iptc.IPTCError:
             knockChainV6 = tableV6.create_chain(IPTABLES_CHAIN_KNOCK)
 
-        inputChainV6 = getIPTablesChainForVersion(KnockProtocolDefinitions.IP_VERSION.V6, IPTABLES_CHAIN_INPUT)
+        inputChainV6 = getIPTablesChainForVersion(Constants.IP_VERSION.V6, IPTABLES_CHAIN_INPUT)
 
         redirectRuleV6 = iptc.Rule6()
         redirectRuleV6.target = iptc.Target(redirectRuleV6, IPTABLES_CHAIN_KNOCK)

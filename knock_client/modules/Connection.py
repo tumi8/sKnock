@@ -16,11 +16,11 @@
 # USA
 #
 
-import logging, socket, random, struct
+import logging, random, socket, struct
 
-from knock_common.definitions import KnockProtocolDefinitions
+from knock_client.definitions import Constants
 
-PROTOCOL_INFORMATION = struct.pack('!cBBB', KnockProtocolDefinitions.KNOCK_ID, *KnockProtocolDefinitions.KNOCK_VERSION)
+PROTOCOL_INFORMATION = struct.pack('!cBBB', Constants.KNOCK_ID, *Constants.KNOCK_VERSION)
 MIN_PORT = 10000
 MAX_PORT = 60000
 

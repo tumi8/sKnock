@@ -19,14 +19,11 @@
 import datetime
 import logging
 
-from knock_common.definitions import KnockProtocolDefinitions
+import LinuxHelpers
 from knock_common.definitions.Exceptions import *
 from knock_common.modules.PlatformUtils import PlatformUtils
-
 from knock_server.decorators.synchronized import synchronized
-
-
-import LinuxHelpers
+from knock_server.definitions import Constants
 
 logger = logging.getLogger(__name__)
 
@@ -79,7 +76,7 @@ class Firewall:
                     protocol, port, addr,
                     datetime.datetime.now(),
                     datetime.datetime.now() +
-                    datetime.timedelta(0, KnockProtocolDefinitions.PORT_OPEN_DURATION_IN_SECONDS))
+                    datetime.timedelta(0, Constants.PORT_OPEN_DURATION_IN_SECONDS))
 
 
 

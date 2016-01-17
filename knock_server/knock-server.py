@@ -26,8 +26,7 @@ import os, sys, pwd, grp, logging
 
 import lib.daemonize
 
-from knock_common.modules.Configuration import Configuration
-from knock_common.modules.CertUtil import CertUtil
+from modules.CertUtil import CertUtil
 
 from modules.Firewall.Firewall import Firewall
 from modules.KnockListener import KnockListener
@@ -52,10 +51,8 @@ def main(argv):
 
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
 
-    config = Configuration()
-
-    certUtil = CertUtil(config)
-    cryptoEngine = certUtil.initializeCryptoEngineForServer()
+    certUtil = CertUtil(os.path.join(os.path.dirname(__file__), 'devserver.pfx') , pfxPasswd='portknocking')
+    cryptoEngine = certUtil.initializeCryptoEngine()
     with Firewall() as firewallHandler:
         knockListener = KnockListener(cryptoEngine, firewallHandler)
 

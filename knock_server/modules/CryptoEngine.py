@@ -16,12 +16,15 @@
 # USA
 #
 
-import logging, os, binascii, hashlib, base64, struct, datetime, time
+import datetime
+import hashlib
+import logging
+import struct
 
 from M2Crypto import *
 from hkdf import hkdf_expand, hkdf_extract
 
-from knock_common.definitions import KnockProtocolDefinitions
+from knock_server.definitions import Constants
 
 SIGNATURE_SIZE = 73
 
@@ -29,24 +32,9 @@ logger = logging.getLogger(__name__)
 
 class CryptoEngine:
 
-    def __init__(self, sk, pk, certUtil):
-        self.pk = None if pk == None else EC.load_pub_key_bio(BIO.MemoryBuffer(pk))
-        self.sk = None if sk == None else EC.load_key_bio(BIO.MemoryBuffer(sk))
+    def __init__(self, privateKey, certUtil):
+        self.privateKey = EC.load_key_bio(BIO.MemoryBuffer(privateKey))
         self.certUtil = certUtil
-
-
-    def signAndEncryptRequest(self, protocol, port):
-        logger.debug("Signing and encrypting request...")
-        packetTime = datetime.datetime.now()
-        timestamp = time.mktime(packetTime.timetuple())
-        request = struct.pack('!B?HL', 0, protocol, int(port), timestamp)
-        logger.debug("Added timestamp: %s", packetTime)
-
-        signedMessage = self.certUtil.signIncludingCertificate(request)
-        signedAndEncryptedMessage, ephPubKey = self.encryptWithECIES(signedMessage, self.pk)
-        signedAndEncryptedMessage += ephPubKey
-        return signedAndEncryptedMessage
-
 
 
     def decryptAndVerifyRequest(self, encryptedMessage):
@@ -74,7 +62,7 @@ class CryptoEngine:
             logger.debug("Checking Timestamp of Request...")
             timestamp = struct.unpack('!L', signedRequest[4:8])[0]
             packetTime = datetime.datetime.fromtimestamp(timestamp)
-            success = packetTime <= datetime.datetime.now() + datetime.timedelta(0, KnockProtocolDefinitions.TIMESTAMP_THRESHOLD_IN_SECONDS)
+            success = packetTime <= datetime.datetime.now() + datetime.timedelta(0, Constants.TIMESTAMP_THRESHOLD_IN_SECONDS)
         else:
             logger.error("Invalid Certificate or Signature!")
 
@@ -83,38 +71,18 @@ class CryptoEngine:
             logger.debug("Processing request...")
             request = signedRequest[1:4]
             protocol, port = struct.unpack('!?H', request)
-            protocol = KnockProtocolDefinitions.PROTOCOL.getById(protocol)      # Convert to Enum
+            protocol = Constants.PROTOCOL.getById(protocol)      # Convert to Enum
         else:
             logger.error("Timestamp verification failed (Timestamp: %s). Check System time & Threshold - otherwise: possible REPLAY ATTACK", packetTime)
 
         return success, protocol, port
-
-    def encryptWithECIES(self, message, pk):
-        logger.debug("Generating ECC ephermal key...")
-        ephermal = EC.gen_params(EC.NID_X9_62_prime256v1)
-        ephermal.gen_key()
-
-        logger.debug("Deriving AES symmetric key...")
-        ecdhSecret = ephermal.compute_dh_key(pk)
-        aesKey = self.hkdf(ecdhSecret)
-
-        logger.debug("Encrypting with AES...")
-        encrypt = EVP.Cipher(alg='aes_128_cbc', key=aesKey, iv = '\0' * 16, padding=1, op=1)
-        encryptedMessage = encrypt.update(message)
-        encryptedMessage += encrypt.final()
-
-        ephPubKeyBIO = BIO.MemoryBuffer()
-        ephermal.save_pub_key_bio(ephPubKeyBIO)
-        ephPubKey = self.certUtil.convertPEMtoDER(ephPubKeyBIO.read_all())
-
-        return encryptedMessage, ephPubKey
 
 
     def decryptWithECIES(self, encryptedMessage):
         logger.debug("Calculating decryption key...")
         ephPubKey = encryptedMessage[-91:]
         encryptedMessage = encryptedMessage[0:-91]
-        ecdhSecret = self.sk.compute_dh_key(EC.load_pub_key_bio(BIO.MemoryBuffer(self.certUtil.convertDERtoPEM(ephPubKey))))
+        ecdhSecret = self.privateKey.compute_dh_key(EC.load_pub_key_bio(BIO.MemoryBuffer(self.certUtil.convertDERtoPEM(ephPubKey))))
         aesKey = self.hkdf(ecdhSecret)
 
         logger.debug("Decrypting AES encrypted request...")
