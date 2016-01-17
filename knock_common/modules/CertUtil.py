@@ -36,31 +36,39 @@ class CertUtil:
 
     def initializeCryptoEngineForClient(self):
         if(self.platform == PlatformUtils.LINUX):
-            pfx = crypto.load_pkcs12(file(os.path.join(self.config.certdir, 'devclient1.pfx'), 'rb').read(), self.config.pfxPasswd)
+            logger.debug("Loading certificates...")
+            try:
+                pfx = crypto.load_pkcs12(file(os.path.join(self.config.certdir, 'devclient1.pfx'), 'rb').read(), self.config.pfxPasswd)
 
-            self.loadCAFromPFX(pfx)
-            self.clientCert = pfx.get_certificate()
-            self.clientKey = pfx.get_privatekey()
+                self.loadCAFromPFX(pfx)
+                self.clientCert = pfx.get_certificate()
+                self.clientKey = pfx.get_privatekey()
 
-            serverCert = crypto.load_certificate(crypto.FILETYPE_ASN1, file(os.path.join(self.config.certdir, 'devserver.cer'), 'rb').read())
-            serverPubKey = serverCert.get_pubkey()
+                serverCert = crypto.load_certificate(crypto.FILETYPE_ASN1, file(os.path.join(self.config.certdir, 'devserver.cer'), 'rb').read())
+                serverPubKey = serverCert.get_pubkey()
 
-            serializedClientPrivKey = crypto.dump_privatekey(crypto.FILETYPE_PEM, self.clientKey)
-            serializedServerPubKey = crypto.dump_publickey(crypto.FILETYPE_PEM, serverPubKey)
+                serializedClientPrivKey = crypto.dump_privatekey(crypto.FILETYPE_PEM, self.clientKey)
+                serializedServerPubKey = crypto.dump_publickey(crypto.FILETYPE_PEM, serverPubKey)
 
-            return CryptoEngine(serializedClientPrivKey, serializedServerPubKey, certUtil=self)
+                return CryptoEngine(serializedClientPrivKey, serializedServerPubKey, certUtil=self)
+            except:
+                logger.error("Failed to load certificates!")
 
 
     def initializeCryptoEngineForServer(self):
         if(self.platform == PlatformUtils.LINUX):
-            pfx = crypto.load_pkcs12(file(os.path.join(self.config.certdir, 'devserver.pfx'), 'rb').read(), self.config.pfxPasswd)
+            logger.debug("Loading certificates...")
+            try:
+                pfx = crypto.load_pkcs12(file(os.path.join(self.config.certdir, 'devserver.pfx'), 'rb').read(), self.config.pfxPasswd)
 
-            self.loadCAFromPFX(pfx)
-            serverKey = pfx.get_privatekey()
+                self.loadCAFromPFX(pfx)
+                serverKey = pfx.get_privatekey()
 
-            serializedServerPrivKey = crypto.dump_privatekey(crypto.FILETYPE_PEM, serverKey)
+                serializedServerPrivKey = crypto.dump_privatekey(crypto.FILETYPE_PEM, serverKey)
 
-            return CryptoEngine(serializedServerPrivKey, None, certUtil=self)
+                return CryptoEngine(serializedServerPrivKey, None, certUtil=self)
+            except:
+                logger.error("Failed to load certificates!")
 
 
     def signIncludingCertificate(self, message):
@@ -75,7 +83,12 @@ class CertUtil:
 
 
     def verifyCertificateAndSignature(self, rawCert, payloadSignature, payload):
-        cert = crypto.load_certificate(crypto.FILETYPE_ASN1, rawCert)
+        try:
+            cert = crypto.load_certificate(crypto.FILETYPE_ASN1, rawCert)
+        except:
+            logger.error("Invalid Certificate data!")
+            return False
+
         return self.verifyCertificate(cert) and self.verifySignature(cert, payloadSignature, payload)
 
 
@@ -84,9 +97,11 @@ class CertUtil:
             CAContext = crypto.X509StoreContext(self.CA, cert)
             try:
                 CAContext.verify_certificate()
+                logger.debug("Certificate OK!")
                 #TODO: Revocation check
                 return True
             except:
+                logger.debug("Certificate check failed!")
                 return False
 
 
@@ -94,8 +109,10 @@ class CertUtil:
         if(self.platform == PlatformUtils.LINUX):
             try:
                 crypto.verify(cert, signature, message, self.hashAlgorithm)
+                logger.debug("Signature OK!")
                 return True
             except:
+                logger.debug("Invalid Signature!")
                 return False
 
 
