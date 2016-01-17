@@ -16,9 +16,7 @@
 # USA
 #
 
-import logging
-import socket
-from struct import *
+import logging, socket, struct
 
 from PortOpenerThread import PortOpenerThread
 from knock_common.definitions import KnockProtocolDefinitions
@@ -39,7 +37,7 @@ class KnockListener:
             packet, source = self.udpsocket.recvfrom(2048)
             source_ip = source[0]
 
-            ipVersionLengthByte = unpack('!B', packet[0])
+            ipVersionLengthByte = struct.unpack('!B', packet[0])
             ipVersion = ipVersionLengthByte[0] >> 4
             udpHeaderLength = 8;
 
@@ -52,17 +50,29 @@ class KnockListener:
 
             udpHeader = packet[ipHeaderLength:ipHeaderLength + udpHeaderLength]
 
-            lengthByte = unpack('!H', udpHeader[4:6])
+            lengthByte = struct.unpack('!H', udpHeader[4:6])
             payloadLength = lengthByte[0] - udpHeaderLength
 
-            if payloadLength == KnockProtocolDefinitions.KNOCKPACKET_LENGTH:
+            isPossibleKnockPacket = payloadLength >= KnockProtocolDefinitions.KNOCKPACKET_MIN_LENGTH
+
+            if isPossibleKnockPacket:
                 payload = packet[ipHeaderLength + udpHeaderLength : ipHeaderLength + udpHeaderLength + payloadLength]
-                yield ipVersion, source_ip, payload
+
+                knockId = struct.unpack('!c', payload[0])[0]
+                isPossibleKnockPacket = knockId == KnockProtocolDefinitions.KNOCK_ID
+
+            if isPossibleKnockPacket:
+                knockVersion = struct.unpack('!BBB', payload[1:4])
+                isPossibleKnockPacket = knockVersion <= KnockProtocolDefinitions.KNOCK_VERSION
+
+            if isPossibleKnockPacket:
+                yield ipVersion, source_ip, payload[4:]
 
 
     def processIncomingPackets(self):
-        for ipVersion, source, request in self.capturePossibleKnockPackets():
-            success, protocol, port = self.cryptoEngine.decryptAndVerifyRequest(request)
+        for ipVersion, source, encryptedRequest in self.capturePossibleKnockPackets():
+            #TODO: put in extra thread
+            success, protocol, port = self.cryptoEngine.decryptAndVerifyRequest(encryptedRequest)
 
             if success:
                 logger.info('Got request for %s Port: %s from host: %s', protocol, port, source)

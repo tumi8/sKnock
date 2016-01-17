@@ -23,6 +23,8 @@ from hkdf import hkdf_expand, hkdf_extract
 
 from knock_common.definitions import KnockProtocolDefinitions
 
+SIGNATURE_SIZE = 73
+
 class CryptoEngine:
 
     def __init__(self, sk, pk, certUtil):
@@ -32,7 +34,6 @@ class CryptoEngine:
 
 
     def signAndEncryptRequest(self, protocol, port):
-
         timestamp = time.mktime(datetime.datetime.now().timetuple())
         request = struct.pack('!B?HL', 0, protocol, int(port), timestamp)
 
@@ -43,17 +44,20 @@ class CryptoEngine:
 
 
 
-    def decryptAndVerifyRequest(self, payload):
-        signedRequestWithSignature = self.decryptWithECIES(payload)
+    def decryptAndVerifyRequest(self, encryptedMessage):
+        protocol = None
+        port = None
 
+
+        signedRequestWithSignature = self.decryptWithECIES(encryptedMessage)
         zeroBits = struct.unpack('!B',signedRequestWithSignature[0])[0]
         success = zeroBits == 0
 
         if success:
-            signatureLength = struct.unpack('!B',signedRequestWithSignature[-1:])[0]
-            signedRequest = signedRequestWithSignature[0:-(signatureLength+1)]
-            signature = signedRequestWithSignature[-(signatureLength+1):-1]
-            certificate = signedRequestWithSignature[8:-(signatureLength+1)]
+            signatureLength = struct.unpack('!B',signedRequestWithSignature[-73:-72])[0]
+            signedRequest = signedRequestWithSignature[0:-73]
+            signature = signedRequestWithSignature[-signatureLength:]
+            certificate = signedRequestWithSignature[8:-73]
             success = self.certUtil.verifyCertificateAndSignature(certificate, signature, signedRequest)
 
         if success:

@@ -16,16 +16,19 @@
 # USA
 #
 
-import logging, socket, random
+import logging, socket, random, struct
+
+from knock_common.definitions import KnockProtocolDefinitions
+
+PROTOCOL_INFORMATION = struct.pack('!cBBB', KnockProtocolDefinitions.KNOCK_ID, *KnockProtocolDefinitions.KNOCK_VERSION)
+MIN_PORT = 10000
+MAX_PORT = 60000
 
 logger = logging.getLogger(__name__)
 
 class Connection:
 
-    TCP = 'tcp'
-    UDP = 'udp'
-    MIN_PORT = 10000
-    MAX_PORT = 60000
+
 
     def __init__(self, cryptoEngine, timeout, numberOfRetries):
         self.timeout = timeout
@@ -33,7 +36,7 @@ class Connection:
         self.cryptoEngine = cryptoEngine
 
     def knockOnPort(self, targetHost, requestedPort):
-        randomPort = random.randint(Connection.MIN_PORT, Connection.MAX_PORT)
+        randomPort = random.randint(MIN_PORT, MAX_PORT)
 
         for i in range(0, self.numberOfRetries):
             self.sendKnockPacket(targetHost, requestedPort, randomPort)
@@ -53,7 +56,7 @@ class Connection:
         encryptedRequest = self.cryptoEngine.signAndEncryptRequest(protocol, requestedPort)
 
         socketToServer = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        socketToServer.sendto(encryptedRequest, (targetHost, knockPort))
+        socketToServer.sendto(PROTOCOL_INFORMATION + encryptedRequest, (targetHost, knockPort))
 
         logger.info('Knock Packet sent to %s:%s', targetHost, knockPort)
 

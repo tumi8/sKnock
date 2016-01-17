@@ -66,7 +66,10 @@ class CertUtil:
     def signIncludingCertificate(self, message):
         messageWithCert = message + crypto.dump_certificate(crypto.FILETYPE_ASN1, self.clientCert)
         signature = crypto.sign(self.clientKey, messageWithCert, self.hashAlgorithm)
-        signedMessageWithCert = messageWithCert + signature + struct.pack('!B', len(signature))
+
+        padding = ''.join(['x' for diff in xrange(72 - len(signature))])
+
+        signedMessageWithCert = messageWithCert + struct.pack('!B' + padding, len(signature)) + signature
 
         return signedMessageWithCert
 
