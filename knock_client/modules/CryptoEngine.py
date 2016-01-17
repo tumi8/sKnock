@@ -25,7 +25,7 @@ import time
 from M2Crypto import *
 from hkdf import hkdf_expand, hkdf_extract
 
-from knock_server.definitions import Constants
+from knock_client.definitions import Constants
 
 SIGNATURE_SIZE = 73
 

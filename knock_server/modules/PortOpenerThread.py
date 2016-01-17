@@ -20,7 +20,7 @@ import time
 
 from threading import Thread
 
-from knock_common.definitions.Exceptions import *
+from knock_server.definitions.Exceptions import *
 from knock_server.definitions import Constants
 
 

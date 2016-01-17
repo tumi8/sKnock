@@ -16,9 +16,9 @@
 # USA
 #
 import logging, os, struct
-from knock_common.lib.OpenSSL import crypto
-from knock_common.definitions.Exceptions import *
-from knock_common.modules.PlatformUtils import PlatformUtils
+from knock_server.lib.OpenSSL import crypto
+from knock_server.definitions.Exceptions import *
+from knock_server.modules.PlatformUtils import PlatformUtils
 from CryptoEngine import CryptoEngine
 
 PROBABLE_INDEX_FOR_SUBJECTALTNAME = 4

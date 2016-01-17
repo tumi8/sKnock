@@ -16,8 +16,8 @@
 # USA
 #
 import logging, os, struct
-from knock_common.lib.OpenSSL import crypto
-from knock_common.definitions.Exceptions import *
+from knock_client.lib.OpenSSL import crypto
+from knock_client.definitions.Exceptions import *
 from PlatformUtils import PlatformUtils
 from CryptoEngine import CryptoEngine
 

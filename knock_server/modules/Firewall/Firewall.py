@@ -20,8 +20,8 @@ import datetime
 import logging
 
 import LinuxHelpers
-from knock_common.definitions.Exceptions import *
-from knock_common.modules.PlatformUtils import PlatformUtils
+from knock_server.definitions.Exceptions import *
+from knock_server.modules.PlatformUtils import PlatformUtils
 from knock_server.decorators.synchronized import synchronized
 from knock_server.definitions import Constants
 
