@@ -1,1 +1,3 @@
 python-iptables ;sys_platform!='win32'
+m2crypto ;sys_platform!='win32'
+hkdf

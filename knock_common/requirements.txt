@@ -1,2 +1,0 @@
-hkdf
-m2crypto ;sys_platform!='win32'

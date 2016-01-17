@@ -16,12 +16,12 @@
 # USA
 #
 
-import logging, socket, struct
-
-from knock_common.definitions import KnockProtocolDefinitions
+import logging
+import socket
+import struct
 
 from ProcessRequestThread import ProcessRequestThread
-from PortOpenerThread import PortOpenerThread
+from knock_server.definitions import Constants
 
 logger = logging.getLogger(__name__)
 
@@ -43,9 +43,9 @@ class KnockListener:
             ipVersion = ipVersionLengthByte[0] >> 4
             udpHeaderLength = 8;
 
-            if ipVersion == KnockProtocolDefinitions.IP_VERSION.V4:
+            if ipVersion == Constants.IP_VERSION.V4:
                 ipHeaderLength = (ipVersionLengthByte[0] & 0xF) * 4
-            elif ipVersion == KnockProtocolDefinitions.IP_VERSION.V6:
+            elif ipVersion == Constants.IP_VERSION.V6:
                 ipHeaderLength = 40
             else:
                 continue
@@ -55,17 +55,17 @@ class KnockListener:
             lengthByte = struct.unpack('!H', udpHeader[4:6])
             payloadLength = lengthByte[0] - udpHeaderLength
 
-            isPossibleKnockPacket = payloadLength >= KnockProtocolDefinitions.KNOCKPACKET_MIN_LENGTH
+            isPossibleKnockPacket = payloadLength >= Constants.KNOCKPACKET_MIN_LENGTH
 
             if isPossibleKnockPacket:
                 payload = packet[ipHeaderLength + udpHeaderLength : ipHeaderLength + udpHeaderLength + payloadLength]
 
                 knockId = struct.unpack('!c', payload[0])[0]
-                isPossibleKnockPacket = knockId == KnockProtocolDefinitions.KNOCK_ID
+                isPossibleKnockPacket = knockId == Constants.KNOCK_ID
 
             if isPossibleKnockPacket:
                 knockVersion = struct.unpack('!BBB', payload[1:4])
-                isPossibleKnockPacket = knockVersion <= KnockProtocolDefinitions.KNOCK_VERSION
+                isPossibleKnockPacket = knockVersion <= Constants.KNOCK_VERSION
 
             if isPossibleKnockPacket:
                 ProcessRequestThread(self.cryptoEngine, self.firewallHandler, self.runningPortOpenTasks, ipVersion, source_ip, payload[4:]).start()
