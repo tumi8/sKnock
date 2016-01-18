@@ -41,7 +41,7 @@ class Connection:
         for i in range(0, self.numberOfRetries):
             self.sendKnockPacket(targetHost, requestedPort, requestedProtocol, randomPort)
             if self.verifyTargetPortIsOpen(targetHost,requestedPort):
-                LOG.info('Port-knocking successfull. Application Port %s is now open!', requestedPort)
+                LOG.info('Port-knocking successful. Application Port %s is now open!', requestedPort)
                 break
             LOG.info('Port still not open - maybe packet got lost. Retrying...')
         LOG.error('Port-knocking failed. Verify you are authorized to open the requested port and check your configuration!')
