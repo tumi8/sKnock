@@ -1,4 +1,4 @@
-# Copyright (c) 2015 Daniel Sel
+# Copyright (C) 2015-2016 Daniel Sel
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -15,14 +15,14 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
 # USA
 #
-import logging, os, struct
+import logging, sys, os, struct
 from knock_client.lib.OpenSSL import crypto
 from knock_client.definitions.Exceptions import *
 from PlatformUtils import PlatformUtils
 from CryptoEngine import CryptoEngine
 
 
-logger = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 class CertUtil:
 
@@ -38,7 +38,7 @@ class CertUtil:
 
     def initializeCryptoEngine(self):
         if(self.platform == PlatformUtils.LINUX):
-            logger.debug("Loading certificates...")
+            LOG.debug("Loading certificates...")
             try:
                 pfx = crypto.load_pkcs12(file(os.path.join(self.pfxFile), 'rb').read(), self.pfxPasswd)
 
@@ -54,7 +54,8 @@ class CertUtil:
 
                 return CryptoEngine(serializedClientPrivKey, serializedServerPubKey, certUtil=self)
             except:
-                logger.error("Failed to load certificates!")
+                LOG.error("Failed to load certificates!")
+                sys.exit("Failed to load certificates!")
 
     def signIncludingCertificate(self, message):
         messageWithCert = message + crypto.dump_certificate(crypto.FILETYPE_ASN1, self.clientCert)
@@ -70,11 +71,11 @@ class CertUtil:
     def loadCAFromPFX(self, pfx):
         CAcerts = pfx.get_ca_certificates()
         if len(CAcerts) != 1:
-            logger.error("Incompatible Root CA structure!")
+            LOG.error("Incompatible Root CA structure!")
             raise IncompatibleRootCAException
 
         if (CAcerts[0].get_signature_algorithm() != 'ecdsa-with-SHA256'):
-            logger.error("Incompatible Signature Algorithm!")
+            LOG.error("Incompatible Signature Algorithm!")
             raise IncompatibleRootCAException
 
         self.hashAlgorithm = 'sha256'

@@ -16,21 +16,16 @@
 # USA
 #
 
-import platform
+__all__ = [
+    "__author__", "__copyright__", "__email__", "__license__", "__summary__",
+    "__title__", "__uri__", "__version__",
+]
 
-class PlatformUtils:
-    UNDEFINED = 0
-    WINDOWS = 1
-    LINUX = 2
+__version__ = "0.0.1"
 
-    @staticmethod
-    def detectPlatform():
-        platformString = platform.system();
-        if(platformString == "Windows"):
-            return PlatformUtils.WINDOWS
-        elif (platformString == "Linux"):
-            return PlatformUtils.LINUX
-        else:
-            return PlatformUtils.UNDEFINED
-
-
+__title__ = "KNOCK Client"
+__uri__ = "https://github.com/DanielSel/knock"
+__summary__ = "Client Library for the secure authenticated scalable port-knocking implementation \"KNOCK\""
+__author__ = "Daniel Sel"
+__license__ = "GNU General Public License"
+__copyright__ = "Copyright 2015-2016 {0}".format(__author__)

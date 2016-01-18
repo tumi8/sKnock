@@ -22,15 +22,14 @@ USA
 
 """
 
-import os, sys, getopt, logging
+import logging, os, getopt, sys
 
 from struct import *
 
-from modules.CertUtil import CertUtil
-from modules.Connection import Connection
+from modules.ClientInterface import ClientInterface
 
 def usage():
-    print "Usage: knockknock.py -p <portToOpen> <host>"
+    print "Usage: knock-client.py -p <portToOpen> <host>"
     sys.exit(2)
 
 def parseArguments(argv):
@@ -68,19 +67,12 @@ def verifyPermissions():
 def main(argv):
 
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
+    LOG = logging.getLogger(__name__)
 
     (port, host) = parseArguments(argv)
 
-
-    logger = logging.getLogger(__name__)
-
-    certUtil = CertUtil(os.path.join(os.path.dirname(__file__), 'devserver.cer'), os.path.join(os.path.dirname(__file__), 'devclient1.pfx'), pfxPasswd='portknocking')
-    cryptoEngine = certUtil.initializeCryptoEngine()
-
-
-    logger.debug('Knocking %s on port %s', host, port)
-    connectionHandler = Connection(cryptoEngine, 10, 3)
-    connectionHandler.knockOnPort(host, port)
+    knockClient = ClientInterface()
+    knockClient.knockOnPort(host, port)
 
 
     sys.exit(0)

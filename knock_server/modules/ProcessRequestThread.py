@@ -1,4 +1,4 @@
-# Copyright (c) 2015 Daniel Sel
+# Copyright (C) 2015-2016 Daniel Sel
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -22,7 +22,7 @@ from threading import Thread
 from PortOpenerThread import PortOpenerThread
 
 
-logger = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 class ProcessRequestThread(Thread):
 
@@ -40,9 +40,9 @@ class ProcessRequestThread(Thread):
         success, protocol, port = self.cryptoEngine.decryptAndVerifyRequest(self.request)
 
         if success:
-            logger.info('Got request for %s Port: %s from host: %s', protocol, port, self.addr)
+            LOG.info('Got request for %s Port: %s from host: %s', protocol, port, self.addr)
             if not hash(str(port) + str(self.ipVersion) + protocol + self.addr) in self.runningPortOpenTasks:
                 PortOpenerThread(self.runningPortOpenTasks, self.firewallHandler, self.ipVersion, protocol, port, self.addr).start()
             else:
-                logger.info('There is already a Port-open process running for %s Port: %s for host: %s!',
+                LOG.info('There is already a Port-open process running for %s Port: %s for host: %s!',
                             protocol, port, self.addr)

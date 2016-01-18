@@ -1,4 +1,4 @@
-# Copyright (c) 2015 Daniel Sel
+# Copyright (C) 2015-2016 Daniel Sel
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -25,7 +25,7 @@ from knock_server.modules.PlatformUtils import PlatformUtils
 from knock_server.decorators.synchronized import synchronized
 from knock_server.definitions import Constants
 
-logger = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 class Firewall:
 
@@ -61,7 +61,7 @@ class Firewall:
 
         openPort = hash(str(port) + str(ipVersion) + protocol + addr)
         if openPort in self.openPortsList:
-            logger.info('%s Port: %s for host: %s is already open!', protocol, port, addr)
+            LOG.info('%s Port: %s for host: %s is already open!', protocol, port, addr)
             raise PortAlreadyOpenException
 
         if(self.platform == PlatformUtils.LINUX):
@@ -72,7 +72,7 @@ class Firewall:
             chain.append_rule(rule)
 
         self.openPortsList.append(openPort)
-        logger.info('%s Port: %s opened for host: %s from: %s until: %s',
+        LOG.info('%s Port: %s opened for host: %s from: %s until: %s',
                     protocol, port, addr,
                     datetime.datetime.now(),
                     datetime.datetime.now() +
@@ -89,4 +89,4 @@ class Firewall:
             chain.delete_rule(rule)
 
         self.openPortsList.remove(hash(str(port) + str(ipVersion) + protocol + addr))
-        logger.info('%s Port: %s closed for host: %s at: %s', protocol, port, addr, datetime.datetime.now())
+        LOG.info('%s Port: %s closed for host: %s at: %s', protocol, port, addr, datetime.datetime.now())

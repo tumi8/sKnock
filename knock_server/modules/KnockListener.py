@@ -1,4 +1,4 @@
-# Copyright (c) 2015 Daniel Sel
+# Copyright (C) 2015-2016 Daniel Sel
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -23,7 +23,7 @@ import struct
 from ProcessRequestThread import ProcessRequestThread
 from knock_server.definitions import Constants
 
-logger = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 class KnockListener:
 
@@ -32,7 +32,7 @@ class KnockListener:
         self.firewallHandler = firewallHandler
         self.runningPortOpenTasks = list()
         self.udpsocket = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_UDP)
-        logger.debug("Socket initialized")
+        LOG.debug("Socket initialized")
 
     def processPossibleKnockPackets(self):
         while True:

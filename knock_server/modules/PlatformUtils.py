@@ -1,4 +1,4 @@
-# Copyright (c) 2015 Daniel Sel
+# Copyright (C) 2015-2016 Daniel Sel
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as

@@ -1,4 +1,4 @@
-# Copyright (c) 2015 Daniel Sel
+# Copyright (C) 2015-2016 Daniel Sel
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -18,13 +18,13 @@
 
 import logging, random, socket, struct
 
-from knock_client.definitions import Constants
+from knock_client.definitions.Constants import *
 
-PROTOCOL_INFORMATION = struct.pack('!cBBB', Constants.KNOCK_ID, *Constants.KNOCK_VERSION)
+PROTOCOL_INFORMATION = struct.pack('!cBBB', KNOCK_ID, *KNOCK_VERSION)
 MIN_PORT = 10000
 MAX_PORT = 60000
 
-logger = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 class Connection:
 
@@ -35,30 +35,27 @@ class Connection:
         self.numberOfRetries = numberOfRetries
         self.cryptoEngine = cryptoEngine
 
-    def knockOnPort(self, targetHost, requestedPort):
+    def knockOnPort(self, targetHost, requestedPort, requestedProtocol):
         randomPort = random.randint(MIN_PORT, MAX_PORT)
 
         for i in range(0, self.numberOfRetries):
-            self.sendKnockPacket(targetHost, requestedPort, randomPort)
+            self.sendKnockPacket(targetHost, requestedPort, requestedProtocol, randomPort)
             if self.verifyTargetPortIsOpen(targetHost,requestedPort):
-                logger.info('Port-knocking successfull. Application Port %s is now open!', requestedPort)
+                LOG.info('Port-knocking successfull. Application Port %s is now open!', requestedPort)
                 break
-            logger.info('Port still not open - maybe packet got lost. Retrying...')
-        logger.error('Port-knocking failed. Verify you are authorized to open the requested port and check your configuration!')
+            LOG.info('Port still not open - maybe packet got lost. Retrying...')
+        LOG.error('Port-knocking failed. Verify you are authorized to open the requested port and check your configuration!')
 
 
-    def sendKnockPacket(self, targetHost, requestedPort, knockPort):
+    def sendKnockPacket(self, targetHost, requestedPort, requestedProtocol, knockPort):
 
-        logger.debug('Knock Target Port: %s, Requested Application Port: %s', knockPort, requestedPort)
-
-        # TODO: implement protocol
-        protocol = 1    # 1 = TCP, 0 = UDP
-        encryptedRequest = self.cryptoEngine.signAndEncryptRequest(protocol, requestedPort)
+        LOG.debug('Knock Target Port: %s, Requested Application Port: %s', requestedProtocol, requestedPort)
+        encryptedRequest = self.cryptoEngine.signAndEncryptRequest(PROTOCOL.getId(requestedProtocol), requestedPort)
 
         socketToServer = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         socketToServer.sendto(PROTOCOL_INFORMATION + encryptedRequest, (targetHost, knockPort))
 
-        logger.info('Knock Packet sent to %s:%s', targetHost, knockPort)
+        LOG.info('Knock Packet sent to %s:%s', targetHost, knockPort)
 
 
     def verifyTargetPortIsOpen(self, targetHost ,requestedPort):

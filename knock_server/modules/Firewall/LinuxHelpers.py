@@ -1,4 +1,4 @@
-# Copyright (c) 2015 Daniel Sel
+# Copyright (C) 2015-2016 Daniel Sel
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -23,7 +23,7 @@ import iptc
 
 from knock_server.definitions import Constants
 
-logger = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 IPTABLES_CHAIN_KNOCK = 'knock'
 IPTABLES_CHAIN_INPUT = 'INPUT'
@@ -35,7 +35,7 @@ def getIPTablesRuleForClient(port, ipVersion, protocol, addr):
         rule.src = addr
         rule.protocol = protocol
         rule.create_match(protocol).dport = str(port)
-        logger.debug("Created Rule For IPv%s Request: PORT=%s, HOST=%s PROTOCOL=%s", ipVersion, port, addr, protocol)
+        LOG.debug("Created Rule For IPv%s Request: PORT=%s, HOST=%s PROTOCOL=%s", ipVersion, port, addr, protocol)
 
     elif ipVersion == Constants.IP_VERSION.V6 and iptc.is_table_available(iptc.Table6.FILTER):
         rule = iptc.Rule6()
@@ -43,10 +43,10 @@ def getIPTablesRuleForClient(port, ipVersion, protocol, addr):
         rule.src = addr
         rule.protocol = protocol
         rule.create_match(protocol).dport = str(port)
-        logger.debug("Created Rule For IPv%s Request: PORT=%s, HOST=%s PROTOCOL=%s", ipVersion, port, addr, protocol)
+        LOG.debug("Created Rule For IPv%s Request: PORT=%s, HOST=%s PROTOCOL=%s", ipVersion, port, addr, protocol)
 
     else:
-        logger.error("Could not construct Rule For IPv%s Request: PORT=%s, HOST=%s PROTOCOL=%s", ipVersion, port, addr, protocol)
+        LOG.error("Could not construct Rule For IPv%s Request: PORT=%s, HOST=%s PROTOCOL=%s", ipVersion, port, addr, protocol)
 
     return rule
 
@@ -56,7 +56,7 @@ def getIPTablesChainForVersion(ipVersion, chain):
     elif ipVersion == Constants.IP_VERSION.V6 and iptc.is_table_available(iptc.Table6.FILTER):
         chain = iptc.Chain(iptc.Table6(iptc.Table6.FILTER), chain)
     else:
-        logger.error("Could not find chain \'%s\' for IPv%s IPTables", chain, ipVersion)
+        LOG.error("Could not find chain \'%s\' for IPv%s IPTables", chain, ipVersion)
 
     return chain
 
@@ -86,7 +86,7 @@ def setupIPTabkesPortKnockingChainAndRedirectTraffic():
         deleteIPTablesRuleIgnoringError(establishedRuleV4, inputChainV4)
         inputChainV4.insert_rule(establishedRuleV4)
 
-        logger.debug("Setup Port-knocking IPTables Configuration for IPv4")
+        LOG.debug("Setup Port-knocking IPTables Configuration for IPv4")
 
     if iptc.is_table_available(iptc.Table6.FILTER):
         tableV6 = iptc.Table6(iptc.Table6.FILTER)
@@ -111,7 +111,7 @@ def setupIPTabkesPortKnockingChainAndRedirectTraffic():
         deleteIPTablesRuleIgnoringError(establishedRuleV6, inputChainV6)
         inputChainV6.insert_rule(establishedRuleV6)
 
-        logger.debug("Setup Port-knocking IPTables Configuration for IPv6")
+        LOG.debug("Setup Port-knocking IPTables Configuration for IPv6")
 
 
 
@@ -126,7 +126,7 @@ def insertEmergencySSHAccessRule():
         deleteIPTablesRuleIgnoringError(ruleV4, chainV4)
         chainV4.insert_rule(ruleV4)
 
-        logger.debug("Inserted Emergency SSH Access Rule for IPv4")
+        LOG.debug("Inserted Emergency SSH Access Rule for IPv4")
 
     if iptc.is_table_available(iptc.Table6.FILTER):
         ruleV6 = iptc.Rule6()
@@ -138,30 +138,30 @@ def insertEmergencySSHAccessRule():
         deleteIPTablesRuleIgnoringError(ruleV6, chainV6)
         chainV6.insert_rule(ruleV6)
 
-        logger.debug("Inserted Emergency SSH Access Rule for IPv6")
+        LOG.debug("Inserted Emergency SSH Access Rule for IPv6")
 
 
 
 def backupIPTablesState():
     if iptc.is_table_available(iptc.Table.FILTER):
         subprocess.call('iptables-save > /tmp/iptables.bak', shell=True)
-        logger.debug("Backed up current IPTables Rules to /tmp/iptables.bak")
+        LOG.debug("Backed up current IPTables Rules to /tmp/iptables.bak")
     if iptc.is_table_available(iptc.Table6.FILTER):
         subprocess.call('ip6tables-save > /tmp/ip6tables.bak', shell=True)
-        logger.debug("Backed up current IPTables Rules to /tmp/ip6tables.bak")
+        LOG.debug("Backed up current IPTables Rules to /tmp/ip6tables.bak")
 
 
 def restoreIPTablesState():
     if iptc.is_table_available(iptc.Table.FILTER):
         subprocess.call('iptables-restore < /tmp/iptables.bak', shell=True)
-        logger.debug("Restored IPTables Rules from /tmp/iptables.bak")
+        LOG.debug("Restored IPTables Rules from /tmp/iptables.bak")
         subprocess.call('rm /tmp/iptables.bak', shell=True)
-        logger.debug("Cleaned up backup file /tmp/iptables.bak")
+        LOG.debug("Cleaned up backup file /tmp/iptables.bak")
     if iptc.is_table_available(iptc.Table6.FILTER):
         subprocess.call('ip6tables-restore < /tmp/ip6tables.bak', shell=True)
-        logger.debug("Restored IPTables Rules from /tmp/ip6tables.bak")
+        LOG.debug("Restored IPTables Rules from /tmp/ip6tables.bak")
         subprocess.call('rm /tmp/iptables.bak', shell=True)
-        logger.debug("Cleaned up backup file /tmp/ip6tables.bak")
+        LOG.debug("Cleaned up backup file /tmp/ip6tables.bak")
 
 def deleteIPTablesRuleIgnoringError(rule, chain):
     try:

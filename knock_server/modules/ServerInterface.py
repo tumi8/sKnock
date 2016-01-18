@@ -16,21 +16,11 @@
 # USA
 #
 
-import platform
+import logging
 
-class PlatformUtils:
-    UNDEFINED = 0
-    WINDOWS = 1
-    LINUX = 2
+LOG = logging.getLogger(__name__)
 
-    @staticmethod
-    def detectPlatform():
-        platformString = platform.system();
-        if(platformString == "Windows"):
-            return PlatformUtils.WINDOWS
-        elif (platformString == "Linux"):
-            return PlatformUtils.LINUX
-        else:
-            return PlatformUtils.UNDEFINED
+class ClientInterface:
 
-
+    def __init__(self):
+        pass

@@ -1,4 +1,4 @@
-# Copyright (c) 2015 Daniel Sel
+# Copyright (C) 2015-2016 Daniel Sel
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -29,7 +29,7 @@ from knock_client.definitions import Constants
 
 SIGNATURE_SIZE = 73
 
-logger = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 class CryptoEngine:
 
@@ -40,11 +40,11 @@ class CryptoEngine:
 
 
     def signAndEncryptRequest(self, protocol, port):
-        logger.debug("Signing and encrypting request...")
+        LOG.debug("Signing and encrypting request...")
         packetTime = datetime.datetime.now()
         timestamp = time.mktime(packetTime.timetuple())
         request = struct.pack('!B?HL', 0, protocol, int(port), timestamp)
-        logger.debug("Added timestamp: %s", packetTime)
+        LOG.debug("Added timestamp: %s", packetTime)
 
         signedMessage = self.certUtil.signIncludingCertificate(request)
         signedAndEncryptedMessage, ephPubKey = self.encryptWithECIES(signedMessage, self.serverPublicKey)
@@ -52,15 +52,15 @@ class CryptoEngine:
         return signedAndEncryptedMessage
 
     def encryptWithECIES(self, message, pk):
-        logger.debug("Generating ECC ephermal key...")
+        LOG.debug("Generating ECC ephermal key...")
         ephermal = EC.gen_params(EC.NID_X9_62_prime256v1)
         ephermal.gen_key()
 
-        logger.debug("Deriving AES symmetric key...")
+        LOG.debug("Deriving AES symmetric key...")
         ecdhSecret = ephermal.compute_dh_key(pk)
         aesKey = self.hkdf(ecdhSecret)
 
-        logger.debug("Encrypting with AES...")
+        LOG.debug("Encrypting with AES...")
         encrypt = EVP.Cipher(alg='aes_128_cbc', key=aesKey, iv = '\0' * 16, padding=1, op=1)
         encryptedMessage = encrypt.update(message)
         encryptedMessage += encrypt.final()
