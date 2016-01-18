@@ -15,11 +15,14 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
 # USA
 #
-import logging, sys, os, struct
-from knock_server.lib.OpenSSL import crypto
-from knock_server.definitions.Exceptions import *
-from knock_server.modules.PlatformUtils import PlatformUtils
+import logging
+import struct
+import sys
+
 from CryptoEngine import CryptoEngine
+from knock_server.definitions.Exceptions import *
+from knock_server.lib.OpenSSL import crypto
+from knock_server.modules.Platform.PlatformUtils import PlatformUtils
 
 PROBABLE_INDEX_FOR_SUBJECTALTNAME = 4
 

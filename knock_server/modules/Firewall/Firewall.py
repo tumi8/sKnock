@@ -18,12 +18,17 @@
 
 import datetime
 import logging
+import random
+import string
+import sys
+from multiprocessing import Process, Pipe
 
 import LinuxHelpers
-from knock_server.definitions.Exceptions import *
-from knock_server.modules.PlatformUtils import PlatformUtils
+import LinuxServiceWrapper
 from knock_server.decorators.synchronized import synchronized
 from knock_server.definitions import Constants
+from knock_server.definitions.Exceptions import *
+from knock_server.modules.Platform.PlatformUtils import PlatformUtils
 
 LOG = logging.getLogger(__name__)
 
@@ -33,9 +38,13 @@ class Firewall:
         self.platform = PlatformUtils.detectPlatform()
 
         if(self.platform == PlatformUtils.LINUX):
-            LinuxHelpers.backupIPTablesState()
+            self.linuxFirewallServicePipe, remotePipeEnd = Pipe()
+            self.linuxFirewallService = Process(target=LinuxServiceWrapper.processFirewallCommands, args=((remotePipeEnd),))
+            self.linuxFirewallService.daemon = True
+            self.linuxFirewallService.start()
+            self._executeTask(["startService"])
 
-        self.setupDefaultFirewallState()
+        self._setupDefaultFirewallState()
         self.openPortsList = list()
 
     def __enter__(self):
@@ -43,17 +52,19 @@ class Firewall:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if(self.platform == PlatformUtils.LINUX):
-            LinuxHelpers.restoreIPTablesState()
+            self.linuxFirewallServicePipe.send(["stopService"])
+            self.linuxFirewallServicePipe.close()
+            self.linuxFirewallService.join()
 
-    def setupEmergencyAccessFirewallRules(self):
+    def _setupEmergencyAccessFirewallRules(self):
         if(self.platform == PlatformUtils.LINUX):
             LinuxHelpers.insertEmergencySSHAccessRule()
 
-    def setupDefaultFirewallState(self):
+    def _setupDefaultFirewallState(self):
         if(self.platform == PlatformUtils.LINUX):
-            LinuxHelpers.setupIPTabkesPortKnockingChainAndRedirectTraffic()
+            LinuxHelpers.setupIPTablesPortKnockingChainAndRedirectTraffic()
 
-        self.setupEmergencyAccessFirewallRules()
+        self._setupEmergencyAccessFirewallRules()
 
 
     @synchronized
@@ -65,11 +76,7 @@ class Firewall:
             raise PortAlreadyOpenException
 
         if(self.platform == PlatformUtils.LINUX):
-            chain = LinuxHelpers.getIPTablesChainForVersion(ipVersion, LinuxHelpers.IPTABLES_CHAIN_KNOCK)
-            rule = LinuxHelpers.getIPTablesRuleForClient(port, ipVersion, protocol, addr)
-
-            LinuxHelpers.deleteIPTablesRuleIgnoringError(rule, chain)
-            chain.append_rule(rule)
+            self.linuxFirewallServicePipe.send(['openPort', port, ipVersion, protocol, addr])
 
         self.openPortsList.append(openPort)
         LOG.info('%s Port: %s opened for host: %s from: %s until: %s',
@@ -83,10 +90,28 @@ class Firewall:
     @synchronized
     def closePortForClient(self, port, ipVersion, protocol, addr):
         if(self.platform == PlatformUtils.LINUX):
-            chain = LinuxHelpers.getIPTablesChainForVersion(ipVersion, LinuxHelpers.IPTABLES_CHAIN_KNOCK)
-            rule = LinuxHelpers.getIPTablesRuleForClient(port, ipVersion, protocol, addr)
-
-            chain.delete_rule(rule)
+            self.linuxFirewallServicePipe.send(['closePort', port, ipVersion, protocol, addr])
 
         self.openPortsList.remove(hash(str(port) + str(ipVersion) + protocol + addr))
         LOG.info('%s Port: %s closed for host: %s at: %s', protocol, port, addr, datetime.datetime.now())
+
+
+    @synchronized
+    def _executeTask(self, msg):
+        taskId = Firewall._generateRandomTaskId()
+        taskMsg = [taskId]
+        taskMsg.extend(msg)
+
+        self.linuxFirewallServicePipe.send(taskMsg)
+        if self.linuxFirewallServicePipe.recv() != taskId:
+            Firewall._crashRaceCondition()
+
+
+    @staticmethod
+    def _generateRandomTaskId():
+        return ''.join([random.choice(string.ascii_letters + string.digits) for n in xrange(32)])
+
+    @staticmethod
+    def _crashRaceCondition():
+        LOG.error("Tasks executed in wrong order - possible race condition or vulnerability!")
+        sys.exit("Tasks executed in wrong order - possible race condition or vulnerability!")

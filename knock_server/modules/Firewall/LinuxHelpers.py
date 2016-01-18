@@ -16,8 +16,7 @@
 # USA
 #
 
-import logging
-import subprocess
+import logging, subprocess
 
 import iptc
 
@@ -62,7 +61,7 @@ def getIPTablesChainForVersion(ipVersion, chain):
 
 
 # TODO: Set Policy to DROP
-def setupIPTabkesPortKnockingChainAndRedirectTraffic():
+def setupIPTablesPortKnockingChainAndRedirectTraffic():
     if iptc.is_table_available(iptc.Table.FILTER):
         tableV4 = iptc.Table(iptc.Table.FILTER)
         try:
