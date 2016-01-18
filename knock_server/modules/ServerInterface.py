@@ -16,11 +16,24 @@
 # USA
 #
 
-import logging
+import logging, os, sys
+
+from CertUtil import CertUtil
+from Firewall.Firewall import Firewall
+from KnockListener import KnockListener
 
 LOG = logging.getLogger(__name__)
 
-class ClientInterface:
+class ServerInterface:
 
-    def __init__(self):
-        pass
+    def __init__(self,
+                 serverPFXFile=os.path.join(os.path.dirname(__file__), os.pardir, 'devserver.pfx'),
+                 PFXPasswd='portknocking'):
+
+        self.cryptoEngine = CertUtil(serverPFXFile, PFXPasswd).initializeCryptoEngine()
+
+    def runKnockDaemon(self):
+        with Firewall() as firewallHandler:
+            knockListener = KnockListener(self.cryptoEngine, firewallHandler)
+            # knock_server.lib.daemonize.createDaemon()
+            knockListener.processPossibleKnockPackets()

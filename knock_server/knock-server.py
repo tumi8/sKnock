@@ -24,19 +24,14 @@ USA
 
 import os, sys, pwd, grp, logging
 
-import lib.daemonize
-
-from modules.CertUtil import CertUtil
-
-from modules.Firewall.Firewall import Firewall
-from modules.KnockListener import KnockListener
+from modules.ServerInterface import ServerInterface
 
 
 
 def checkPrivileges():
     if (not os.geteuid() == 0):
          print "Sorry, you have to run knock-server as root."
-   #     sys.exit(3)
+         sys.exit(3)
 
 def dropPrivileges():
     nobody = pwd.getpwnam('nobody')
@@ -48,17 +43,10 @@ def dropPrivileges():
 
 def main(argv):
     checkPrivileges()
-
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
 
-    certUtil = CertUtil(os.path.join(os.path.dirname(__file__), 'devserver.pfx') , pfxPasswd='portknocking')
-    cryptoEngine = certUtil.initializeCryptoEngine()
-    with Firewall() as firewallHandler:
-        knockListener = KnockListener(cryptoEngine, firewallHandler)
-
-        # knockknock.daemonize.createDaemon()
-
-        knockListener.processPossibleKnockPackets()
+    knockServer = ServerInterface()
+    knockServer.runKnockDaemon()
                 
 if __name__ == '__main__':
     main(sys.argv[1:])
