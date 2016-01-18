@@ -67,7 +67,6 @@ def verifyPermissions():
 def main(argv):
 
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
-    LOG = logging.getLogger(__name__)
 
     (port, host) = parseArguments(argv)
 
