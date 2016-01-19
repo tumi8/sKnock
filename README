@@ -1,2 +1,14 @@
+### Client
 Dependencies:
-* iptc
+* hkdf
+* Linux: m2crypto
+
+A requirements.txt for `pip` is proviced for convenience.
+
+### Server
+Dependencies:
+* hkdf
+* Linux: m2crypto
+* Linux: iptc
+
+A requirements.txt for `pip` is proviced for convenience.
