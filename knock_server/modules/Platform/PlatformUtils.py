@@ -18,19 +18,17 @@
 
 import platform
 
-class PlatformUtils:
-    UNDEFINED = 0
-    WINDOWS = 1
-    LINUX = 2
+UNDEFINED = 0
+WINDOWS = 1
+LINUX = 2
 
-    @staticmethod
-    def detectPlatform():
-        platformString = platform.system();
-        if(platformString == "Windows"):
-            return PlatformUtils.WINDOWS
-        elif (platformString == "Linux"):
-            return PlatformUtils.LINUX
-        else:
-            return PlatformUtils.UNDEFINED
+def detectPlatform():
+    platformString = platform.system();
+    if(platformString == "Windows"):
+        return WINDOWS
+    elif (platformString == "Linux"):
+        return LINUX
+    else:
+        return UNDEFINED
 
 

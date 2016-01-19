@@ -1,7 +1,7 @@
 KNOCK_ID='a'
 KNOCK_VERSION=(0,0,1)
 
-KNOCKPACKET_MIN_LENGTH = 827
+KNOCKPACKET_MIN_LENGTH = 800
 PORT_OPEN_DURATION_IN_SECONDS = 15
 TIMESTAMP_THRESHOLD_IN_SECONDS = 7
 
@@ -17,3 +17,7 @@ class PROTOCOL:
     @staticmethod
     def getById(id):
         return PROTOCOL.TCP if id else PROTOCOL.UDP
+
+    @staticmethod
+    def getId(protocol):
+        return 1 if PROTOCOL.TCP == protocol else 0

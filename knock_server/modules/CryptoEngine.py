@@ -24,7 +24,9 @@ import struct
 from M2Crypto import *
 from hkdf import hkdf_expand, hkdf_extract
 
-from knock_server.definitions import Constants
+from knock_server.definitions.Constants import *
+
+import Utils
 
 SIGNATURE_SIZE = 73
 
@@ -62,7 +64,7 @@ class CryptoEngine:
             LOG.debug("Checking Timestamp of Request...")
             timestamp = struct.unpack('!L', signedRequest[4:8])[0]
             packetTime = datetime.datetime.fromtimestamp(timestamp)
-            success = packetTime <= datetime.datetime.now() + datetime.timedelta(0, Constants.TIMESTAMP_THRESHOLD_IN_SECONDS)
+            success = packetTime <= datetime.datetime.now() + datetime.timedelta(0, TIMESTAMP_THRESHOLD_IN_SECONDS)
         else:
             LOG.error("Invalid Certificate or Signature!")
 
@@ -71,9 +73,16 @@ class CryptoEngine:
             LOG.debug("Processing request...")
             request = signedRequest[1:4]
             protocol, port = struct.unpack('!?H', request)
-            protocol = Constants.PROTOCOL.getById(protocol)      # Convert to Enum
+            protocol = PROTOCOL.getById(protocol)      # Convert to Enum
+            LOG.debug("Checking if user is authorized to open requested port...")
+            success, certFingerprint = Utils.checkIfRequestIsAuthorized([PROTOCOL.getId(protocol), port], certificate)
         else:
             LOG.error("Timestamp verification failed (Timestamp: %s). Check System time & Threshold - otherwise: possible REPLAY ATTACK", packetTime)
+
+        if success:
+            LOG.debug("Authorization OK!")
+        else:
+            LOG.warning("Unauthorized Request for %s Port: %s from User with Certificate Fingerprint: %s", protocol, port, certFingerprint)
 
         return success, protocol, port
 

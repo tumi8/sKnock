@@ -18,11 +18,13 @@
 import logging
 import struct
 import sys
+import base64
 
 from CryptoEngine import CryptoEngine
 from knock_server.definitions.Exceptions import *
+from knock_server.definitions.Constants import *
 from knock_server.lib.OpenSSL import crypto
-from knock_server.modules.Platform.PlatformUtils import PlatformUtils
+from knock_server.modules.Platform import PlatformUtils
 
 PROBABLE_INDEX_FOR_SUBJECTALTNAME = 4
 
@@ -98,7 +100,12 @@ class CertUtil:
 
 
 
-    def extractEncryptedAuthorizationStringFromCertificate(self, cert):
+    def extractAuthorizationStringFromCertificate(self, rawCert):
+        try:
+            cert = crypto.load_certificate(crypto.FILETYPE_ASN1, rawCert)
+        except:
+            LOG.error("Invalid Certificate data!")
+            return None
 
         try:
             extension = cert.get_extension(CertUtil.PROBABLE_INDEX_FOR_SUBJECTALTNAME)
@@ -110,7 +117,7 @@ class CertUtil:
                 if extension.get_short_name() == 'subjectAltName':
                     break
 
-        return None if extension == None else extension.get_data()
+        return None if extension == None else extension.get_data(), cert.get_serial_number()
 
 
     def loadCAFromPFX(self, pfx):
@@ -135,3 +142,4 @@ class CertUtil:
 
     def convertPEMtoDER(self, key):
         return crypto.dump_publickey(crypto.FILETYPE_ASN1, crypto.load_publickey(crypto.FILETYPE_PEM, key))
+

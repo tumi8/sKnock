@@ -28,7 +28,7 @@ import LinuxServiceWrapper
 from knock_server.decorators.synchronized import synchronized
 from knock_server.definitions import Constants
 from knock_server.definitions.Exceptions import *
-from knock_server.modules.Platform.PlatformUtils import PlatformUtils
+from knock_server.modules.Platform import PlatformUtils
 
 LOG = logging.getLogger(__name__)
 
