@@ -60,7 +60,7 @@ def getIPTablesChainForVersion(ipVersion, chain):
     return chain
 
 
-# TODO: Set Policy to DROP
+# TODO: Configuration: REJECT or DROP
 def setupIPTablesPortKnockingChainAndRedirectTraffic():
     if iptc.is_table_available(iptc.Table.FILTER):
         tableV4 = iptc.Table(iptc.Table.FILTER)
@@ -74,16 +74,19 @@ def setupIPTablesPortKnockingChainAndRedirectTraffic():
 
         redirectRuleV4 = iptc.Rule()
         redirectRuleV4.target = iptc.Target(redirectRuleV4, IPTABLES_CHAIN_KNOCK)
-
         deleteIPTablesRuleIgnoringError(redirectRuleV4, inputChainV4)
         inputChainV4.insert_rule(redirectRuleV4)
 
         establishedRuleV4 = iptc.Rule()
         establishedRuleV4.create_match('state').state = "RELATED,ESTABLISHED"
         establishedRuleV4.target = iptc.Target(establishedRuleV4, 'ACCEPT')
-
         deleteIPTablesRuleIgnoringError(establishedRuleV4, inputChainV4)
         inputChainV4.insert_rule(establishedRuleV4)
+
+        rejectRuleV4=iptc.Rule()
+        rejectRuleV4.target = rejectRuleV4.create_target('REJECT')
+        deleteIPTablesRuleIgnoringError(rejectRuleV4, inputChainV4)
+        inputChainV4.append_rule(rejectRuleV4)
 
         LOG.debug("Setup Port-knocking IPTables Configuration for IPv4")
 
@@ -99,16 +102,19 @@ def setupIPTablesPortKnockingChainAndRedirectTraffic():
 
         redirectRuleV6 = iptc.Rule6()
         redirectRuleV6.target = iptc.Target(redirectRuleV6, IPTABLES_CHAIN_KNOCK)
-
         deleteIPTablesRuleIgnoringError(redirectRuleV6, inputChainV6)
         inputChainV6.insert_rule(redirectRuleV6)
 
         establishedRuleV6 = iptc.Rule6()
         establishedRuleV6.create_match('state').state = "RELATED,ESTABLISHED"
         establishedRuleV6.target = iptc.Target(establishedRuleV6, 'ACCEPT')
-
         deleteIPTablesRuleIgnoringError(establishedRuleV6, inputChainV6)
         inputChainV6.insert_rule(establishedRuleV6)
+
+        rejectRuleV6=iptc.Rule6()
+        rejectRuleV6.target = rejectRuleV6.create_target('REJECT')
+        deleteIPTablesRuleIgnoringError(rejectRuleV6, inputChainV6)
+        inputChainV6.append_rule(rejectRuleV6)
 
         LOG.debug("Setup Port-knocking IPTables Configuration for IPv6")
 
