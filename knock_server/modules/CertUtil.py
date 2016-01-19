@@ -137,6 +137,7 @@ class CertUtil:
 
         LOG.debug("Checking for new CRL on CA Server...")
         try:
+            # TODO: get this from Certificate + CRL-specific cache
             remoteCRL = urllib2.urlopen("http://home.in.tum.de/~sel/BA/CA/devca.crl")
         except:
             LOG.warning("CA Server seems to be offline")
