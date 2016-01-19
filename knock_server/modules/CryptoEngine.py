@@ -58,6 +58,7 @@ class CryptoEngine:
             success = self.certUtil.verifyCertificateAndSignature(certificate, signature, signedRequest)
         else:
             LOG.error("Unable to decrypt Request. Invalid Format?")
+            return success, None, None
 
         if success:
             LOG.debug("Certificate & signature OK!")
@@ -67,6 +68,7 @@ class CryptoEngine:
             success = packetTime <= datetime.datetime.now() + datetime.timedelta(0, TIMESTAMP_THRESHOLD_IN_SECONDS)
         else:
             LOG.error("Invalid Certificate or Signature!")
+            return success, None, None
 
         if success:
             LOG.debug("Timestamp OK!")
@@ -78,11 +80,13 @@ class CryptoEngine:
             success, certFingerprint = Utils.checkIfRequestIsAuthorized([PROTOCOL.getId(protocol), port], certificate)
         else:
             LOG.error("Timestamp verification failed (Timestamp: %s). Check System time & Threshold - otherwise: possible REPLAY ATTACK", packetTime)
+            return success, protocol, port
 
         if success:
             LOG.debug("Authorization OK!")
         else:
             LOG.warning("Unauthorized Request for %s Port: %s from User with Certificate Fingerprint: %s", protocol, port, certFingerprint)
+            return success, protocol, port
 
         return success, protocol, port
 

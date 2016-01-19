@@ -30,10 +30,11 @@ LOG = logging.getLogger(__name__)
 class ServerInterface:
 
     def __init__(self,
-                 serverPFXFile=os.path.join(os.path.dirname(__file__), os.pardir, 'devserver.pfx'),
+                 crlFile=os.path.join(os.path.dirname(__file__), os.pardir, 'certificates', 'devca.crl'),
+                 serverPFXFile=os.path.join(os.path.dirname(__file__), os.pardir, 'certificates', 'devserver.pfx'),
                  PFXPasswd='portknocking'):
 
-        self.cryptoEngine = CertUtil(serverPFXFile, PFXPasswd).initializeCryptoEngine()
+        self.cryptoEngine = CertUtil(crlFile, serverPFXFile, PFXPasswd).initializeCryptoEngine()
 
     def runKnockDaemon(self):
         with Firewall() as firewallHandler:

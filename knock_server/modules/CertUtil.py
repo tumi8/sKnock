@@ -32,7 +32,8 @@ LOG = logging.getLogger(__name__)
 
 class CertUtil:
 
-    def __init__(self, pfxFile, pfxPasswd):
+    def __init__(self, crlFile, pfxFile, pfxPasswd):
+        self.crlFile = crlFile
         self.pfxFile = pfxFile
         self.pfxPasswd = pfxPasswd
         self.platform = PlatformUtils.detectPlatform()
@@ -44,8 +45,9 @@ class CertUtil:
                 pfx = crypto.load_pkcs12(file(self.pfxFile, 'rb').read(), self.pfxPasswd)
 
                 self.loadCAFromPFX(pfx)
-                serverKey = pfx.get_privatekey()
+                self.updateCrl()
 
+                serverKey = pfx.get_privatekey()
                 serializedServerPrivKey = crypto.dump_privatekey(crypto.FILETYPE_PEM, serverKey)
 
                 return CryptoEngine(serializedServerPrivKey, certUtil=self)
@@ -81,8 +83,13 @@ class CertUtil:
             try:
                 CAContext.verify_certificate()
                 LOG.debug("Certificate OK!")
-                #TODO: Revocation check
-                return True
+                if not (self.revokedCertificateSerials == None or format(cert.get_serial_number(), 'x').upper() in self.revokedCertificateSerials):
+                    LOG.debug("Certificate Revocation Status OK")
+                    return True
+                else:
+                    LOG.warning("Certificate with Serial Number: %s is revoked!", cert.get_serial_number())
+                    return False
+
             except:
                 LOG.debug("Certificate check failed!")
                 return False
@@ -134,6 +141,16 @@ class CertUtil:
 
         self.CA = crypto.X509Store()
         self.CA.add_cert(CAcerts[0])
+
+
+    def updateCrl(self):
+        # TODO: check if there is a newer CRL on the distribution point and download
+
+        try:
+            crl = crypto.load_crl(crypto.FILETYPE_ASN1, file(self.crlFile, 'rb').read())
+            self.revokedCertificateSerials = [x.get_serial() for x in crl.get_revoked()]
+        except:
+            LOG.error("Failed to load CRL (Certificate Revocation List)!")
 
 
     def convertDERtoPEM(self, key):

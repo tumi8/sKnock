@@ -27,8 +27,8 @@ LOG = logging.getLogger(__name__)
 class ClientInterface:
 
     def __init__(self, timeout=10, numRetries=3,
-                 serverCertFile=os.path.join(os.path.dirname(__file__), os.pardir, 'devserver.cer'),
-                 clientPFXFile=os.path.join(os.path.dirname(__file__), os.pardir, 'devclient.pfx'),
+                 serverCertFile=os.path.join(os.path.dirname(__file__), os.pardir, 'certificates', 'devserver.cer'),
+                 clientPFXFile=os.path.join(os.path.dirname(__file__), os.pardir, 'certificates', 'devclient.pfx'),
                  PFXPasswd='portknocking'):
 
         self.connectionHandler = Connection(CertUtil(serverCertFile, clientPFXFile, PFXPasswd).initializeCryptoEngine(),

@@ -17,7 +17,7 @@
 #
 
 import logging
-from knock_server.lib.X509Cert import X509
+from knock_server.lib.X509Cert import X509CertWrapper
 
 LOG = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ LOG = logging.getLogger(__name__)
 # Request has to be tuple of (PROTOCOL, PORTNUMBER) eg.: (1, 2000)
 # TCP = 1, UDP = 0
 def checkIfRequestIsAuthorized(request, rawCert):
-    cert = X509(rawCert)
+    cert = X509CertWrapper(rawCert)
 
     if cert.SAN_auth == None:
         LOG.warning('Unsupported Authenticator in Certificate!')

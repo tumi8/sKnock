@@ -3,7 +3,6 @@ import sys
 
 from asn1tinydecoder import *
 import hashlib
-import base64
 
 
 # algo OIDs
@@ -22,7 +21,7 @@ PREFIX_RSA_SHA512 = bytearray([0x30,0x51,0x30,0x0d,0x06,0x09,0x60,0x86,0x48,0x01
 class CertificateError(Exception):
     pass
 
-class X509(object):
+class X509CertWrapper(object):
 
     def __init__(self, b):
 
@@ -96,13 +95,17 @@ class X509(object):
                     self.AKI = asn1_get_sequence(value)[0].encode('hex')
                 elif oid == '2.5.29.17':
                     # Subject Alternative Name
-                    for sanAttribute in asn1_get_sequence(value):
-                        sanNode = asn1_node_root(sanAttribute)
-                        if asn1_get_value_of_type(sanAttribute, sanNode, 'OBJECT IDENTIFIER').encode('hex') == '2b0601040181983e':
-                            # TUM Identifier
-                            sanNode = asn1_node_next(sanAttribute, sanNode)
-                            sanNode = asn1_node_first_child(sanAttribute, sanNode)
-                            self.SAN_auth = asn1_get_value_of_type(sanAttribute, sanNode, 'UTF8String')
+                    try:
+                        for sanAttribute in asn1_get_sequence(value):
+                            sanNode = asn1_node_root(sanAttribute)
+                            if asn1_get_value_of_type(sanAttribute, sanNode, 'OBJECT IDENTIFIER').encode('hex') == '2b0601040181983e':
+                                # TUM Identifier
+                                sanNode = asn1_node_next(sanAttribute, sanNode)
+                                sanNode = asn1_node_first_child(sanAttribute, sanNode)
+                                self.SAN_auth = asn1_get_value_of_type(sanAttribute, sanNode, 'UTF8String')
+                    except:
+                        pass
+
                 else:
                     pass
 
