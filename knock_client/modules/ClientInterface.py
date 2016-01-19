@@ -26,15 +26,39 @@ LOG = logging.getLogger(__name__)
 
 class ClientInterface:
 
-    def __init__(self, timeout=10, numRetries=3,
+    def __init__(self, timeout=10, numRetries=3, verify=True,
                  serverCertFile=os.path.join(os.path.dirname(__file__), os.pardir, 'certificates', 'devserver.cer'),
                  clientPFXFile=os.path.join(os.path.dirname(__file__), os.pardir, 'certificates', 'devclient.pfx'),
                  PFXPasswd='portknocking'):
+        """
+        This function initializes the Port-Knocking client library \"knock\"
+
+        Set context parameters and load required certificates
+
+        timeout: Time in seconds to wait between retries. Default: 10
+        numRetries: Number of Retries. Default: 3
+        verify: Verify if the target Port was successfully opened. Only TCP is supported. Default: True
+        serverCertFile: Path to the Server Certificate File encoded in DER. Default: certificates/devserver.cer
+        clientPFXFile: Path to the Client Certificate with Private Key in PKCS#7 Format (.pfx). Default: certificates/devclient.pfx
+        PFXPasswd: Password to decrypt @clientPFXFile
+        """
 
         self.connectionHandler = Connection(CertUtil(serverCertFile, clientPFXFile, PFXPasswd).initializeCryptoEngine(),
-                                            timeout, numRetries)
+                                            timeout, numRetries, verify)
 
 
     def knockOnPort(self, host, port, protocol=PROTOCOL.TCP):
+        """
+        Actual port-knocking function
+
+        Generate port-knocking packet for opening the requested @port on @host. Can be used to create TCP or UDP connections;
+        Defaults to TCP connection if @protocol is not given.
+        After sending the port-knocking request verifies that the target @port is open, and if necessary retries the port-knocking
+
+        host: Target @host, on which the application is running
+        port: Port to open on target @host
+        protocol: Requested Target Protocol. Default: TCP
+        """
+
         LOG.debug('Knocking %s on port %s', host, port)
         self.connectionHandler.knockOnPort(host, port, protocol)

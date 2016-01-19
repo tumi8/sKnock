@@ -30,21 +30,29 @@ class Connection:
 
 
 
-    def __init__(self, cryptoEngine, timeout, numberOfRetries):
+    def __init__(self, cryptoEngine, timeout, numberOfRetries, verify):
         self.timeout = timeout
         self.numberOfRetries = numberOfRetries
         self.cryptoEngine = cryptoEngine
+        self.verify = verify
 
     def knockOnPort(self, targetHost, requestedPort, requestedProtocol):
         randomPort = random.randint(MIN_PORT, MAX_PORT)
 
         for i in range(0, self.numberOfRetries):
             self.sendKnockPacket(targetHost, requestedPort, requestedProtocol, randomPort)
-            if self.verifyTargetPortIsOpen(targetHost,requestedPort):
+            if not self.verify:
+                LOG.info("Port-knocking finished. Verification of target port is disabled.")
+                return True
+            elif PROTOCOL.UDP == requestedProtocol:
+                LOG.info("Port-knocking finished. Verification of UDP Ports is not supported.")
+                return True
+            elif self.verifyTargetTCPPortIsOpen(targetHost, requestedPort):
                 LOG.info('Port-knocking successful. Application Port %s is now open!', requestedPort)
-                break
+                return True
             LOG.info('Port still not open - maybe packet got lost. Retrying...')
         LOG.error('Port-knocking failed. Verify you are authorized to open the requested port and check your configuration!')
+        return False
 
 
     def sendKnockPacket(self, targetHost, requestedPort, requestedProtocol, knockPort):
@@ -58,7 +66,7 @@ class Connection:
         LOG.info('Knock Packet sent to %s:%s', targetHost, knockPort)
 
 
-    def verifyTargetPortIsOpen(self, targetHost ,requestedPort):
+    def verifyTargetTCPPortIsOpen(self, targetHost, requestedPort):
         try:
             s = socket.create_connection((targetHost, requestedPort), timeout=self.timeout)
             s.shutdown(socket.SHUT_RDWR)
