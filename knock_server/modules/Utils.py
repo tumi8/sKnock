@@ -17,6 +17,7 @@
 #
 
 import logging
+import knock_server.lib.asn1tinydecoder as asn1decoder 
 from knock_server.lib.X509Cert import X509CertWrapper
 
 LOG = logging.getLogger(__name__)
@@ -42,3 +43,38 @@ def checkIfRequestIsAuthorized(request, rawCert):
             return True, cert.getFingerprint().encode('hex')
 
     return False, cert.getFingerprint().encode('hex')
+
+
+# TODO: fix this
+def extractCRLContentAndSignature(crl_der):
+        # unpack sequence
+        i = asn1decoder.asn1_node_root(crl_der)
+        # unpack sequence
+        i = asn1decoder.asn1_node_first_child(crl_der,i)
+        crl_signed_content= i
+
+        # get 1. item inside (version)
+        i = asn1decoder.asn1_node_first_child(crl_der,i)
+        # advance 1 item (Algoidentifier)
+        i = asn1decoder.asn1_node_next(crl_der,i)
+        # advance 1 item (email, CN etc.)
+        i = asn1decoder.asn1_node_next(crl_der,i)
+        # advance 1 item
+        i = asn1decoder.asn1_node_next(crl_der,i)
+        # advance 1 item
+        i = asn1decoder.asn1_node_next(crl_der,i)
+
+        # advance 1 item (the list)
+        i = asn1decoder.asn1_node_next(crl_der,i)
+
+        # advance 1 item
+        i = asn1decoder.asn1_node_next(crl_der,i)
+        # advance 1 item (obj. identifier)
+        i = asn1decoder.asn1_node_next(crl_der,i)
+        # advance 1 item (signature)
+        i = asn1decoder.asn1_node_next(crl_der,i)
+        # content is crl_signature
+        crl_signature = asn1decoder.bitstr_to_bytestr(
+                asn1decoder.asn1_get_value_of_type(crl_der,i,'BIT STRING'))
+
+        return crl_signed_content, crl_signature

@@ -18,15 +18,20 @@
 import logging
 import struct
 import sys
-import base64
+import os
+import urllib2
+import datetime
+import time
 
 from CryptoEngine import CryptoEngine
 from knock_server.definitions.Exceptions import *
-from knock_server.definitions.Constants import *
+from knock_server.decorators.synchronized import synchronized
 from knock_server.lib.OpenSSL import crypto
-from knock_server.modules.Platform import PlatformUtils
 
-PROBABLE_INDEX_FOR_SUBJECTALTNAME = 4
+from Platform import PlatformUtils
+import Utils
+
+CRL_UPDATE_INTERVAL = datetime.timedelta(minutes=30)
 
 LOG = logging.getLogger(__name__)
 
@@ -37,6 +42,8 @@ class CertUtil:
         self.pfxFile = pfxFile
         self.pfxPasswd = pfxPasswd
         self.platform = PlatformUtils.detectPlatform()
+
+        self.lastCRLUpdate = None
 
     def initializeCryptoEngine(self):
         if(self.platform == PlatformUtils.LINUX):
@@ -83,6 +90,7 @@ class CertUtil:
             try:
                 CAContext.verify_certificate()
                 LOG.debug("Certificate OK!")
+                self.updateCrl()
                 if not (self.revokedCertificateSerials == None or format(cert.get_serial_number(), 'x').upper() in self.revokedCertificateSerials):
                     LOG.debug("Certificate Revocation Status OK")
                     return True
@@ -106,27 +114,6 @@ class CertUtil:
                 return False
 
 
-
-    def extractAuthorizationStringFromCertificate(self, rawCert):
-        try:
-            cert = crypto.load_certificate(crypto.FILETYPE_ASN1, rawCert)
-        except:
-            LOG.error("Invalid Certificate data!")
-            return None
-
-        try:
-            extension = cert.get_extension(CertUtil.PROBABLE_INDEX_FOR_SUBJECTALTNAME)
-            if extension.get_short_name() != 'subjectAltName':
-                raise Exception
-        except:
-            for i in range (0, cert.get_extension_count()):
-                extension = cert.get_extension(i)
-                if extension.get_short_name() == 'subjectAltName':
-                    break
-
-        return None if extension == None else extension.get_data(), cert.get_serial_number()
-
-
     def loadCAFromPFX(self, pfx):
         CAcerts = pfx.get_ca_certificates()
         if len(CAcerts) != 1:
@@ -143,12 +130,52 @@ class CertUtil:
         self.CA.add_cert(CAcerts[0])
 
 
+    @synchronized
     def updateCrl(self):
-        # TODO: check if there is a newer CRL on the distribution point and download
+        if self.lastCRLUpdate != None and time.mktime((datetime.datetime.now() - CRL_UPDATE_INTERVAL).timetuple()) < self.lastCRLUpdate:
+            return
+
+        LOG.debug("Checking for new CRL on CA Server...")
+        try:
+            remoteCRL = urllib2.urlopen("http://home.in.tum.de/~sel/BA/CA/devca.crl")
+        except:
+            LOG.warning("CA Server seems to be offline")
+            return
+
+        remoteCRLTimestamp = remoteCRL.info().getdate('last-modified')
+        if remoteCRLTimestamp == None:
+            remoteCRLTimestamp = remoteCRL.info().getdate('date')
+
+        if remoteCRLTimestamp == None:
+            LOG.error("Cannot obtain metadata of remote CRL file")
+            return
+
+        remoteCRLTimestamp = time.mktime(remoteCRLTimestamp)
+
+        if os.path.isfile(self.crlFile):
+            if os.path.getmtime(self.crlFile) < remoteCRLTimestamp:
+                logging.debug("Found new CRL. Downloading...")
+            else:
+                logging.debug("CRL is up to date.")
+                return
+        else:
+            logging.debug("No CRL found in cache. Downloading...")
+
+        try:
+            with open(self.crlFile, 'w') as crlFileHandle:
+                crlFileHandle.write(remoteCRL.read())
+                LOG.debug("Successfully downloaded new CRL from Server")
+        except:
+            LOG.error("Error downloading CRL file!")
 
         try:
             crl = crypto.load_crl(crypto.FILETYPE_ASN1, file(self.crlFile, 'rb').read())
+
+            # TODO: verify CRL signature
+
             self.revokedCertificateSerials = [x.get_serial() for x in crl.get_revoked()]
+            self.lastCRLUpdate = time.mktime(datetime.datetime.now().timetuple())
+            LOG.debug("CRL update complete!")
         except:
             LOG.error("Failed to load CRL (Certificate Revocation List)!")
 
