@@ -41,18 +41,21 @@ int main(int argc, char *argv[])
   assert (NULL != py_func_hello);
   assert (PyFunction_Check (py_func_hello));
 
-  PyObject *py_func_hello_args = NULL;
-  py_func_hello_args = Py_BuildValue("(s)", "Python from C");
+  PyObject *py_args_hello = NULL;
+  py_args_hello = Py_BuildValue("(s)", "Python from C");
   PyObject *py_return;
   if (NULL == (py_return = PyObject_CallObject(py_func_hello,
-                                               py_func_hello_args)))
+                                               py_args_hello)))
     PyErr_Print();
   else
     Py_DECREF(py_return);
-
+  py_return = PyObject_Call(py_func_hello,
+                            py_args_hello, NULL);
+  Py_XDECREF (py_return);
   py_return = PyObject_CallFunction(py_func_hello,
                                     "(s)", "World from C");
   Py_XDECREF (py_return);
+
   /* PyRun_SimpleString("from time import time,ctime\n" */
   /*                    "print 'Today is',ctime(time())\n" */
   /*                    "import sys\n" */
