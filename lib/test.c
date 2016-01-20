@@ -1,7 +1,7 @@
 #include <python2.7/Python.h>
 #include <assert.h>
 
-#define IMPORT_MODULE "knock_client.modules.ClientInterface"
+#define IMPORT_MODULE "testdir.hello"
 
 #define LOG(...)\
   fprintf(stderr, __VA_ARGS__);
@@ -35,11 +35,24 @@ int main(int argc, char *argv[])
   PyObject *py_dict_module;
   py_dict_module = PyModule_GetDict(py_module);
   assert (NULL != py_dict_module);
-  PyObject *py_class_ifx = NULL;
-  py_class_ifx = PyDict_GetItemString(py_dict_module, "ClientInterface");
-  assert (NULL != py_class_ifx);
-  assert (PyClass_Check (py_class_ifx));
+  PyObject *py_func_hello = NULL;
+  /* Dictionary get gives a borrowed reference */
+  py_func_hello = PyDict_GetItemString(py_dict_module, "hello");
+  assert (NULL != py_func_hello);
+  assert (PyFunction_Check (py_func_hello));
 
+  PyObject *py_func_hello_args = NULL;
+  py_func_hello_args = Py_BuildValue("(s)", "Python from C");
+  PyObject *py_return;
+  if (NULL == (py_return = PyObject_CallObject(py_func_hello,
+                                               py_func_hello_args)))
+    PyErr_Print();
+  else
+    Py_DECREF(py_return);
+
+  py_return = PyObject_CallFunction(py_func_hello,
+                                    "(s)", "World from C");
+  Py_XDECREF (py_return);
   /* PyRun_SimpleString("from time import time,ctime\n" */
   /*                    "print 'Today is',ctime(time())\n" */
   /*                    "import sys\n" */
