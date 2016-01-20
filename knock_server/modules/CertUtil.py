@@ -136,40 +136,44 @@ class CertUtil:
             return
 
         LOG.debug("Checking for new CRL on CA Server...")
+        remoteCRL = None
         try:
             # TODO: get this from Certificate + CRL-specific cache
             remoteCRL = urllib2.urlopen("http://home.in.tum.de/~sel/BA/CA/devca.crl")
         except:
             LOG.warning("CA Server seems to be offline")
-            return
 
-        remoteCRLTimestamp = remoteCRL.info().getdate('last-modified')
-        if remoteCRLTimestamp == None:
-            remoteCRLTimestamp = remoteCRL.info().getdate('date')
+        if remoteCRL != None:
+            remoteCRLTimestamp = remoteCRL.info().getdate('last-modified')
+            if remoteCRLTimestamp == None:
+                remoteCRLTimestamp = remoteCRL.info().getdate('date')
 
-        if remoteCRLTimestamp == None:
-            LOG.error("Cannot obtain metadata of remote CRL file")
-            return
-
-        remoteCRLTimestamp = time.mktime(remoteCRLTimestamp)
-
-        if os.path.isfile(self.crlFile):
-            if os.path.getmtime(self.crlFile) < remoteCRLTimestamp:
-                logging.debug("Found new CRL. Downloading...")
+            if remoteCRLTimestamp == None:
+                LOG.error("Cannot obtain metadata of remote CRL file")
             else:
-                logging.debug("CRL is up to date.")
-                return
-        else:
-            logging.debug("No CRL found in cache. Downloading...")
+                remoteCRLTimestamp = time.mktime(remoteCRLTimestamp)
+
+                if os.path.isfile(self.crlFile) and not os.path.getmtime(self.crlFile) < remoteCRLTimestamp:
+                    # Our File is up to date -> no downloading
+                    logging.debug("CRL is up to date.")
+                else:
+                    if not os.path.isfile(self.crlFile):
+                        # We don't have a CRL at all
+                        logging.debug("No CRL found in cache. Downloading...")
+                    else:
+                        # Our CRL is not up to date
+                        logging.debug("Found new CRL. Downloading...")
+
+                    try:
+                        with open(self.crlFile, 'w') as crlFileHandle:
+                            crlFileHandle.write(remoteCRL.read())
+                            LOG.debug("Successfully downloaded new CRL from Server")
+                    except:
+                        LOG.error("Error downloading CRL file!")
+
 
         try:
-            with open(self.crlFile, 'w') as crlFileHandle:
-                crlFileHandle.write(remoteCRL.read())
-                LOG.debug("Successfully downloaded new CRL from Server")
-        except:
-            LOG.error("Error downloading CRL file!")
-
-        try:
+            LOG.debug("Importing CRL from file...")
             crl = crypto.load_crl(crypto.FILETYPE_ASN1, file(self.crlFile, 'rb').read())
 
             # TODO: verify CRL signature
@@ -178,7 +182,11 @@ class CertUtil:
             self.lastCRLUpdate = time.mktime(datetime.datetime.now().timetuple())
             LOG.debug("CRL update complete!")
         except:
-            LOG.error("Failed to load CRL (Certificate Revocation List)!")
+            LOG.error("Failed to load CRL!")
+
+
+
+
 
 
     def convertDERtoPEM(self, key):
@@ -187,4 +195,3 @@ class CertUtil:
 
     def convertPEMtoDER(self, key):
         return crypto.dump_publickey(crypto.FILETYPE_ASN1, crypto.load_publickey(crypto.FILETYPE_PEM, key))
-

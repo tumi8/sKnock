@@ -59,6 +59,6 @@ def synchronized(item):
         return decorator(item)
 
     else:
-        new_lock = threading.Lock()
+        new_lock = threading.RLock()
         decorator = syncronized_with(new_lock)
         return decorator(item)

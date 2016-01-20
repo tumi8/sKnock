@@ -26,10 +26,6 @@ LOG = logging.getLogger(__name__)
 
 class CertUtil:
 
-    PROBABLE_INDEX_FOR_SUBJECTALTNAME = 4
-
-
-
     def __init__(self, serverCertFile, pfxFile, pfxPasswd):
         self.serverCertFile = serverCertFile
         self.pfxFile = pfxFile
