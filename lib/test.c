@@ -25,6 +25,7 @@ int main(int argc, char *argv[])
 
   py_list_syspath = PySys_GetObject("path");
   py_list_syspath = PySequence_InPlaceConcat(py_list_syspath, py_list_path);
+  Py_DECREF(py_list_path);
   py_list_path = NULL;
   py_list_syspath = NULL;       /* py_list_syspath is a borrowed reference */
 
@@ -34,10 +35,12 @@ int main(int argc, char *argv[])
   assert (PyModule_Check(py_module));
   PyObject *py_dict_module;
   py_dict_module = PyModule_GetDict(py_module);
+  Py_DECREF (py_module); py_module = NULL;
   assert (NULL != py_dict_module);
   PyObject *py_func_hello = NULL;
   /* Dictionary get gives a borrowed reference */
   py_func_hello = PyDict_GetItemString(py_dict_module, "hello");
+  py_dict_module = NULL         /* borrowed reference! */
   assert (NULL != py_func_hello);
   assert (PyFunction_Check (py_func_hello));
 
@@ -51,6 +54,7 @@ int main(int argc, char *argv[])
     Py_DECREF(py_return);
   py_return = PyObject_Call(py_func_hello,
                             py_args_hello, NULL);
+  Py_DECREF (py_args_hello);
   Py_XDECREF (py_return);
   py_return = PyObject_CallFunction(py_func_hello,
                                     "(s)", "World from C");
