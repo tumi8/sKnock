@@ -62,3 +62,14 @@ class ClientInterface:
 
         LOG.debug('Knocking %s on port %s', host, port)
         self.connectionHandler.knockOnPort(host, port, protocol)
+
+
+def init(timeout, numRetries, verify,
+         serverCert, clientCert, passwd):
+    return ClientInterface(timeout=timeout, numRetries=numRetries,
+                           serverCertFile=os.path.abspath(serverCert),
+                           clientPFXFile=os.path.abspath(clientCert),
+                           PFXPasswd=passwd)
+
+def init_defaults(passwd):
+    return ClientInterface(PFXPasswd=passwd)
