@@ -178,7 +178,10 @@ class CertUtil:
 
             # TODO: verify CRL signature
 
-            self.revokedCertificateSerials = [x.get_serial() for x in crl.get_revoked()]
+            if crl.get_revoked() != None:
+                self.revokedCertificateSerials = [x.get_serial() for x in crl.get_revoked()]
+            else:
+                self.revokedCertificateSerials = []
             self.lastCRLUpdate = time.mktime(datetime.datetime.now().timetuple())
             LOG.debug("CRL update complete!")
         except:

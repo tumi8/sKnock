@@ -86,7 +86,7 @@ def setupIPTablesPortKnockingChainAndRedirectTraffic():
         rejectRuleV4=iptc.Rule()
         rejectRuleV4.target = rejectRuleV4.create_target('REJECT')
         deleteIPTablesRuleIgnoringError(rejectRuleV4, inputChainV4)
-        inputChainV4.append_rule(rejectRuleV4)
+        #inputChainV4.append_rule(rejectRuleV4)
 
         LOG.debug("Setup Port-knocking IPTables Configuration for IPv4")
 
@@ -114,7 +114,7 @@ def setupIPTablesPortKnockingChainAndRedirectTraffic():
         rejectRuleV6=iptc.Rule6()
         rejectRuleV6.target = rejectRuleV6.create_target('REJECT')
         deleteIPTablesRuleIgnoringError(rejectRuleV6, inputChainV6)
-        inputChainV6.append_rule(rejectRuleV6)
+        #inputChainV6.append_rule(rejectRuleV6)
 
         LOG.debug("Setup Port-knocking IPTables Configuration for IPv6")
 

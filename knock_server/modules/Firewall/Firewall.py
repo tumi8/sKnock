@@ -67,7 +67,6 @@ class Firewall:
         self._setupEmergencyAccessFirewallRules()
 
 
-    @synchronized
     def openPortForClient(self, port, ipVersion, protocol, addr):
 
         openPort = hash(str(port) + str(ipVersion) + protocol + addr)
@@ -76,7 +75,7 @@ class Firewall:
             raise PortAlreadyOpenException
 
         if(self.platform == PlatformUtils.LINUX):
-            self.linuxFirewallServicePipe.send(['openPort', port, ipVersion, protocol, addr])
+            self._executeTask(['openPort', port, ipVersion, protocol, addr])
 
         self.openPortsList.append(openPort)
         LOG.info('%s Port: %s opened for host: %s from: %s until: %s',
@@ -87,7 +86,6 @@ class Firewall:
 
 
 
-    @synchronized
     def closePortForClient(self, port, ipVersion, protocol, addr):
         if(self.platform == PlatformUtils.LINUX):
             self.linuxFirewallServicePipe.send(['closePort', port, ipVersion, protocol, addr])

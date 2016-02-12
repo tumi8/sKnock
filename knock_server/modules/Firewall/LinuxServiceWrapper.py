@@ -29,10 +29,10 @@ def processFirewallCommands(pipe):
             _startService()
             pipe.send(msg[0])
         elif msg[1] == 'openPort' and len(msg) == 6:
-            _openPort(msg[1], msg[2], msg[3], msg[4])
+            _openPort(msg[2], msg[3], msg[4], msg[5])
             pipe.send(msg[0])
         elif msg[1] == 'closePort' and len(msg) == 6:
-            _closePort(msg[1], msg[2], msg[3], msg[4])
+            _closePort(msg[2], msg[3], msg[4], msg[5])
             pipe.send(msg[0])
         elif msg[1] == 'stopService' and len(msg) == 2:
             _stopService()

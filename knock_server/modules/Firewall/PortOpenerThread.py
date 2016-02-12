@@ -20,9 +20,11 @@ import time
 
 from threading import Thread
 
+from knock_server.decorators.synchronized import synchronized
 from knock_server.definitions.Exceptions import *
 from knock_server.definitions import Constants
 
+from PortCloseThread import PortCloseThread
 
 class PortOpenerThread(Thread):
 
@@ -36,17 +38,18 @@ class PortOpenerThread(Thread):
         Thread.__init__(self)
 
 
+    @synchronized
     def run(self):
         threadTaskHash = hash(str(self.port) + str(self.ipVersion) + self.protocol + self.addr)
         self.runningOpenPortTasks.append(threadTaskHash)
 
         try:
             self.firewallHandler.openPortForClient(self.port, self.ipVersion, self.protocol, self.addr)
-            time.sleep(Constants.PORT_OPEN_DURATION_IN_SECONDS)
-            self.firewallHandler.closePortForClient(self.port, self.ipVersion, self.protocol, self.addr)
+            PortCloseThread(self.runningOpenPortTasks, self.firewallHandler, self.ipVersion, self.protocol, self.port, self.addr).start()
 
         except PortAlreadyOpenException:
-            return
-
-        finally:
             self.runningOpenPortTasks.remove(threadTaskHash)
+            return
+        except:
+            self.runningOpenPortTasks.remove(threadTaskHash)
+            raise

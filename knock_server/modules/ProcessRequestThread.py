@@ -19,8 +19,7 @@
 import logging
 from threading import Thread
 
-from PortOpenerThread import PortOpenerThread
-
+from knock_server.modules.Firewall.PortOpenerThread import PortOpenerThread
 
 LOG = logging.getLogger(__name__)
 
