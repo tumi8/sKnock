@@ -36,7 +36,9 @@ class CertUtil:
         if(self.platform == PlatformUtils.LINUX):
             LOG.debug("Loading certificates...")
             try:
-                pfx = crypto.load_pkcs12(file(os.path.join(self.pfxFile), 'rb').read(), self.pfxPasswd)
+                pfx_path=(os.path.join(self.pfxFile));
+                LOG.debug ("Loading certficate:" + pfx_path);
+                pfx = crypto.load_pkcs12(file(pfx_path, 'rb').read(), self.pfxPasswd)
 
                 self.loadCAFromPFX(pfx)
                 self.clientCert = pfx.get_certificate()
