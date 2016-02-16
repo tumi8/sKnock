@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
   assert (PyFunction_Check (py_func_knock_init));
 
   PyObject *py_args_knock_init = NULL;
-  py_args_knock_init = Py_BuildValue("(s)", "knockpassword");
+  py_args_knock_init = Py_BuildValue("(s)", "portknocking");
   PyObject *py_return;
   if (NULL == (py_return = PyObject_CallObject(py_func_knock_init,
                                                py_args_knock_init)))

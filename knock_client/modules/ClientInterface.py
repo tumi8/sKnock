@@ -67,9 +67,16 @@ class ClientInterface:
 def init(timeout, numRetries, verify,
          serverCert, clientCert, passwd):
     return ClientInterface(timeout=timeout, numRetries=numRetries,
+                           verify=verify,
                            serverCertFile=os.path.abspath(serverCert),
                            clientPFXFile=os.path.abspath(clientCert),
                            PFXPasswd=passwd)
 
 def init_defaults(passwd):
     return ClientInterface(PFXPasswd=passwd)
+
+
+# protocol_num: 0 for UDP; 1 for TCP
+def knock(interface, host, port, protocol_num):
+    protocol = PROTOCOL.getById (protocol_num)
+    return interface.knockOnPort (host, port, protocol)

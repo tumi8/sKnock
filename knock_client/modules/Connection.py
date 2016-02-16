@@ -70,7 +70,6 @@ class Connection:
         try:
             s = socket.create_connection((targetHost, requestedPort), timeout=self.timeout)
             s.shutdown(socket.SHUT_RDWR)
-
             return True
         except:
             return False
