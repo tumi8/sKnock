@@ -29,6 +29,19 @@ struct KNOCK_Handle;
 
 
 /**
+ * Initializes the library.  This function should be called exactly once before
+ * using any other functions of this library.
+ *
+ * Initializes the underlying python system and paths required for finding the
+ * correct python modules for Knock's client interface.
+ *
+ * @return 0 upon success; -1 upon error
+ */
+int
+knock_init();
+
+
+/**
  * Function to create a new knock handle
  *
  * @param timeout number of seconds to wait before retrying the knock attempt
