@@ -46,8 +46,7 @@ knock_init();
  *
  * @param timeout number of seconds to wait before retrying the knock attempt
  * @param retries number of times to retry
- * @param verify flag to verify the server certificate; 0 to disable, 1 to
- *          enable
+ * @param verify flag to verify whether the port-knocking is successful or not
  * @param server_cert_path path of the server certificate
  * @param client_cert_path path of the client certificate
  * @param client_cert_passwd password for opening the client certificate.  If
@@ -77,13 +76,16 @@ knock_default_new (const char *client_cert_passwd);
 /**
  * Knock the given port on the given host.
  *
+ * @param handle the knock handle created either with knock_new() or
+ *          knock_default_new()
  * @param host the hostname of the target host to knock
  * @param port the port to open
  * @param protocol 1 for TCP; 0 for UDP
  * @return ??(should be a socket?)
  */
 int
-knock_knock(const char *host,
+knock_knock(struct KNOCK_Handle *handle,
+            const char *host,
             unsigned short port,
             int protocol);
 
