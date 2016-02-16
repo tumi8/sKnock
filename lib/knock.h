@@ -81,7 +81,9 @@ knock_default_new (const char *client_cert_passwd);
  * @param host the hostname of the target host to knock
  * @param port the port to open
  * @param protocol 1 for TCP; 0 for UDP
- * @return ??(should be a socket?)
+ * @return 1 if the knocking is successful OR if verify flag was disable for the
+ *          handle OR if protocol is UDP; 0 if the verify flag is enabled and
+ *          port-knocking failed; -1 upon error
  */
 int
 knock_knock(struct KNOCK_Handle *handle,
