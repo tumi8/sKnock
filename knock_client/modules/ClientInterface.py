@@ -67,7 +67,7 @@ class ClientInterface:
 def init(timeout, numRetries, verify,
          serverCert, clientCert, passwd):
     return ClientInterface(timeout=timeout, numRetries=numRetries,
-                           verify,
+                           verify=verify,
                            serverCertFile=os.path.abspath(serverCert),
                            clientPFXFile=os.path.abspath(clientCert),
                            PFXPasswd=passwd)
