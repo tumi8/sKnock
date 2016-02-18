@@ -69,8 +69,7 @@ class Connection:
         socketToServer = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
 
         try:
-            pass
-#            socketToServer.connect((targetHost,knockPort))
+            socketToServer.connect((targetHost,knockPort))
         except socket.error: pass
         localIPString = socketToServer.getsockname()[0]
 
