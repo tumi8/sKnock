@@ -52,7 +52,7 @@ class Firewall:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if(self.platform == PlatformUtils.LINUX):
-            self.linuxFirewallServicePipe.send(["stopService"])
+            self._executeTask(["stopService"])
             self.linuxFirewallServicePipe.close()
             self.linuxFirewallService.join()
 
@@ -88,7 +88,7 @@ class Firewall:
 
     def closePortForClient(self, port, ipVersion, protocol, addr):
         if(self.platform == PlatformUtils.LINUX):
-            self.linuxFirewallServicePipe.send(['closePort', port, ipVersion, protocol, addr])
+            self._executeTask(['closePort', port, ipVersion, protocol, addr])
 
         self.openPortsList.remove(hash(str(port) + str(ipVersion) + protocol + addr))
         LOG.info('%s Port: %s closed for host: %s at: %s', protocol, port, addr, datetime.datetime.now())

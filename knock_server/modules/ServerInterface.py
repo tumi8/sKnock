@@ -16,14 +16,13 @@
 # USA
 #
 
-import logging, os, sys
-
-from knock_server.lib.daemonize import createDaemon
-from knock_server.modules.Platform.LinuxUtils import dropPrivileges
+import logging
+import os
 
 from CertUtil import CertUtil
 from Firewall.Firewall import Firewall
-from KnockListener import KnockListener
+from knock_server.modules.Listener.KnockListener import KnockListener
+from knock_server.modules.Platform.LinuxUtils import dropPrivileges
 
 LOG = logging.getLogger(__name__)
 

@@ -16,7 +16,7 @@
 # USA
 #
 
-import logging, random, socket, struct
+import logging, random, socket, struct, sys
 
 from knock_client.definitions.Constants import *
 
@@ -58,9 +58,43 @@ class Connection:
     def sendKnockPacket(self, targetHost, requestedPort, requestedProtocol, knockPort):
 
         LOG.debug('Knock Target Port: %s, Requested Application Port: %s', requestedProtocol, requestedPort)
-        encryptedRequest = self.cryptoEngine.signAndEncryptRequest(PROTOCOL.getId(requestedProtocol), requestedPort)
 
-        socketToServer = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        targetInfo = socket.getaddrinfo(targetHost, knockPort)
+
+        # For IP4 We want socket.AF_INET, socket.SOCK_DGRAM, socket.SOL_UDP and struct.pack('xxxxxxxxxxxx')
+        # For IP6 We want socket.AF_INET6, socket.SOCK_DGRAM, socket.SOL_UDP
+
+
+
+        socketToServer = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
+
+        try:
+            socketToServer.connect((targetHost,knockPort))
+        except socket.error: pass
+        localIPString = socketToServer.getsockname()[0]
+
+        if localIPString == '::':
+            LOG.warn('IPV6 not supported in current environment, using IPv4...')
+            socketToServer = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+            try:
+                socketToServer.connect((targetHost,knockPort))
+            except socket.error: pass
+            localIPString = socketToServer.getsockname()[0]
+
+            if localIPString == '0.0.0.0':
+                LOG.error('Could not determine IP of network interface. Please check network configuration and internet connectivity!')
+                sys.exit(2)
+
+            else:
+                localIP = ''.join((socket.inet_pton(socket.AF_INET, localIPString), struct.pack('xxxxxxxxxxxx'))) # 4 bytes IPv4 address + padding
+
+        else:
+            localIP = socket.inet_pton(socket.AF_INET6, localIPString) # 16 bytes IPv6 address
+
+
+
+        encryptedRequest = self.cryptoEngine.signAndEncryptRequest(PROTOCOL.getId(requestedProtocol), requestedPort)
         socketToServer.sendto(PROTOCOL_INFORMATION + encryptedRequest, (targetHost, knockPort))
 
         LOG.info('Knock Packet sent to %s:%s', targetHost, knockPort)

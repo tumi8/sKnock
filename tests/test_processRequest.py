@@ -1,10 +1,8 @@
-from unittest import TestCase
 import time
-from knock_server.decorators.synchronized import synchronized
+from unittest import TestCase
+
 from knock_server.definitions.Constants import *
-from knock_server.modules.ProcessRequestThread import ProcessRequestThread
-import knock_server.modules.Firewall.Firewall
-import knock_server.modules.CryptoEngine
+from knock_server.modules.Listener.ProcessRequestThread import ProcessRequestThread
 
 
 # Mocks / Stubs

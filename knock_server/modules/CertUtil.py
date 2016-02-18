@@ -22,6 +22,7 @@ import os
 import urllib2
 import datetime
 import time
+import socket
 
 from CryptoEngine import CryptoEngine
 from knock_server.definitions.Exceptions import *
@@ -139,8 +140,8 @@ class CertUtil:
         remoteCRL = None
         try:
             # TODO: get this from Certificate + CRL-specific cache
-            remoteCRL = urllib2.urlopen("http://home.in.tum.de/~sel/BA/CA/devca.crl")
-        except:
+            remoteCRL = urllib2.urlopen("http://home.in.tum.de/~sel/BA/CA/devca.crl", timeout=2)
+        except (socket.timeout, urllib2.URLError, urllib2.HTTPError):
             LOG.warning("CA Server seems to be offline")
 
         if remoteCRL != None:

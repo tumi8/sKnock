@@ -16,32 +16,36 @@
 # USA
 #
 
-import logging
-import socket
-import struct
+import logging, struct
+from threading import Thread
 
 from ProcessRequestThread import ProcessRequestThread
 from knock_server.definitions import Constants
 
 LOG = logging.getLogger(__name__)
 
-class KnockListener:
+class PacketListenerThread(Thread):
 
-    def __init__(self, cryptoEngine, firewallHandler):
-        self.cryptoEngine = cryptoEngine
-        self.firewallHandler = firewallHandler
-        self.runningPortOpenTasks = list()
-        self.udpsocket = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_UDP)
-        LOG.debug("Socket initialized")
+    def __init__(self, socket):
+        self.socket = socket
+        Thread.__init__(self)
 
-    def processPossibleKnockPackets(self):
+
+    def run(self):
         while True:
-            packet, source = self.udpsocket.recvfrom(2048)
+            packet, source = self.socket.recvfrom(2048)
             source_ip = source[0]
+
+            LOG.debug(source_ip)
 
             ipVersionLengthByte = struct.unpack('!B', packet[0])
             ipVersion = ipVersionLengthByte[0] >> 4
             udpHeaderLength = 8;
+
+            LOG.debug(str(packet[0]))
+            LOG.debug(str(ipVersionLengthByte))
+            LOG.debug(ipVersion)
+
 
             if ipVersion == Constants.IP_VERSION.V4:
                 ipHeaderLength = (ipVersionLengthByte[0] & 0xF) * 4
@@ -50,10 +54,14 @@ class KnockListener:
             else:
                 continue
 
+            LOG.debug(ipHeaderLength)
+
             udpHeader = packet[ipHeaderLength:ipHeaderLength + udpHeaderLength]
 
             lengthByte = struct.unpack('!H', udpHeader[4:6])
             payloadLength = lengthByte[0] - udpHeaderLength
+
+            LOG.debug(payloadLength)
 
             isPossibleKnockPacket = payloadLength >= Constants.KNOCKPACKET_MIN_LENGTH
 

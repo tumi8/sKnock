@@ -25,6 +25,7 @@ import LinuxHelpers
 def processFirewallCommands(pipe):
     while True:
         msg = pipe.recv()
+        print(str(msg))
         if msg[1] == 'startService' and len(msg) == 2:
             _startService()
             pipe.send(msg[0])
