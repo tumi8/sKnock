@@ -26,7 +26,8 @@ LOG = logging.getLogger(__name__)
 
 class PacketListenerThread(Thread):
 
-    def __init__(self, socket):
+    def __init__(self, knockListener, socket):
+        self.knockListener = knockListener
         self.socket = socket
         Thread.__init__(self)
 
@@ -65,4 +66,4 @@ class PacketListenerThread(Thread):
                 isPossibleKnockPacket = knockVersion <= Constants.KNOCK_VERSION
 
             if isPossibleKnockPacket:
-                ProcessRequestThread(self.cryptoEngine, self.firewallHandler, self.runningPortOpenTasks, ipVersion, source_ip, payload[4:]).start()
+                ProcessRequestThread(self.knockListener, ipVersion, source_ip, payload[4:]).start()

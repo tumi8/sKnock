@@ -31,8 +31,8 @@ class KnockListener:
         self.runningPortOpenTasks = list()
         udpsocket4 = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_UDP)
         udpsocket6 = socket.socket(socket.AF_INET6, socket.SOCK_RAW, socket.IPPROTO_UDP)
-        self.listener4 = PacketListenerThread(udpsocket4)
-        self.listener6 = PacketListenerThread(udpsocket6)
+        self.listener4 = PacketListenerThread(self, udpsocket4)
+        self.listener6 = PacketListenerThread(self, udpsocket6)
         LOG.debug("Sockets initialized")
 
     def processPossibleKnockPackets(self):

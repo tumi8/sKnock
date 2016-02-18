@@ -39,11 +39,11 @@ class CryptoEngine:
         self.certUtil = certUtil
 
 
-    def signAndEncryptRequest(self, protocol, port):
+    def signAndEncryptRequest(self, protocol, port, clientIP):
         LOG.debug("Signing and encrypting request...")
         packetTime = datetime.datetime.now()
         timestamp = time.mktime(packetTime.timetuple())
-        request = struct.pack('!B?HL', 0, protocol, int(port), timestamp)
+        request = ''.join((struct.pack('!B?H', 0, protocol, int(port)), clientIP, struct.pack('!L', timestamp)))
         LOG.debug("Added timestamp: %s", packetTime)
 
         signedMessage = self.certUtil.signIncludingCertificate(request)

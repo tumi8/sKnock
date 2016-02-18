@@ -20,6 +20,7 @@ import datetime
 import hashlib
 import logging
 import struct
+import socket
 
 from M2Crypto import *
 from hkdf import hkdf_expand, hkdf_extract
@@ -39,9 +40,10 @@ class CryptoEngine:
         self.certUtil = certUtil
 
 
-    def decryptAndVerifyRequest(self, encryptedMessage):
+    def decryptAndVerifyRequest(self, encryptedMessage, ipVersion):
         protocol = None
         port = None
+        addr = None
 
         signedRequestWithSignature = self.decryptWithECIES(encryptedMessage)
         LOG.debug("Checking Integrity of decrypted Message...")
@@ -54,7 +56,7 @@ class CryptoEngine:
             signatureLength = struct.unpack('!B',signedRequestWithSignature[-73:-72])[0]
             signedRequest = signedRequestWithSignature[0:-73]
             signature = signedRequestWithSignature[-signatureLength:]
-            certificate = signedRequestWithSignature[8:-73]
+            certificate = signedRequestWithSignature[24:-73]
             success = self.certUtil.verifyCertificateAndSignature(certificate, signature, signedRequest)
         else:
             LOG.error("Unable to decrypt Request. Invalid Format?")
@@ -63,7 +65,7 @@ class CryptoEngine:
         if success:
             LOG.debug("Certificate & signature OK!")
             LOG.debug("Checking Timestamp of Request...")
-            timestamp = struct.unpack('!L', signedRequest[4:8])[0]
+            timestamp = struct.unpack('!L', signedRequest[20:24])[0]
             packetTime = datetime.datetime.fromtimestamp(timestamp)
             success = packetTime <= datetime.datetime.now() + datetime.timedelta(0, TIMESTAMP_THRESHOLD_IN_SECONDS)
         else:
@@ -73,22 +75,30 @@ class CryptoEngine:
         if success:
             LOG.debug("Timestamp OK!")
             LOG.debug("Processing request...")
-            request = signedRequest[1:4]
-            protocol, port = struct.unpack('!?H', request)
+            request = signedRequest[1:20]
+            protocol, port = struct.unpack('!?H', request[0:3])
             protocol = PROTOCOL.getById(protocol)      # Convert to Enum
+            source_ip_tuple = struct.unpack('!BBBB', request[3:7])
+            addr = '.'.join(map(str, source_ip_tuple))
+
+            if ipVersion == IP_VERSION.V4:
+                addr = socket.inet_ntop(socket.AF_INET, request[3:7])
+            elif ipVersion == IP_VERSION.V6:
+                addr = socket.inet_ntop(socket.AF_INET6, request[3:19])
+
             LOG.debug("Checking if user is authorized to open requested port...")
             success, certFingerprint = Utils.checkIfRequestIsAuthorized([PROTOCOL.getId(protocol), port], certificate)
         else:
             LOG.error("Timestamp verification failed (Timestamp: %s). Check System time & Threshold - otherwise: possible REPLAY ATTACK", packetTime)
-            return success, protocol, port
+            return success, protocol, port, addr
 
         if success:
             LOG.debug("Authorization OK!")
         else:
             LOG.warning("Unauthorized Request for %s Port: %s from User with Certificate Fingerprint: %s", protocol, port, certFingerprint)
-            return success, protocol, port
+            return success, protocol, port, addr
 
-        return success, protocol, port
+        return success, protocol, port, addr
 
 
     def decryptWithECIES(self, encryptedMessage):

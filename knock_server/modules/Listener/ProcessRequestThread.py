@@ -25,10 +25,8 @@ LOG = logging.getLogger(__name__)
 
 class ProcessRequestThread(Thread):
 
-    def __init__(self, cryptoEngine, firewallHandler, runningPortOpenTasks, ipVersion, addr, request):
-        self.cryptoEngine = cryptoEngine
-        self.firewallHandler = firewallHandler
-        self.runningPortOpenTasks = runningPortOpenTasks
+    def __init__(self, knockListener, ipVersion, addr, request):
+        self.knockListener = knockListener
         self.ipVersion = ipVersion
         self.request = request
         self.addr = addr
@@ -36,12 +34,21 @@ class ProcessRequestThread(Thread):
 
 
     def run(self):
-        success, protocol, port = self.cryptoEngine.decryptAndVerifyRequest(self.request)
+        success, protocol, port, addr = self.knockListener.cryptoEngine.decryptAndVerifyRequest(self.request, self.ipVersion)
 
         if success:
-            LOG.info('Got request for %s Port: %s from host: %s', protocol, port, self.addr)
-            if not hash(str(port) + str(self.ipVersion) + protocol + self.addr) in self.runningPortOpenTasks:
-                PortOpenerThread(self.runningPortOpenTasks, self.firewallHandler, self.ipVersion, protocol, port, self.addr).start()
+            # Check if the source ip in the header was changed in the mean time
+            success = addr == self.addr
+
+
+        if success:
+            LOG.info('Processing decoded request for %s Port: %s from host: %s', protocol, port, addr)
+            if not hash(str(port) + str(self.ipVersion) + protocol + addr) in self.knockListener.runningPortOpenTasks:
+                PortOpenerThread(self.knockListener.runningPortOpenTasks, self.knockListener.firewallHandler, self.ipVersion, protocol, port, addr).start()
             else:
                 LOG.info('There is already a Port-open process running for %s Port: %s for host: %s!',
-                            protocol, port, self.addr)
+                            protocol, port, addr)
+
+        else:
+            LOG.warn('Client IP of request does not match Source IP of IP Header! -> Possible Man-in-the-Middle attack for request for %s Port: %s for host: %s! Source IP from packet header: %s',
+                            protocol, port, addr, self.addr)

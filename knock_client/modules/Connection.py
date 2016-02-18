@@ -69,7 +69,8 @@ class Connection:
         socketToServer = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
 
         try:
-            socketToServer.connect((targetHost,knockPort))
+            pass
+#            socketToServer.connect((targetHost,knockPort))
         except socket.error: pass
         localIPString = socketToServer.getsockname()[0]
 
@@ -87,14 +88,16 @@ class Connection:
                 sys.exit(2)
 
             else:
+                LOG.debug("Determined client ip: %s", localIPString)
                 localIP = ''.join((socket.inet_pton(socket.AF_INET, localIPString), struct.pack('xxxxxxxxxxxx'))) # 4 bytes IPv4 address + padding
 
         else:
+            LOG.debug("Determined client ip: %s", localIPString)
             localIP = socket.inet_pton(socket.AF_INET6, localIPString) # 16 bytes IPv6 address
 
 
 
-        encryptedRequest = self.cryptoEngine.signAndEncryptRequest(PROTOCOL.getId(requestedProtocol), requestedPort)
+        encryptedRequest = self.cryptoEngine.signAndEncryptRequest(PROTOCOL.getId(requestedProtocol), requestedPort, localIP)
         socketToServer.sendto(PROTOCOL_INFORMATION + encryptedRequest, (targetHost, knockPort))
 
         LOG.info('Knock Packet sent to %s:%s', targetHost, knockPort)
