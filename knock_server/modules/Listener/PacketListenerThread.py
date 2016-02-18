@@ -42,19 +42,12 @@ class PacketListenerThread(Thread):
             ipVersion = ipVersionLengthByte[0] >> 4
             udpHeaderLength = 8;
 
-            LOG.debug(str(packet[0]))
-            LOG.debug(str(ipVersionLengthByte))
-            LOG.debug(ipVersion)
-
-
             if ipVersion == Constants.IP_VERSION.V4:
                 ipHeaderLength = (ipVersionLengthByte[0] & 0xF) * 4
             elif ipVersion == Constants.IP_VERSION.V6:
                 ipHeaderLength = 40
             else:
                 continue
-
-            LOG.debug(ipHeaderLength)
 
             udpHeader = packet[ipHeaderLength:ipHeaderLength + udpHeaderLength]
 
