@@ -36,16 +36,9 @@ class PacketListenerThread(Thread):
             packet, source = self.socket.recvfrom(2048)
             source_ip = source[0]
 
-            LOG.debug(source_ip)
-
             ipVersionLengthByte = struct.unpack('!B', packet[0])
             ipVersion = ipVersionLengthByte[0] >> 4
             udpHeaderLength = 8;
-
-            LOG.debug(str(packet[0]))
-            LOG.debug(str(ipVersionLengthByte))
-            LOG.debug(ipVersion)
-
 
             if ipVersion == Constants.IP_VERSION.V4:
                 ipHeaderLength = (ipVersionLengthByte[0] & 0xF) * 4
@@ -54,14 +47,10 @@ class PacketListenerThread(Thread):
             else:
                 continue
 
-            LOG.debug(ipHeaderLength)
-
             udpHeader = packet[ipHeaderLength:ipHeaderLength + udpHeaderLength]
 
             lengthByte = struct.unpack('!H', udpHeader[4:6])
             payloadLength = lengthByte[0] - udpHeaderLength
-
-            LOG.debug(payloadLength)
 
             isPossibleKnockPacket = payloadLength >= Constants.KNOCKPACKET_MIN_LENGTH
 
