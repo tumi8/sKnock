@@ -20,15 +20,16 @@ import logging, struct
 from threading import Thread
 
 from ProcessRequestThread import ProcessRequestThread
-from knock_server.definitions import Constants
+from knock_server.definitions.Constants import *
 
 LOG = logging.getLogger(__name__)
 
 class PacketListenerThread(Thread):
 
-    def __init__(self, knockListener, socket):
+    def __init__(self, knockListener, socket, ipVersion):
         self.knockListener = knockListener
         self.socket = socket
+        self.ipVersion = ipVersion
         Thread.__init__(self)
 
 
@@ -37,33 +38,34 @@ class PacketListenerThread(Thread):
             packet, source = self.socket.recvfrom(2048)
             source_ip = source[0]
 
-            ipVersionLengthByte = struct.unpack('!B', packet[0])
-            ipVersion = ipVersionLengthByte[0] >> 4
             udpHeaderLength = 8;
 
-            if ipVersion == Constants.IP_VERSION.V4:
-                ipHeaderLength = (ipVersionLengthByte[0] & 0xF) * 4
-            elif ipVersion == Constants.IP_VERSION.V6:
-                ipHeaderLength = 40
-            else:
-                continue
+            if self.ipVersion == IP_VERSION.V6:
+                udpHeader = packet[0:udpHeaderLength]
 
-            udpHeader = packet[ipHeaderLength:ipHeaderLength + udpHeaderLength]
+            elif self.ipVersion == IP_VERSION.V4:
+                ipVersionLengthByte = struct.unpack('!B', packet[0])
+                ipHeaderLength = (ipVersionLengthByte[0] & 0xF) * 4
+                udpHeader = packet[ipHeaderLength:ipHeaderLength + udpHeaderLength]
 
             lengthByte = struct.unpack('!H', udpHeader[4:6])
             payloadLength = lengthByte[0] - udpHeaderLength
 
-            isPossibleKnockPacket = payloadLength >= Constants.KNOCKPACKET_MIN_LENGTH
+            isPossibleKnockPacket = payloadLength >= KNOCKPACKET_MIN_LENGTH
 
             if isPossibleKnockPacket:
-                payload = packet[ipHeaderLength + udpHeaderLength : ipHeaderLength + udpHeaderLength + payloadLength]
+                if self.ipVersion == IP_VERSION.V6:
+                    payload = packet[udpHeaderLength : udpHeaderLength + payloadLength]
+
+                elif self.ipVersion == IP_VERSION.V4:
+                    payload = packet[ipHeaderLength + udpHeaderLength : ipHeaderLength + udpHeaderLength + payloadLength]
 
                 knockId = struct.unpack('!c', payload[0])[0]
-                isPossibleKnockPacket = knockId == Constants.KNOCK_ID
+                isPossibleKnockPacket = knockId == KNOCK_ID
 
             if isPossibleKnockPacket:
                 knockVersion = struct.unpack('!BBB', payload[1:4])
-                isPossibleKnockPacket = knockVersion <= Constants.KNOCK_VERSION
+                isPossibleKnockPacket = knockVersion <= KNOCK_VERSION
 
             if isPossibleKnockPacket:
-                ProcessRequestThread(self.knockListener, ipVersion, source_ip, payload[4:]).start()
+                ProcessRequestThread(self.knockListener, self.ipVersion, source_ip, payload[4:]).start()

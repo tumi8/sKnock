@@ -19,6 +19,7 @@
 import logging
 import socket
 
+from knock_server.definitions.Constants import *
 from PacketListenerThread import PacketListenerThread
 
 LOG = logging.getLogger(__name__)
@@ -31,8 +32,8 @@ class KnockListener:
         self.runningPortOpenTasks = list()
         udpsocket4 = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_UDP)
         udpsocket6 = socket.socket(socket.AF_INET6, socket.SOCK_RAW, socket.IPPROTO_UDP)
-        self.listener4 = PacketListenerThread(self, udpsocket4)
-        self.listener6 = PacketListenerThread(self, udpsocket6)
+        self.listener4 = PacketListenerThread(self, udpsocket4, IP_VERSION.V4)
+        self.listener6 = PacketListenerThread(self, udpsocket6, IP_VERSION.V6)
         LOG.debug("Sockets initialized")
 
     def processPossibleKnockPackets(self):
