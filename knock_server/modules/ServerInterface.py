@@ -21,7 +21,7 @@ import os
 
 from CertUtil import CertUtil
 from Firewall.Firewall import Firewall
-from knock_server.modules.Listener.KnockListener import KnockListener
+from knock_server.modules.Listener.KnockProcessor import KnockProcessor
 from knock_server.modules.Platform.LinuxUtils import dropPrivileges
 
 LOG = logging.getLogger(__name__)
@@ -37,7 +37,7 @@ class ServerInterface:
 
     def runKnockDaemon(self):
         with Firewall() as firewallHandler:
-            knockListener = KnockListener(self.cryptoEngine, firewallHandler)
+            knockListener = KnockProcessor(self.cryptoEngine, firewallHandler)
             # knock_server.lib.daemonize.createDaemon()
             dropPrivileges()
             knockListener.processPossibleKnockPackets()

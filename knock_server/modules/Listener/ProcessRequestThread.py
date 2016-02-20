@@ -19,7 +19,7 @@
 import logging
 from threading import Thread
 
-from knock_server.modules.Firewall.PortOpenerThread import PortOpenerThread
+from knock_server.modules.Firewall.PortOpenThread import PortOpenThread
 
 LOG = logging.getLogger(__name__)
 
@@ -44,7 +44,7 @@ class ProcessRequestThread(Thread):
         if success:
             LOG.info('Processing decoded request for %s Port: %s from host: %s', protocol, port, addr)
             if not hash(str(port) + str(self.ipVersion) + protocol + addr) in self.knockListener.runningPortOpenTasks:
-                PortOpenerThread(self.knockListener.runningPortOpenTasks, self.knockListener.firewallHandler, self.ipVersion, protocol, port, addr).start()
+                PortOpenThread(self.knockListener.runningPortOpenTasks, self.knockListener.firewallHandler, self.ipVersion, protocol, port, addr).start()
             else:
                 LOG.info('There is already a Port-open process running for %s Port: %s for host: %s!',
                             protocol, port, addr)

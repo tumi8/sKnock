@@ -24,7 +24,7 @@ from PacketListenerThread import PacketListenerThread
 
 LOG = logging.getLogger(__name__)
 
-class KnockListener:
+class KnockProcessor:
 
     def __init__(self, cryptoEngine, firewallHandler):
         self.cryptoEngine = cryptoEngine

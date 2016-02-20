@@ -20,8 +20,6 @@ import time
 
 from threading import Thread
 
-from knock_server.decorators.synchronized import synchronized
-from knock_server.definitions.Exceptions import *
 from knock_server.definitions import Constants
 
 class PortCloseThread(Thread):
