@@ -23,7 +23,6 @@ import string
 import sys
 from multiprocessing import Process, Pipe
 
-import LinuxHelpers
 import LinuxServiceWrapper
 from knock_server.decorators.synchronized import synchronized
 from knock_server.definitions import Constants
@@ -36,36 +35,34 @@ class Firewall:
 
     def __init__(self):
         self.platform = PlatformUtils.detectPlatform()
+        self.firewallServicePipe, remotePipeEnd = Pipe()
+        self.firewallService = None
 
         if(self.platform == PlatformUtils.LINUX):
-            self.linuxFirewallServicePipe, remotePipeEnd = Pipe()
-            self.linuxFirewallService = Process(target=LinuxServiceWrapper.processFirewallCommands, args=((remotePipeEnd),))
-            self.linuxFirewallService.daemon = True
-            self.linuxFirewallService.start()
-            self._executeTask(["startService"])
+            self.firewallService = Process(target=LinuxServiceWrapper.processFirewallCommands, args=((remotePipeEnd),))
+            self.firewallService.daemon = True
+            self.firewallService.start()
 
-        self._setupDefaultFirewallState()
+        elif self.platform == PlatformUtils.WINDOWS:
+            # TODO: implement for windows
+            pass
+
+        self._executeTask(["startService"])
         self.openPortsList = list()
 
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        self._executeTask(["stopService"])
+        self.firewallServicePipe.close()
+
         if(self.platform == PlatformUtils.LINUX):
-            self._executeTask(["stopService"])
-            self.linuxFirewallServicePipe.close()
-            self.linuxFirewallService.join()
+            self.firewallService.join()
 
-    def _setupEmergencyAccessFirewallRules(self):
-        if(self.platform == PlatformUtils.LINUX):
-            LinuxHelpers.insertEmergencySSHAccessRule()
-
-    def _setupDefaultFirewallState(self):
-        if(self.platform == PlatformUtils.LINUX):
-            LinuxHelpers.setupIPTablesPortKnockingChainAndRedirectTraffic()
-
-        self._setupEmergencyAccessFirewallRules()
-
+        elif self.platform == PlatformUtils.WINDOWS:
+            # TODO: implement for windows
+            pass
 
     def openPortForClient(self, port, ipVersion, protocol, addr):
 
@@ -74,9 +71,7 @@ class Firewall:
             LOG.info('%s Port: %s for host: %s is already open!', protocol, port, addr)
             raise PortAlreadyOpenException
 
-        if(self.platform == PlatformUtils.LINUX):
-            self._executeTask(['openPort', port, ipVersion, protocol, addr])
-
+        self._executeTask(['openPort', port, ipVersion, protocol, addr])
         self.openPortsList.append(openPort)
         LOG.info('%s Port: %s opened for host: %s from: %s until: %s',
                     protocol, port, addr,
@@ -87,9 +82,7 @@ class Firewall:
 
 
     def closePortForClient(self, port, ipVersion, protocol, addr):
-        if(self.platform == PlatformUtils.LINUX):
-            self._executeTask(['closePort', port, ipVersion, protocol, addr])
-
+        self._executeTask(['closePort', port, ipVersion, protocol, addr])
         self.openPortsList.remove(hash(str(port) + str(ipVersion) + protocol + addr))
         LOG.info('%s Port: %s closed for host: %s at: %s', protocol, port, addr, datetime.datetime.now())
 
@@ -100,8 +93,8 @@ class Firewall:
         taskMsg = [taskId]
         taskMsg.extend(msg)
 
-        self.linuxFirewallServicePipe.send(taskMsg)
-        if self.linuxFirewallServicePipe.recv() != taskId:
+        self.firewallServicePipe.send(taskMsg)
+        if self.firewallServicePipe.recv() != taskId:
             Firewall._crashRaceCondition()
 
 

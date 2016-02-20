@@ -45,6 +45,8 @@ def processFirewallCommands(pipe):
 
 def _startService():
     LinuxHelpers.backupIPTablesState()
+    LinuxHelpers.setupIPTablesPortKnockingChainAndRedirectTraffic()
+    LinuxHelpers.insertEmergencySSHAccessRule()
 
 def _openPort(port, ipVersion, protocol, addr):
     chain = LinuxHelpers.getIPTablesChainForVersion(ipVersion, LinuxHelpers.IPTABLES_CHAIN_KNOCK)
