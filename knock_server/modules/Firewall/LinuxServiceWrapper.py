@@ -19,8 +19,7 @@
 
 # THIS WRAPPER IS NEEDED TO PROVIDE PRIVILEGES DROPPING OF THE MAIN THREAD
 
-import os
-import LinuxHelpers
+import IPTablesHelper
 
 def processFirewallCommands(pipe):
     while True:
@@ -44,22 +43,22 @@ def processFirewallCommands(pipe):
 
 
 def _startService():
-    LinuxHelpers.backupIPTablesState()
-    LinuxHelpers.setupIPTablesPortKnockingChainAndRedirectTraffic()
-    LinuxHelpers.insertEmergencySSHAccessRule()
+    IPTablesHelper.backupIPTablesState()
+    IPTablesHelper.setupIPTablesPortKnockingChainAndRedirectTraffic()
+    IPTablesHelper.insertEmergencySSHAccessRule()
 
 def _openPort(port, ipVersion, protocol, addr):
-    chain = LinuxHelpers.getIPTablesChainForVersion(ipVersion, LinuxHelpers.IPTABLES_CHAIN_KNOCK)
-    rule = LinuxHelpers.getIPTablesRuleForClient(port, ipVersion, protocol, addr)
+    chain = IPTablesHelper.getIPTablesChainForVersion(ipVersion, IPTablesHelper.IPTABLES_CHAIN_KNOCK)
+    rule = IPTablesHelper.getIPTablesRuleForClient(port, ipVersion, protocol, addr)
 
-    LinuxHelpers.deleteIPTablesRuleIgnoringError(rule, chain)
+    IPTablesHelper.deleteIPTablesRuleIgnoringError(rule, chain)
     chain.append_rule(rule)
 
 def _closePort(port, ipVersion, protocol, addr):
-    chain = LinuxHelpers.getIPTablesChainForVersion(ipVersion, LinuxHelpers.IPTABLES_CHAIN_KNOCK)
-    rule = LinuxHelpers.getIPTablesRuleForClient(port, ipVersion, protocol, addr)
+    chain = IPTablesHelper.getIPTablesChainForVersion(ipVersion, IPTablesHelper.IPTABLES_CHAIN_KNOCK)
+    rule = IPTablesHelper.getIPTablesRuleForClient(port, ipVersion, protocol, addr)
 
     chain.delete_rule(rule)
 
 def _stopService():
-    LinuxHelpers.restoreIPTablesState()
+    IPTablesHelper.restoreIPTablesState()
