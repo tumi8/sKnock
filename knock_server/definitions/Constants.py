@@ -16,8 +16,18 @@ class PROTOCOL:
 
     @staticmethod
     def getById(id):
-        return PROTOCOL.TCP if id else PROTOCOL.UDP
+        if id == 1:
+            return PROTOCOL.TCP
+        elif id == 0:
+            return PROTOCOL.UDP
+        else
+            return None
 
     @staticmethod
     def getId(protocol):
-        return 1 if PROTOCOL.TCP == protocol else 0
+        if PROTOCOL.TCP == protocol:
+            return 1
+        elif PROTOCOL.UDP == protocol:
+            return 0
+        else
+            return None
