@@ -3,7 +3,7 @@ Dependencies:
 * hkdf
 * Linux: m2crypto
 
-A requirements.txt for `pip` is proviced for convenience.
+A requirements.txt for `pip` is provided for convenience.
 
 ### Server
 Dependencies:
@@ -11,4 +11,4 @@ Dependencies:
 * Linux: m2crypto
 * Linux: iptc
 
-A requirements.txt for `pip` is proviced for convenience.
+A requirements.txt for `pip` is provided for convenience.
