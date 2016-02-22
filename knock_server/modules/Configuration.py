@@ -33,6 +33,7 @@ def initialize(configFilePath = os.path.join(os.path.dirname(__file__), os.pardi
             'PORT_OPEN_DURATION_IN_SECONDS': '15',
             'TIMESTAMP_THRESHOLD_IN_SECONDS': '7',
             'crlFile': os.path.join('certificates', 'devca.crl'),
+            'crlUrl' : 'https://home.in.tum.de/~sel/BA/CA/devca.crl',
             'serverPFXFile': os.path.join('certificates', 'devserver.pfx'),
             'PFXPasswd': 'portknocking'
         }
@@ -44,5 +45,6 @@ def initialize(configFilePath = os.path.join(os.path.dirname(__file__), os.pardi
     config.TIMESTAMP_THRESHOLD_IN_SECONDS = configReader.getint('DEFAULT', 'TIMESTAMP_THRESHOLD_IN_SECONDS')
 
     config.crlFile = os.path.join(os.path.dirname(__file__), os.pardir, configReader.get('DEFAULT', 'crlFile'))
+    config.crlUrl = configReader.get('DEFAULT', 'crlUrl')
     config.serverPFXFile = os.path.join(os.path.dirname(__file__), os.pardir, configReader.get('DEFAULT', 'serverPFXFile'))
     config.PFXPasswd = configReader.get('DEFAULT', 'PFXPasswd')

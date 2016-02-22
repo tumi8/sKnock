@@ -23,6 +23,7 @@ import urllib2
 import datetime
 import time
 import socket
+import calendar
 
 from CryptoEngine import CryptoEngine
 from knock_server.definitions.Exceptions import *
@@ -92,7 +93,7 @@ class CertUtil:
                 CAContext.verify_certificate()
                 LOG.debug("Certificate OK!")
                 self.updateCrl()
-                if not (self.revokedCertificateSerials == None or format(cert.get_serial_number(), 'x').upper() in self.revokedCertificateSerials):
+                if not (self.revokedCertificateSerials is None or format(cert.get_serial_number(), 'x').upper() in self.revokedCertificateSerials):
                     LOG.debug("Certificate Revocation Status OK")
                     return True
                 else:
@@ -133,26 +134,26 @@ class CertUtil:
 
     @synchronized
     def updateCrl(self):
-        if self.lastCRLUpdate != None and time.mktime((datetime.datetime.now() - CRL_UPDATE_INTERVAL).timetuple()) < self.lastCRLUpdate:
+        if self.lastCRLUpdate is not None and time.mktime((datetime.datetime.now() - CRL_UPDATE_INTERVAL).timetuple()) < self.lastCRLUpdate:
             return
 
         LOG.debug("Checking for new CRL on CA Server...")
         remoteCRL = None
         try:
             # TODO: get this from Certificate + CRL-specific cache
-            remoteCRL = urllib2.urlopen("http://home.in.tum.de/~sel/BA/CA/devca.crl", timeout=2)
+            remoteCRL = urllib2.urlopen(self.config.crlUrl, timeout=2)
         except (socket.timeout, urllib2.URLError, urllib2.HTTPError):
             LOG.warning("CA Server seems to be offline")
 
-        if remoteCRL != None:
+        if remoteCRL is not None:
             remoteCRLTimestamp = remoteCRL.info().getdate('last-modified')
-            if remoteCRLTimestamp == None:
+            if remoteCRLTimestamp is None:
                 remoteCRLTimestamp = remoteCRL.info().getdate('date')
 
-            if remoteCRLTimestamp == None:
+            if remoteCRLTimestamp is None:
                 LOG.error("Cannot obtain metadata of remote CRL file")
             else:
-                remoteCRLTimestamp = time.mktime(remoteCRLTimestamp)
+                remoteCRLTimestamp = calendar.timegm(remoteCRLTimestamp)
 
                 if os.path.isfile(self.crlFile) and not os.path.getmtime(self.crlFile) < remoteCRLTimestamp:
                     # Our File is up to date -> no downloading
@@ -179,7 +180,7 @@ class CertUtil:
 
             # TODO: verify CRL signature
 
-            if crl.get_revoked() != None:
+            if crl.get_revoked() is not None:
                 self.revokedCertificateSerials = [x.get_serial() for x in crl.get_revoked()]
             else:
                 self.revokedCertificateSerials = []

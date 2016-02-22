@@ -28,7 +28,7 @@ LOG = logging.getLogger(__name__)
 def checkIfRequestIsAuthorized(request, rawCert):
     cert = X509CertWrapper(rawCert)
 
-    if cert.SAN_auth == None:
+    if cert.SAN_auth is None:
         LOG.warning('Unsupported Authenticator in Certificate!')
         return False, None
 

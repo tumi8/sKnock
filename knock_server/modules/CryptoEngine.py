@@ -66,8 +66,8 @@ class CryptoEngine:
             LOG.debug("Certificate & signature OK!")
             LOG.debug("Checking Timestamp of Request...")
             timestamp = struct.unpack('!L', signedRequest[20:24])[0]
-            packetTime = datetime.datetime.fromtimestamp(timestamp)
-            success = packetTime <= datetime.datetime.now() + datetime.timedelta(0, self.config.TIMESTAMP_THRESHOLD_IN_SECONDS)
+            packetTime = datetime.datetime.utcfromtimestamp(timestamp)
+            success = packetTime <= datetime.datetime.utcnow() + datetime.timedelta(0, self.config.TIMESTAMP_THRESHOLD_IN_SECONDS)
         else:
             LOG.error("Invalid Certificate or Signature!")
             return success, None, None

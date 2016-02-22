@@ -57,13 +57,6 @@ def parseArguments(argv):
 
     return (port, host)
 
-
-def verifyPermissions():
-    if os.getuid() != 0:
-        print 'Sorry, you must be root to run this.'
-        sys.exit(2)    
-
-
 def main(argv):
 
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)

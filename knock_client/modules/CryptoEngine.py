@@ -41,7 +41,7 @@ class CryptoEngine:
 
     def signAndEncryptRequest(self, protocol, port, clientIP):
         LOG.debug("Signing and encrypting request...")
-        packetTime = datetime.datetime.now()
+        packetTime = datetime.datetime.utcnow()
         timestamp = time.mktime(packetTime.timetuple())
         request = ''.join((struct.pack('!B?H', 0, protocol, int(port)), clientIP, struct.pack('!L', timestamp)))
         LOG.debug("Added timestamp: %s", packetTime)
