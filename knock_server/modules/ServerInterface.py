@@ -19,25 +19,28 @@
 import logging
 import os
 
+import Configuration
+from Configuration import config
+
 from CertUtil import CertUtil
 from Firewall.Firewall import Firewall
-from knock_server.modules.Listener.KnockProcessor import KnockProcessor
-from knock_server.modules.Platform.LinuxUtils import dropPrivileges
+from Listener.KnockProcessor import KnockProcessor
+from Platform.LinuxUtils import dropPrivileges
+
 
 LOG = logging.getLogger(__name__)
 
 class ServerInterface:
 
     def __init__(self,
-                 crlFile=os.path.join(os.path.dirname(__file__), os.pardir, 'certificates', 'devca.crl'),
-                 serverPFXFile=os.path.join(os.path.dirname(__file__), os.pardir, 'certificates', 'devserver.pfx'),
-                 PFXPasswd='portknocking'):
+                 configFilePath = os.path.join(os.path.dirname(__file__), os.pardir, 'config.ini')):
 
-        self.cryptoEngine = CertUtil(crlFile, serverPFXFile, PFXPasswd).initializeCryptoEngine()
+        Configuration.initialize(configFilePath)
+        self.cryptoEngine = CertUtil(config).initializeCryptoEngine()
 
     def runKnockDaemon(self):
-        with Firewall() as firewallHandler:
-            knockListener = KnockProcessor(self.cryptoEngine, firewallHandler)
+        with Firewall(config) as firewallHandler:
+            knockProcessor = KnockProcessor(config, self.cryptoEngine, firewallHandler)
             # knock_server.lib.daemonize.createDaemon()
             dropPrivileges()
-            knockListener.processPossibleKnockPackets()
+            knockProcessor.processPossibleKnockPackets()

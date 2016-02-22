@@ -20,8 +20,6 @@ import time
 
 from threading import Thread
 
-from knock_server.definitions import Constants
-
 class PortCloseThread(Thread):
 
     def __init__(self, runningOpenPortTasks, firewallHandler, ipVersion, protocol, port, addr):
@@ -38,7 +36,7 @@ class PortCloseThread(Thread):
         threadTaskHash = hash(str(self.port) + str(self.ipVersion) + self.protocol + self.addr)
 
         try:
-            time.sleep(Constants.PORT_OPEN_DURATION_IN_SECONDS)
+            time.sleep(self.firewallHandler.config.PORT_OPEN_DURATION_IN_SECONDS)
             self.firewallHandler.closePortForClient(self.port, self.ipVersion, self.protocol, self.addr)
 
         except:

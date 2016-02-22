@@ -26,7 +26,8 @@ LOG = logging.getLogger(__name__)
 
 class KnockProcessor:
 
-    def __init__(self, cryptoEngine, firewallHandler):
+    def __init__(self, config, cryptoEngine, firewallHandler):
+        self.config = config
         self.cryptoEngine = cryptoEngine
         self.firewallHandler = firewallHandler
         self.runningPortOpenTasks = list()

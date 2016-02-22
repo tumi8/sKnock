@@ -30,7 +30,6 @@ from knock_server.decorators.synchronized import synchronized
 from knock_server.lib.OpenSSL import crypto
 
 from Platform import PlatformUtils
-import Utils
 
 CRL_UPDATE_INTERVAL = datetime.timedelta(minutes=30)
 
@@ -38,10 +37,11 @@ LOG = logging.getLogger(__name__)
 
 class CertUtil:
 
-    def __init__(self, crlFile, pfxFile, pfxPasswd):
-        self.crlFile = crlFile
-        self.pfxFile = pfxFile
-        self.pfxPasswd = pfxPasswd
+    def __init__(self, config):
+        self.config = config
+        self.crlFile = config.crlFile
+        self.pfxFile = config.serverPFXFile
+        self.pfxPasswd = config.PFXPasswd
         self.platform = PlatformUtils.detectPlatform()
 
         self.lastCRLUpdate = None
@@ -58,7 +58,7 @@ class CertUtil:
                 serverKey = pfx.get_privatekey()
                 serializedServerPrivKey = crypto.dump_privatekey(crypto.FILETYPE_PEM, serverKey)
 
-                return CryptoEngine(serializedServerPrivKey, certUtil=self)
+                return CryptoEngine(self.config, serializedServerPrivKey, certUtil=self)
             except:
                 LOG.error("Failed to load certificates!")
                 sys.exit("Failed to load certificates!")
@@ -156,14 +156,14 @@ class CertUtil:
 
                 if os.path.isfile(self.crlFile) and not os.path.getmtime(self.crlFile) < remoteCRLTimestamp:
                     # Our File is up to date -> no downloading
-                    logging.debug("CRL is up to date.")
+                    LOG.debug("CRL is up to date.")
                 else:
                     if not os.path.isfile(self.crlFile):
                         # We don't have a CRL at all
-                        logging.debug("No CRL found in cache. Downloading...")
+                        LOG.debug("No CRL found in cache. Downloading...")
                     else:
                         # Our CRL is not up to date
-                        logging.debug("Found new CRL. Downloading...")
+                        LOG.debug("Found new CRL. Downloading...")
 
                     try:
                         with open(self.crlFile, 'w') as crlFileHandle:

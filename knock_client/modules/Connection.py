@@ -61,11 +61,6 @@ class Connection:
 
         targetInfo = socket.getaddrinfo(targetHost, knockPort)
 
-        # For IP4 We want socket.AF_INET, socket.SOCK_DGRAM, socket.SOL_UDP and struct.pack('xxxxxxxxxxxx')
-        # For IP6 We want socket.AF_INET6, socket.SOCK_DGRAM, socket.SOL_UDP
-
-
-
         socketToServer = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
 
         try:

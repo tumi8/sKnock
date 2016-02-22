@@ -25,8 +25,8 @@ LOG = logging.getLogger(__name__)
 
 class ProcessRequestThread(Thread):
 
-    def __init__(self, knockListener, ipVersion, addr, request):
-        self.knockListener = knockListener
+    def __init__(self, knockProcessor, ipVersion, addr, request):
+        self.knockProcessor = knockProcessor
         self.ipVersion = ipVersion
         self.request = request
         self.addr = addr
@@ -34,7 +34,7 @@ class ProcessRequestThread(Thread):
 
 
     def run(self):
-        success, protocol, port, addr = self.knockListener.cryptoEngine.decryptAndVerifyRequest(self.request, self.ipVersion)
+        success, protocol, port, addr = self.knockProcessor.cryptoEngine.decryptAndVerifyRequest(self.request, self.ipVersion)
 
         if success:
             # Check if the source ip in the header was changed in the mean time
@@ -43,8 +43,8 @@ class ProcessRequestThread(Thread):
 
         if success:
             LOG.info('Processing decoded request for %s Port: %s from host: %s', protocol, port, addr)
-            if not hash(str(port) + str(self.ipVersion) + protocol + addr) in self.knockListener.runningPortOpenTasks:
-                PortOpenThread(self.knockListener.runningPortOpenTasks, self.knockListener.firewallHandler, self.ipVersion, protocol, port, addr).start()
+            if not hash(str(port) + str(self.ipVersion) + protocol + addr) in self.knockProcessor.runningPortOpenTasks:
+                PortOpenThread(self.knockProcessor.runningPortOpenTasks, self.knockProcessor.firewallHandler, self.ipVersion, protocol, port, addr).start()
             else:
                 LOG.info('There is already a Port-open process running for %s Port: %s for host: %s!',
                             protocol, port, addr)

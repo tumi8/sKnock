@@ -2,7 +2,7 @@ from unittest import TestCase
 import os
 from knock_client.modules.CertUtil import CertUtil as CertUtilClient
 from knock_server.modules.CertUtil import CertUtil as CertUtilServer
-
+from configurations import config_server_valid
 
 class TestCryptoEngine_VALID(TestCase):
 
@@ -14,9 +14,7 @@ class TestCryptoEngine_VALID(TestCase):
             pfxPasswd='portknocking').initializeCryptoEngine()
 
         cls.cryptoEngineServer = CertUtilServer(
-            crlFile=os.path.join(os.path.dirname(__file__), 'data', 'devca_valid.crl'),
-            pfxFile=os.path.join(os.path.dirname(__file__), 'data', 'devserver_valid.pfx'),
-                pfxPasswd='portknocking').initializeCryptoEngine()
+            config_server_valid).initializeCryptoEngine()
 
     def test_encryption(self):
         original_message = "Writing tests makes me want to jump out of the window..."

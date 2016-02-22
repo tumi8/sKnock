@@ -16,7 +16,8 @@
 # USA
 #
 
-import logging, struct
+import logging
+import struct
 from threading import Thread
 
 from ProcessRequestThread import ProcessRequestThread
@@ -26,8 +27,8 @@ LOG = logging.getLogger(__name__)
 
 class PacketListenerThread(Thread):
 
-    def __init__(self, knockListener, socket, ipVersion):
-        self.knockListener = knockListener
+    def __init__(self, knockProcessor, socket, ipVersion):
+        self.knockProcessor = knockProcessor
         self.socket = socket
         self.ipVersion = ipVersion
         Thread.__init__(self)
@@ -51,7 +52,7 @@ class PacketListenerThread(Thread):
             lengthByte = struct.unpack('!H', udpHeader[4:6])
             payloadLength = lengthByte[0] - udpHeaderLength
 
-            isPossibleKnockPacket = payloadLength >= KNOCKPACKET_MIN_LENGTH
+            isPossibleKnockPacket = payloadLength >= self.knockProcessor.config.KNOCKPACKET_MIN_LENGTH
 
             if isPossibleKnockPacket:
                 if self.ipVersion == IP_VERSION.V6:
@@ -68,4 +69,4 @@ class PacketListenerThread(Thread):
                 isPossibleKnockPacket = knockVersion <= KNOCK_VERSION
 
             if isPossibleKnockPacket:
-                ProcessRequestThread(self.knockListener, self.ipVersion, source_ip, payload[4:]).start()
+                ProcessRequestThread(self.knockProcessor, self.ipVersion, source_ip, payload[4:]).start()

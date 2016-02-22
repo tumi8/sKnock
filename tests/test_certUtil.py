@@ -3,6 +3,8 @@ import os, base64, struct
 from knock_client.modules.CertUtil import CertUtil as CertUtilClient
 from knock_server.modules.CertUtil import CertUtil as CertUtilServer
 
+from configurations import config_server_valid
+
 
 class TestCertUtil_VALID(TestCase):
     @classmethod
@@ -12,9 +14,7 @@ class TestCertUtil_VALID(TestCase):
                                 pfxPasswd='portknocking')
         cls.certUtilClient.initializeCryptoEngine()
 
-        cls.certUtilServer = CertUtilServer(crlFile=os.path.join(os.path.dirname(__file__), 'data', 'devca_valid.crl'),
-                                pfxFile=os.path.join(os.path.dirname(__file__), 'data', 'devserver_valid.pfx'),
-                                pfxPasswd='portknocking')
+        cls.certUtilServer = CertUtilServer(config_server_valid)
         cls.certUtilServer.initializeCryptoEngine()
 
     def test_signature(self):

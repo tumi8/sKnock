@@ -19,15 +19,14 @@
 import datetime
 import hashlib
 import logging
-import struct
 import socket
+import struct
 
 from M2Crypto import *
 from hkdf import hkdf_expand, hkdf_extract
 
-from knock_server.definitions.Constants import *
-
 import Utils
+from knock_server.definitions.Constants import *
 
 SIGNATURE_SIZE = 73
 
@@ -35,7 +34,8 @@ LOG = logging.getLogger(__name__)
 
 class CryptoEngine:
 
-    def __init__(self, privateKey, certUtil):
+    def __init__(self, config, privateKey, certUtil):
+        self.config = config
         self.privateKey = EC.load_key_bio(BIO.MemoryBuffer(privateKey))
         self.certUtil = certUtil
 
@@ -67,7 +67,7 @@ class CryptoEngine:
             LOG.debug("Checking Timestamp of Request...")
             timestamp = struct.unpack('!L', signedRequest[20:24])[0]
             packetTime = datetime.datetime.fromtimestamp(timestamp)
-            success = packetTime <= datetime.datetime.now() + datetime.timedelta(0, TIMESTAMP_THRESHOLD_IN_SECONDS)
+            success = packetTime <= datetime.datetime.now() + datetime.timedelta(0, self.config.TIMESTAMP_THRESHOLD_IN_SECONDS)
         else:
             LOG.error("Invalid Certificate or Signature!")
             return success, None, None

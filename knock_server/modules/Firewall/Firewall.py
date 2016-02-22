@@ -25,7 +25,6 @@ from multiprocessing import Process, Pipe
 
 import LinuxServiceWrapper
 from knock_server.decorators.synchronized import synchronized
-from knock_server.definitions import Constants
 from knock_server.definitions.Exceptions import *
 from knock_server.modules.Platform import PlatformUtils
 
@@ -33,7 +32,8 @@ LOG = logging.getLogger(__name__)
 
 class Firewall:
 
-    def __init__(self):
+    def __init__(self, config):
+        self.config = config
         self.platform = PlatformUtils.detectPlatform()
         self.firewallServicePipe, remotePipeEnd = Pipe()
         self.firewallService = None
@@ -74,10 +74,10 @@ class Firewall:
         self._executeTask(['openPort', port, ipVersion, protocol, addr])
         self.openPortsList.append(openPort)
         LOG.info('%s Port: %s opened for host: %s from: %s until: %s',
-                    protocol, port, addr,
-                    datetime.datetime.now(),
-                    datetime.datetime.now() +
-                    datetime.timedelta(0, Constants.PORT_OPEN_DURATION_IN_SECONDS))
+                 protocol, port, addr,
+                 datetime.datetime.now(),
+                 datetime.datetime.now() +
+                 datetime.timedelta(0, self.config.PORT_OPEN_DURATION_IN_SECONDS))
 
 
 
