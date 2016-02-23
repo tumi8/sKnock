@@ -19,7 +19,7 @@
 import logging
 import os
 
-from knock_server.lib import daemonize
+from lib import daemonize
 
 import Configuration
 from Configuration import config

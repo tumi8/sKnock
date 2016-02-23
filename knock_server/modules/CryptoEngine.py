@@ -26,7 +26,7 @@ from M2Crypto import *
 from hkdf import hkdf_expand, hkdf_extract
 
 import Utils
-from knock_server.definitions.Constants import *
+from definitions.Constants import *
 
 SIGNATURE_SIZE = 73
 

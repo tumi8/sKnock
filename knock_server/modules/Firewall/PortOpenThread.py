@@ -20,8 +20,8 @@ import time
 
 from threading import Thread
 
-from knock_server.decorators.synchronized import synchronized
-from knock_server.definitions.Exceptions import *
+from decorators.synchronized import synchronized
+from definitions.Exceptions import *
 
 from PortCloseThread import PortCloseThread
 

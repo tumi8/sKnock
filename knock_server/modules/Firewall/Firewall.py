@@ -24,9 +24,9 @@ import sys
 from multiprocessing import Process, Pipe
 
 import LinuxServiceWrapper
-from knock_server.decorators.synchronized import synchronized
-from knock_server.definitions.Exceptions import *
-from knock_server.modules.Platform import PlatformUtils
+from decorators.synchronized import synchronized
+from definitions.Exceptions import *
+from modules.Platform import PlatformUtils
 
 LOG = logging.getLogger(__name__)
 
@@ -47,7 +47,7 @@ class Firewall:
             # TODO: implement for windows
             pass
 
-        self._executeTask(["startService"])
+        self._executeTask(["startService", self.config.firewallPolicy])
         self.openPortsList = list()
 
     def __enter__(self):

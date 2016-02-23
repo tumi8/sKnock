@@ -27,7 +27,6 @@ import os, sys, pwd, grp, logging
 from modules.ServerInterface import ServerInterface
 
 
-
 def checkPrivileges():
     if (not os.geteuid() == 0):
          print "Sorry, you have to run knock-server as root."
@@ -43,7 +42,10 @@ def dropPrivileges():
 
 def main(argv):
     checkPrivileges()
-    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
+    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG, filename=os.path.join(os.path.dirname(__file__), 'knock-server.log'))
+
+    print os.path.join(os.path.dirname(__file__), 'knock-server.log')
+    print logging.root.handlers
 
     knockServer = ServerInterface()
     knockServer.runKnockDaemon()

@@ -1,8 +1,8 @@
 import time
 from unittest import TestCase
 
-from knock_server.definitions.Constants import *
-from knock_server.modules.Listener.ProcessRequestThread import ProcessRequestThread
+from definitions.Constants import *
+from modules.Listener.ProcessRequestThread import ProcessRequestThread
 
 from configurations import config_server_valid
 

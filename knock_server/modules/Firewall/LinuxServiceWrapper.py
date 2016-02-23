@@ -24,8 +24,8 @@ import IPTablesHelper
 def processFirewallCommands(pipe):
     while True:
         msg = pipe.recv()
-        if msg[1] == 'startService' and len(msg) == 2:
-            _startService()
+        if msg[1] == 'startService' and len(msg) == 3:
+            _startService(msg[2])
             pipe.send(msg[0])
         elif msg[1] == 'openPort' and len(msg) == 6:
             _openPort(msg[2], msg[3], msg[4], msg[5])
@@ -42,9 +42,9 @@ def processFirewallCommands(pipe):
             pass
 
 
-def _startService():
+def _startService(firewallPolicy):
     IPTablesHelper.backupIPTablesState()
-    IPTablesHelper.setupIPTablesPortKnockingChainAndRedirectTraffic()
+    IPTablesHelper.setupIPTablesPortKnockingChainAndRedirectTraffic(firewallPolicy)
     IPTablesHelper.insertEmergencySSHAccessRule()
 
 def _openPort(port, ipVersion, protocol, addr):

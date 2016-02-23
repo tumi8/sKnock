@@ -17,8 +17,8 @@
 #
 
 import logging
-import knock_server.lib.asn1tinydecoder as asn1decoder 
-from knock_server.lib.X509Cert import X509CertWrapper
+import lib.asn1tinydecoder as asn1decoder
+from lib.X509Cert import X509CertWrapper
 
 LOG = logging.getLogger(__name__)
 

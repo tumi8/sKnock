@@ -21,7 +21,7 @@ import struct
 from threading import Thread
 
 from ProcessRequestThread import ProcessRequestThread
-from knock_server.definitions.Constants import *
+from definitions.Constants import *
 
 LOG = logging.getLogger(__name__)
 

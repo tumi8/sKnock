@@ -19,7 +19,7 @@
 import logging
 import socket
 
-from knock_server.definitions.Constants import *
+from definitions.Constants import *
 from PacketListenerThread import PacketListenerThread
 
 LOG = logging.getLogger(__name__)
