@@ -16,7 +16,7 @@ class PROTOCOL:
             return PROTOCOL.TCP
         elif id == 0:
             return PROTOCOL.UDP
-        else
+        else:
             return None
 
     @staticmethod
@@ -25,5 +25,5 @@ class PROTOCOL:
             return 1
         elif PROTOCOL.UDP == protocol:
             return 0
-        else
+        else:
             return None
