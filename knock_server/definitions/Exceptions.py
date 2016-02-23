@@ -3,3 +3,6 @@ class PortAlreadyOpenException(Exception):
 
 class IncompatibleRootCAException(Exception):
     pass
+
+class InvalidConfigException(Exception):
+    pass

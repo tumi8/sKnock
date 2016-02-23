@@ -35,7 +35,8 @@ def initialize(configFilePath = os.path.join(os.path.dirname(__file__), os.pardi
             'crlFile': os.path.join('certificates', 'devca.crl'),
             'crlUrl' : 'https://home.in.tum.de/~sel/BA/CA/devca.crl',
             'serverPFXFile': os.path.join('certificates', 'devserver.pfx'),
-            'PFXPasswd': 'portknocking'
+            'PFXPasswd': 'portknocking',
+            'firewallPolicy' : 'reject'
         }
     )
     configReader.read(configFilePath)
@@ -48,3 +49,5 @@ def initialize(configFilePath = os.path.join(os.path.dirname(__file__), os.pardi
     config.crlUrl = configReader.get('DEFAULT', 'crlUrl')
     config.serverPFXFile = os.path.join(os.path.dirname(__file__), os.pardir, configReader.get('DEFAULT', 'serverPFXFile'))
     config.PFXPasswd = configReader.get('DEFAULT', 'PFXPasswd')
+
+    config.firewallPolicy = configReader.get('DEFAULT', 'firewallPolicy')

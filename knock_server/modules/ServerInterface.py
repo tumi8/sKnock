@@ -19,6 +19,8 @@
 import logging
 import os
 
+from knock_server.lib import daemonize
+
 import Configuration
 from Configuration import config
 
@@ -41,6 +43,6 @@ class ServerInterface:
     def runKnockDaemon(self):
         with Firewall(config) as firewallHandler:
             knockProcessor = KnockProcessor(config, self.cryptoEngine, firewallHandler)
-            # knock_server.lib.daemonize.createDaemon()
+            daemonize.createDaemon()
             dropPrivileges()
             knockProcessor.processPossibleKnockPackets()

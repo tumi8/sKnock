@@ -20,7 +20,8 @@ import logging, subprocess
 
 import iptc
 
-from knock_server.definitions import Constants
+from knock_server.definitions.Constants import *
+from knock_server.definitions.Exceptions import *
 
 LOG = logging.getLogger(__name__)
 
@@ -28,7 +29,7 @@ IPTABLES_CHAIN_KNOCK = 'knock'
 IPTABLES_CHAIN_INPUT = 'INPUT'
 
 def getIPTablesRuleForClient(port, ipVersion, protocol, addr):
-    if ipVersion == Constants.IP_VERSION.V4 and iptc.is_table_available(iptc.Table.FILTER):
+    if ipVersion == IP_VERSION.V4 and iptc.is_table_available(iptc.Table.FILTER):
         rule = iptc.Rule()
         rule.target = iptc.Target(rule, 'RETURN')
         rule.src = addr
@@ -36,7 +37,7 @@ def getIPTablesRuleForClient(port, ipVersion, protocol, addr):
         rule.create_match(protocol).dport = str(port)
         LOG.debug("Created Rule For IPv%s Request: PORT=%s, HOST=%s PROTOCOL=%s", ipVersion, port, addr, protocol)
 
-    elif ipVersion == Constants.IP_VERSION.V6 and iptc.is_table_available(iptc.Table6.FILTER):
+    elif ipVersion == IP_VERSION.V6 and iptc.is_table_available(iptc.Table6.FILTER):
         rule = iptc.Rule6()
         rule.target = iptc.Target(rule, 'RETURN')
         rule.src = addr
@@ -50,9 +51,9 @@ def getIPTablesRuleForClient(port, ipVersion, protocol, addr):
     return rule
 
 def getIPTablesChainForVersion(ipVersion, chain):
-    if ipVersion == Constants.IP_VERSION.V4 and iptc.is_table_available(iptc.Table.FILTER):
+    if ipVersion == IP_VERSION.V4 and iptc.is_table_available(iptc.Table.FILTER):
         chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), chain)
-    elif ipVersion == Constants.IP_VERSION.V6 and iptc.is_table_available(iptc.Table6.FILTER):
+    elif ipVersion == IP_VERSION.V6 and iptc.is_table_available(iptc.Table6.FILTER):
         chain = iptc.Chain(iptc.Table6(iptc.Table6.FILTER), chain)
     else:
         LOG.error("Could not find chain \'%s\' for IPv%s IPTables", chain, ipVersion)
@@ -61,16 +62,16 @@ def getIPTablesChainForVersion(ipVersion, chain):
 
 
 # TODO: Configuration: REJECT or DROP
-def setupIPTablesPortKnockingChainAndRedirectTraffic():
+def setupIPTablesPortKnockingChainAndRedirectTraffic(firewallPolicy):
     if iptc.is_table_available(iptc.Table.FILTER):
         tableV4 = iptc.Table(iptc.Table.FILTER)
         try:
-            knockChainV4 = getIPTablesChainForVersion(Constants.IP_VERSION.V4, IPTABLES_CHAIN_KNOCK)
+            knockChainV4 = getIPTablesChainForVersion(IP_VERSION.V4, IPTABLES_CHAIN_KNOCK)
             knockChainV4.flush()
         except iptc.IPTCError:
             knockChainV4 = tableV4.create_chain(IPTABLES_CHAIN_KNOCK)
 
-        inputChainV4 = getIPTablesChainForVersion(Constants.IP_VERSION.V4, IPTABLES_CHAIN_INPUT)
+        inputChainV4 = getIPTablesChainForVersion(IP_VERSION.V4, IPTABLES_CHAIN_INPUT)
 
         redirectRuleV4 = iptc.Rule()
         redirectRuleV4.target = iptc.Target(redirectRuleV4, IPTABLES_CHAIN_KNOCK)
@@ -83,22 +84,26 @@ def setupIPTablesPortKnockingChainAndRedirectTraffic():
         deleteIPTablesRuleIgnoringError(establishedRuleV4, inputChainV4)
         inputChainV4.insert_rule(establishedRuleV4)
 
-        rejectRuleV4=iptc.Rule()
-        rejectRuleV4.target = rejectRuleV4.create_target('REJECT')
-        deleteIPTablesRuleIgnoringError(rejectRuleV4, inputChainV4)
-        #inputChainV4.append_rule(rejectRuleV4)
+        defaultPolicyRuleV4=iptc.Rule()
+        if firewallPolicy == FIREWALL_POLICY.REJECT:
+            defaultPolicyRuleV4.target = defaultPolicyRuleV4.create_target('REJECT')
+        elif firewallPolicy == FIREWALL_POLICY.DROP:
+            defaultPolicyRuleV4.target = defaultPolicyRuleV4.create_target('REJECT')
+        else: raise InvalidConfigException
+        deleteIPTablesRuleIgnoringError(defaultPolicyRuleV4, inputChainV4)
+        inputChainV4.append_rule(defaultPolicyRuleV4)
 
         LOG.debug("Setup Port-knocking IPTables Configuration for IPv4")
 
     if iptc.is_table_available(iptc.Table6.FILTER):
         tableV6 = iptc.Table6(iptc.Table6.FILTER)
         try:
-            knockChainV6 = getIPTablesChainForVersion(Constants.IP_VERSION.V6, IPTABLES_CHAIN_KNOCK)
+            knockChainV6 = getIPTablesChainForVersion(IP_VERSION.V6, IPTABLES_CHAIN_KNOCK)
             knockChainV6.flush()
         except iptc.IPTCError:
             knockChainV6 = tableV6.create_chain(IPTABLES_CHAIN_KNOCK)
 
-        inputChainV6 = getIPTablesChainForVersion(Constants.IP_VERSION.V6, IPTABLES_CHAIN_INPUT)
+        inputChainV6 = getIPTablesChainForVersion(IP_VERSION.V6, IPTABLES_CHAIN_INPUT)
 
         redirectRuleV6 = iptc.Rule6()
         redirectRuleV6.target = iptc.Target(redirectRuleV6, IPTABLES_CHAIN_KNOCK)
@@ -111,10 +116,14 @@ def setupIPTablesPortKnockingChainAndRedirectTraffic():
         deleteIPTablesRuleIgnoringError(establishedRuleV6, inputChainV6)
         inputChainV6.insert_rule(establishedRuleV6)
 
-        rejectRuleV6=iptc.Rule6()
-        rejectRuleV6.target = rejectRuleV6.create_target('REJECT')
-        deleteIPTablesRuleIgnoringError(rejectRuleV6, inputChainV6)
-        #inputChainV6.append_rule(rejectRuleV6)
+        defaultPolicyRuleV6=iptc.Rule6()
+        if firewallPolicy == FIREWALL_POLICY.REJECT:
+            defaultPolicyRuleV6.target = defaultPolicyRuleV6.create_target('REJECT')
+        elif firewallPolicy == FIREWALL_POLICY.DROP:
+            defaultPolicyRuleV6.target = defaultPolicyRuleV6.create_target('REJECT')
+        else: raise InvalidConfigException
+        deleteIPTablesRuleIgnoringError(defaultPolicyRuleV6, inputChainV6)
+        inputChainV6.append_rule(defaultPolicyRuleV6)
 
         LOG.debug("Setup Port-knocking IPTables Configuration for IPv6")
 
