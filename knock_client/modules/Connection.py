@@ -18,7 +18,7 @@
 
 import logging, socket, struct, sys
 
-from ..definitions.Constants import *
+from definitions.Constants import *
 
 PROTOCOL_INFORMATION = struct.pack('!cBBB', KNOCK_ID, *KNOCK_VERSION)
 MIN_PORT = 10000

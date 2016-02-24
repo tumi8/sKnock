@@ -16,8 +16,8 @@
 # USA
 #
 import logging, sys, os, struct
-from ..lib.OpenSSL import crypto
-from ..definitions.Exceptions import *
+from lib.OpenSSL import crypto
+from definitions.Exceptions import *
 from PlatformUtils import PlatformUtils
 from CryptoEngine import CryptoEngine
 
