@@ -1,8 +1,9 @@
-import os, time, datetime, logging, random, socket, urllib2, schedule, ConfigParser, calendar
-
+import os, time, datetime, logging, random, socket, urllib2, schedule, ConfigParser, calendar, string, subprocess
+from socket import gethostname
 from config import config
 
 from knock_client.modules.ClientInterface import ClientInterface
+from lib import daemonize
 
 class Job: pass
 
@@ -61,42 +62,70 @@ def loadJob():
     jobReader.read(config.jobCfgFile)
 
     job = Job()
+    job.parameters = Job()
 
-    job.ID = jobReader.get('General', 'id')
+    job.parameters.ID = jobReader.get('General', 'id')
     job.processed = jobReader.getboolean('General', 'processed')
 
     job.startTime = jobReader.get('Parameters', 'starttime')
     job.repeatNum = jobReader.getint('Parameters', 'repetitions')
     job.repeatWait = jobReader.getint('Parameters', 'time_between_repetitions')
+    job.type = jobReader.get('Parameters', 'job_type')
 
-    job.targetServer = jobReader.get('Target', 'hostname')
+    job.parameters.targetServer = jobReader.get('Target', 'hostname')
     job.targetRetries = jobReader.getint('Target', 'retries')
     job.targetTimeout = jobReader.getint('Target', 'timeout')
+
+    job.resultServer = jobReader.get('Result', 'collection_server')
+    job.resultServerPath = jobReader.get('Result', 'path')
+    job.resultServerUser = jobReader.get('Result', 'username')
+    job.resultServerPass = jobReader.get('Result', 'password')
+
+    # Optional
     if jobReader.has_option('Target', 'port'):
-        job.targetPort = jobReader.getint('Target', 'port')
+        job.parameters.targetPort = jobReader.getint('Target', 'port')
     else:
-        job.targetPort = random.randint(1900, 20000)
+        job.parameters.targetPort = random.randint(1900, 20000)
+
+    if jobReader.has_option('Target', 'port'):
+        job.parameters.forceIPv4 = jobReader.getboolean('Target', 'force_ipv4')
+    else:
+        job.parameters.forceIPv4 = False
 
     return job
 
 
 
 def executeJob(job):
-    if job.processed == True:
-        LOG.debug('JOB with ID %s has already been processed! Skipping execution...', job.ID)
+    if job.processed:
+        LOG.debug('JOB with ID %s has already been processed! Skipping execution...', job.parameters.ID)
         return
 
-    LOG.debug('Processing JOB with ID %s', job.ID)
-    reconfigureLogging('job-%s.log' % job.ID)
+    LOG.debug('Processing JOB with ID %s', job.parameters.ID)
+
+    try:
+        jobExec = __import__("jobs.%s.job" % job.type, fromlist="jobs.%s").execute
+    except ImportError:
+        LOG.error("Error importing implementation for Job Type: %s", job.type)
+        return False
+
+    job.parameters.resultsDir = os.path.join(os.path.dirname(__file__), 'results', 'job-%s' % job.parameters.ID)
+    if not os.path.exists(job.parameters.resultsDir):
+        os.makedirs(job.parameters.resultsDir)
+
+    reconfigureLogging(os.path.join('job-%s' % job.parameters.ID, 'trace.log'))
 
     startTime = datetime.datetime.strptime(job.startTime, '%Y-%m-%d %H:%M:%S')
     while datetime.datetime.now() < startTime:
         time.sleep(1)
 
-    knockClient = ClientInterface(timeout=job.targetTimeout, numRetries=job.targetRetries)
+    job.parameters.knockClient = ClientInterface(timeout=job.targetTimeout, numRetries=job.targetRetries)
+
+
 
     for i in xrange(job.repeatNum):
-        knockClient.knockOnPort(job.targetServer, job.targetPort)
+        LOG.info('Executing iteration %s', i)
+        jobExec(job.parameters)
         time.sleep(job.repeatWait)
 
     reconfigureLogging('eval.log')
@@ -109,17 +138,34 @@ def executeJob(job):
     with open(config.jobCfgFile, mode='w') as jobCfgFile:
         jobWriter.write(jobCfgFile)
 
-    LOG.debug('Done processing JOB with ID %s', job.ID)
+    LOG.debug('Done processing JOB with ID %s', job.parameters.ID)
+    return True
 
 
 
 
-def processAndSendResults(): pass
+def collectResults(job):
+    if not job.processed:
+        LOG.warning('Tried to collect Results for JOB with ID %s, but it has not been processed yet!', job.parameters.ID)
+        return
+    LOG.info('Collecting result data for JOB with ID %s', job.parameters.ID)
+    host_sub_folder = gethostname()
+    if host_sub_folder is None:
+        host_sub_folder = ''.join([random.choice(string.ascii_letters + string.digits) for n in xrange(8)])
+    results_target_folder = os.path.join(job.resultServerPath, 'job-%s' % job.parameters.ID, host_sub_folder)
+
+    rsync_command = 'sshpass -p \"%s\" rsync -arze \"ssh -o StrictHostKeyChecking=no\" --rsync-path=\"mkdir -p %s && rsync\" \"%s\" %s@%s:\"%s\"' % (job.resultServerPass, results_target_folder, job.parameters.resultsDir, job.resultServerUser, job.resultServer, results_target_folder)
+    LOG.debug('Generated rsync command for result data transfer: %s', rsync_command)
+    subprocess.call(rsync_command, shell=True)
 
 def processNewJob():
     if updateJob():
-        job = loadJob()
-        executeJob(job)
+        try:
+            job = loadJob()
+            if executeJob(job):
+                collectResults(job)
+        except ConfigParser.Error:
+            LOG.error('Could not load JOB!')
 
 
 
@@ -127,6 +173,8 @@ def main():
     reconfigureLogging('eval.log')
     LOG.debug('Starting new evaluation session...')
     schedule.every(1).minutes.do(processNewJob)
+
+    #daemonize.createDaemon()
 
     while True:
         schedule.run_pending()
