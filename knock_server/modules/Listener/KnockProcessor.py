@@ -22,8 +22,6 @@ import socket
 from definitions.Constants import *
 from NewPacketThread import NewPacketThread
 
-from TestLogPacketsThread import TestLogPacketsThread
-
 LOG = logging.getLogger(__name__)
 
 ETH_P_ALL = 3
