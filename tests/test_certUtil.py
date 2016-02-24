@@ -1,7 +1,7 @@
 from unittest import TestCase
 import os, base64, struct
 from knock_client.modules.CertUtil import CertUtil as CertUtilClient
-from modules.CertUtil import CertUtil as CertUtilServer
+from knock_server.modules.CertUtil import CertUtil as CertUtilServer
 
 from configurations import config_server_valid
 
