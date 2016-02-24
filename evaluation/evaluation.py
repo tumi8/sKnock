@@ -2,7 +2,7 @@ import os, time, datetime, logging, random, socket, urllib2, schedule, ConfigPar
 from socket import gethostname
 from config import config
 
-from knock_client.modules.ClientInterface import ClientInterface
+from knock_client.ClientInterface import ClientInterface
 from lib import daemonize
 
 class Job: pass
@@ -126,6 +126,8 @@ def executeJob(job):
     for i in xrange(job.repeatNum):
         LOG.info('Executing iteration %s', i)
         jobExec(job.parameters)
+        LOG.info('Finished iteration %s', i)
+        LOG.info('Waiting %d seconds before continuing...', job.repeatWait)
         time.sleep(job.repeatWait)
 
     reconfigureLogging('eval.log')
@@ -174,7 +176,7 @@ def main():
     LOG.debug('Starting new evaluation session...')
     schedule.every(1).minutes.do(processNewJob)
 
-    #daemonize.createDaemon()
+    daemonize.createDaemon()
 
     while True:
         schedule.run_pending()
