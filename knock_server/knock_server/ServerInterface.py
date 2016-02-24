@@ -35,7 +35,7 @@ LOG = logging.getLogger(__name__)
 class ServerInterface:
 
     def __init__(self,
-                 configFilePath = os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, 'config.ini')):
+                 configFilePath = os.path.join(os.path.dirname(__file__), os.pardir, 'config.ini')):
 
         Configuration.initialize(configFilePath)
         self.cryptoEngine = CertUtil(config).initializeCryptoEngine()
