@@ -55,6 +55,7 @@ class CertUtil:
 
                 self.loadCAFromPFX(pfx)
                 self.updateCrl()
+                self.importCrl()
 
                 serverKey = pfx.get_privatekey()
                 serializedServerPrivKey = crypto.dump_privatekey(crypto.FILETYPE_PEM, serverKey)
@@ -174,6 +175,8 @@ class CertUtil:
                         LOG.error("Error downloading CRL file!")
 
 
+    @synchronized
+    def importCrl(self):
         try:
             LOG.debug("Importing CRL from file...")
             crl = crypto.load_crl(crypto.FILETYPE_ASN1, file(self.crlFile, 'rb').read())

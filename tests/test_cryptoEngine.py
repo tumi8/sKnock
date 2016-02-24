@@ -1,13 +1,15 @@
 from unittest import TestCase
-import os
-from knock_client.modules.CertUtil import CertUtil as CertUtilClient
-from knock_server.modules.CertUtil import CertUtil as CertUtilServer
+import os, logging
+from knock_client.knock_client.modules.CertUtil import CertUtil as CertUtilClient
+from knock_server.knock_server.modules.CertUtil import CertUtil as CertUtilServer
 from configurations import config_server_valid
 
 class TestCryptoEngine_VALID(TestCase):
 
     @classmethod
     def setUpClass(cls):
+        logging.basicConfig()
+
         cls.cryptoEngineClient = CertUtilClient(
             serverCertFile=os.path.join(os.path.dirname(__file__), 'data', 'devserver_valid.cer'),
             pfxFile=os.path.join(os.path.dirname(__file__), 'data', 'devclient_valid.pfx'),

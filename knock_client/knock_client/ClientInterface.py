@@ -18,9 +18,9 @@
 
 import logging, os, random
 
-from knock_client.definitions.Constants import PROTOCOL
-from knock_client.modules.CertUtil import CertUtil
-from knock_client.modules.Connection import Connection, MIN_PORT, MAX_PORT
+from definitions.Constants import PROTOCOL
+from modules.CertUtil import CertUtil
+from modules.Connection import Connection, MIN_PORT, MAX_PORT
 
 LOG = logging.getLogger(__name__)
 

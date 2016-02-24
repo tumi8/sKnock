@@ -1,14 +1,19 @@
 from unittest import TestCase
-import os, base64, struct
-from knock_client.modules.CertUtil import CertUtil as CertUtilClient
-from knock_server.modules.CertUtil import CertUtil as CertUtilServer
+import os, struct, logging
+from knock_client.knock_client.modules.CertUtil import CertUtil as CertUtilClient
 
 from configurations import config_server_valid
 
+from stubs import *
+
+CertUtilServer = stub_CertUtil_Server
 
 class TestCertUtil_VALID(TestCase):
     @classmethod
     def setUpClass(cls):
+
+        logging.basicConfig()
+
         cls.certUtilClient = CertUtilClient(serverCertFile=os.path.join(os.path.dirname(__file__), 'data', 'devserver_valid.cer'),
                                 pfxFile=os.path.join(os.path.dirname(__file__), 'data', 'devclient_valid.pfx'),
                                 pfxPasswd='portknocking')
