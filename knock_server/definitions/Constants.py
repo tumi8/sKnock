@@ -31,3 +31,4 @@ class PROTOCOL:
 class FIREWALL_POLICY:
     DROP = 'drop'
     REJECT = 'reject'
+    NONE = 'none'

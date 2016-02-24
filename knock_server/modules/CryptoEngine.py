@@ -78,8 +78,6 @@ class CryptoEngine:
             request = signedRequest[1:20]
             protocol, port = struct.unpack('!?H', request[0:3])
             protocol = PROTOCOL.getById(protocol)      # Convert to Enum
-            source_ip_tuple = struct.unpack('!BBBB', request[3:7])
-            addr = '.'.join(map(str, source_ip_tuple))
 
             if ipVersion == IP_VERSION.V4:
                 addr = socket.inet_ntop(socket.AF_INET, request[3:7])

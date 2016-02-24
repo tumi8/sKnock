@@ -32,6 +32,7 @@ def initialize(configFilePath = os.path.join(os.path.dirname(__file__), os.pardi
             'KNOCKPACKET_MIN_LENGTH': '800',
             'PORT_OPEN_DURATION_IN_SECONDS': '15',
             'TIMESTAMP_THRESHOLD_IN_SECONDS': '7',
+            'RECV_BUFFER' : '1600',
             'crlFile': os.path.join('certificates', 'devca.crl'),
             'crlUrl' : 'https://home.in.tum.de/~sel/BA/CA/devca.crl',
             'serverPFXFile': os.path.join('certificates', 'devserver.pfx'),
@@ -44,6 +45,7 @@ def initialize(configFilePath = os.path.join(os.path.dirname(__file__), os.pardi
     config.KNOCKPACKET_MIN_LENGTH = configReader.getint('DEFAULT', 'KNOCKPACKET_MIN_LENGTH')
     config.PORT_OPEN_DURATION_IN_SECONDS = configReader.getint('DEFAULT', 'PORT_OPEN_DURATION_IN_SECONDS')
     config.TIMESTAMP_THRESHOLD_IN_SECONDS = configReader.getint('DEFAULT', 'TIMESTAMP_THRESHOLD_IN_SECONDS')
+    config.RECV_BUFFER = configReader.getint('DEFAULT', 'RECV_BUFFER')
 
     config.crlFile = os.path.join(os.path.dirname(__file__), os.pardir, configReader.get('DEFAULT', 'crlFile'))
     config.crlUrl = configReader.get('DEFAULT', 'crlUrl')

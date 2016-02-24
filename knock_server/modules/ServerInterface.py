@@ -43,6 +43,6 @@ class ServerInterface:
     def runKnockDaemon(self):
         with Firewall(config) as firewallHandler:
             knockProcessor = KnockProcessor(config, self.cryptoEngine, firewallHandler)
-            daemonize.createDaemon()
+            #daemonize.createDaemon()
             dropPrivileges()
             knockProcessor.processPossibleKnockPackets()

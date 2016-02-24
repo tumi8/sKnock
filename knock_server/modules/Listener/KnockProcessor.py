@@ -20,9 +20,13 @@ import logging
 import socket
 
 from definitions.Constants import *
-from PacketListenerThread import PacketListenerThread
+from NewPacketThread import NewPacketThread
+
+from TestLogPacketsThread import TestLogPacketsThread
 
 LOG = logging.getLogger(__name__)
+
+ETH_P_ALL = 3
 
 class KnockProcessor:
 
@@ -31,15 +35,13 @@ class KnockProcessor:
         self.cryptoEngine = cryptoEngine
         self.firewallHandler = firewallHandler
         self.runningPortOpenTasks = list()
-        udpsocket4 = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_UDP)
-        udpsocket6 = socket.socket(socket.AF_INET6, socket.SOCK_RAW, socket.IPPROTO_UDP)
-        self.listener4 = PacketListenerThread(self, udpsocket4, IP_VERSION.V4)
-        self.listener6 = PacketListenerThread(self, udpsocket6, IP_VERSION.V6)
+        self.socket = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.htons(ETH_P_ALL))
+
         LOG.debug("Sockets initialized")
 
     def processPossibleKnockPackets(self):
-        self.listener4.start()
-        self.listener6.start()
 
-        self.listener4.join()
-        self.listener6.join()
+        while True:
+            packet = self.socket.recv(self.config.RECV_BUFFER)
+            if len(packet) >= self.config.KNOCKPACKET_MIN_LENGTH:
+                NewPacketThread(self, packet).start()

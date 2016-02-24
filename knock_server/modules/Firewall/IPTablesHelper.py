@@ -61,7 +61,6 @@ def getIPTablesChainForVersion(ipVersion, chain):
     return chain
 
 
-# TODO: Configuration: REJECT or DROP
 def setupIPTablesPortKnockingChainAndRedirectTraffic(firewallPolicy):
     if iptc.is_table_available(iptc.Table.FILTER):
         tableV4 = iptc.Table(iptc.Table.FILTER)
@@ -89,9 +88,11 @@ def setupIPTablesPortKnockingChainAndRedirectTraffic(firewallPolicy):
             defaultPolicyRuleV4.target = defaultPolicyRuleV4.create_target('REJECT')
         elif firewallPolicy == FIREWALL_POLICY.DROP:
             defaultPolicyRuleV4.target = defaultPolicyRuleV4.create_target('REJECT')
+        elif firewallPolicy == FIREWALL_POLICY.NONE: pass
         else: raise InvalidConfigException
         deleteIPTablesRuleIgnoringError(defaultPolicyRuleV4, inputChainV4)
-        inputChainV4.append_rule(defaultPolicyRuleV4)
+        if not firewallPolicy == FIREWALL_POLICY.NONE:
+            inputChainV4.append_rule(defaultPolicyRuleV4)
 
         LOG.debug("Setup Port-knocking IPTables Configuration for IPv4")
 
@@ -121,9 +122,11 @@ def setupIPTablesPortKnockingChainAndRedirectTraffic(firewallPolicy):
             defaultPolicyRuleV6.target = defaultPolicyRuleV6.create_target('REJECT')
         elif firewallPolicy == FIREWALL_POLICY.DROP:
             defaultPolicyRuleV6.target = defaultPolicyRuleV6.create_target('REJECT')
+        elif firewallPolicy == FIREWALL_POLICY.NONE: pass
         else: raise InvalidConfigException
         deleteIPTablesRuleIgnoringError(defaultPolicyRuleV6, inputChainV6)
-        inputChainV6.append_rule(defaultPolicyRuleV6)
+        if not firewallPolicy == FIREWALL_POLICY.NONE:
+            inputChainV6.append_rule(defaultPolicyRuleV6)
 
         LOG.debug("Setup Port-knocking IPTables Configuration for IPv6")
 
@@ -180,5 +183,5 @@ def restoreIPTablesState():
 def deleteIPTablesRuleIgnoringError(rule, chain):
     try:
         chain.delete_rule(rule)
-    except iptc.IPTCError:
+    except (iptc.IPTCError, ValueError):
         pass

@@ -42,10 +42,7 @@ def dropPrivileges():
 
 def main(argv):
     checkPrivileges()
-    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG, filename=os.path.join(os.path.dirname(__file__), 'knock-server.log'))
-
-    print os.path.join(os.path.dirname(__file__), 'knock-server.log')
-    print logging.root.handlers
+    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG, filename=os.path.join(os.path.dirname(__file__), 'portknocking.log'))
 
     knockServer = ServerInterface()
     knockServer.runKnockDaemon()
