@@ -16,12 +16,10 @@
 # USA
 #
 
-import time
-
 from threading import Thread
 
-from decorators.synchronized import synchronized
-from definitions.Exceptions import *
+from ...decorators.synchronized import synchronized
+from ...definitions.Exceptions import *
 
 from PortCloseThread import PortCloseThread
 

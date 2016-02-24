@@ -22,7 +22,7 @@ import socket
 from threading import Thread
 
 from ProcessRequestThread import ProcessRequestThread
-from definitions.Constants import *
+from ...definitions.Constants import *
 
 LOG = logging.getLogger(__name__)
 

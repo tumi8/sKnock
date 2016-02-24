@@ -26,9 +26,9 @@ import socket
 import calendar
 
 from CryptoEngine import CryptoEngine
-from definitions.Exceptions import *
-from decorators.synchronized import synchronized
-from lib.OpenSSL import crypto
+from ..definitions.Exceptions import *
+from ..decorators.synchronized import synchronized
+from ..lib.OpenSSL import crypto
 
 from Platform import PlatformUtils
 

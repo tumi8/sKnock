@@ -21,13 +21,13 @@ import os
 
 from lib import daemonize
 
-import Configuration
-from Configuration import config
+from modules import Configuration
+from modules.Configuration import config
 
-from CertUtil import CertUtil
-from Firewall.Firewall import Firewall
-from Listener.KnockProcessor import KnockProcessor
-from Platform.LinuxUtils import dropPrivileges
+from modules.CertUtil import CertUtil
+from modules.Firewall.Firewall import Firewall
+from modules.Listener.KnockProcessor import KnockProcessor
+from modules.Platform.LinuxUtils import dropPrivileges
 
 
 LOG = logging.getLogger(__name__)
@@ -35,7 +35,7 @@ LOG = logging.getLogger(__name__)
 class ServerInterface:
 
     def __init__(self,
-                 configFilePath = os.path.join(os.path.dirname(__file__), os.pardir, 'config.ini')):
+                 configFilePath = os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, 'config.ini')):
 
         Configuration.initialize(configFilePath)
         self.cryptoEngine = CertUtil(config).initializeCryptoEngine()
@@ -43,6 +43,6 @@ class ServerInterface:
     def runKnockDaemon(self):
         with Firewall(config) as firewallHandler:
             knockProcessor = KnockProcessor(config, self.cryptoEngine, firewallHandler)
-            #daemonize.createDaemon()
+            daemonize.createDaemon()
             dropPrivileges()
             knockProcessor.processPossibleKnockPackets()

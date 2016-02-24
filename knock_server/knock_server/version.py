@@ -23,9 +23,9 @@ __all__ = [
 
 __version__ = "0.0.1"
 
-__title__ = "KNOCK Client"
+__title__ = "KNOCK Server"
 __uri__ = "https://github.com/DanielSel/knock"
-__summary__ = "Client Library for the secure authenticated scalable port-knocking implementation \"KNOCK\""
+__summary__ = "Transparent server service for the secure authenticated scalable port-knocking implementation \"KNOCK\""
 __author__ = "Daniel Sel"
 __license__ = "GNU General Public License"
 __copyright__ = "Copyright 2015-2016 {0}".format(__author__)

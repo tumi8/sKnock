@@ -19,7 +19,6 @@
 import logging
 import socket
 
-from definitions.Constants import *
 from NewPacketThread import NewPacketThread
 
 LOG = logging.getLogger(__name__)

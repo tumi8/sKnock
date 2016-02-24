@@ -22,9 +22,13 @@ USA
 
 """
 
-import os, sys, pwd, grp, logging
+import grp
+import logging
+import os
+import pwd
+import sys
 
-from modules.ServerInterface import ServerInterface
+from knock_server.ServerInterface import ServerInterface
 
 
 def checkPrivileges():

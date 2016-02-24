@@ -24,9 +24,9 @@ import sys
 from multiprocessing import Process, Pipe
 
 import LinuxServiceWrapper
-from decorators.synchronized import synchronized
-from definitions.Exceptions import *
-from modules.Platform import PlatformUtils
+from ...decorators.synchronized import synchronized
+from ...definitions.Exceptions import *
+from ..Platform import PlatformUtils
 
 LOG = logging.getLogger(__name__)
 

@@ -17,8 +17,8 @@
 #
 
 import logging
-import lib.asn1tinydecoder as asn1decoder
-from lib.X509Cert import X509CertWrapper
+from ..lib import asn1tinydecoder as asn1decoder
+from ..lib.X509Cert import X509CertWrapper
 
 LOG = logging.getLogger(__name__)
 
