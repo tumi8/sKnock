@@ -63,7 +63,7 @@ def main(argv):
 
     (port, host) = parseArguments(argv)
 
-    knockClient = ClientInterface()
+    knockClient = ClientInterface(numRetries=1)
     knockClient.knockOnPort(host, port)
 
 

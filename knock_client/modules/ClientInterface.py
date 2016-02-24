@@ -16,11 +16,11 @@
 # USA
 #
 
-import logging, os
+import logging, os, random
 
-from knock_client.definitions.Constants import PROTOCOL
+from definitions.Constants import PROTOCOL
 from CertUtil import CertUtil
-from Connection import Connection
+from Connection import Connection, MIN_PORT, MAX_PORT
 
 LOG = logging.getLogger(__name__)
 
@@ -47,7 +47,7 @@ class ClientInterface:
                                             timeout, numRetries, verify)
 
 
-    def knockOnPort(self, host, port, protocol=PROTOCOL.TCP):
+    def knockOnPort(self, host, port, protocol=PROTOCOL.TCP, knockPort = random.randint(MIN_PORT, MAX_PORT), forceIPv4 = False):
         """
         Actual port-knocking function
 
@@ -58,10 +58,12 @@ class ClientInterface:
         host: Target @host, on which the application is running
         port: Port to open on target @host
         protocol: Requested Target Protocol. Default: TCP
+        knockPort: (Optional) Port to use for port-knocking request. Default: Random Port between MIN_PORT and MAX_PORT
+        forceIPv4: (Optional) Force port-knocking via IPv4, even when IPv6 is available. Default: false
         """
 
         LOG.debug('Knocking %s on port %s', host, port)
-        self.connectionHandler.knockOnPort(host, port, protocol)
+        self.connectionHandler.knockOnPort(host, port, protocol, knockPort, forceIPv4)
 
 
 def init(timeout, numRetries, verify,

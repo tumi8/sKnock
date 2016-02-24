@@ -16,9 +16,9 @@
 # USA
 #
 
-import logging, random, socket, struct, sys
+import logging, socket, struct, sys
 
-from knock_client.definitions.Constants import *
+from definitions.Constants import *
 
 PROTOCOL_INFORMATION = struct.pack('!cBBB', KNOCK_ID, *KNOCK_VERSION)
 MIN_PORT = 10000
@@ -36,11 +36,10 @@ class Connection:
         self.cryptoEngine = cryptoEngine
         self.verify = verify
 
-    def knockOnPort(self, targetHost, requestedPort, requestedProtocol):
-        randomPort = random.randint(MIN_PORT, MAX_PORT)
+    def knockOnPort(self, targetHost, requestedPort, requestedProtocol, knockPort, forceIPv4):
 
         for i in range(0, self.numberOfRetries):
-            self.sendKnockPacket(targetHost, requestedPort, requestedProtocol, randomPort)
+            self.sendKnockPacket(targetHost, requestedPort, requestedProtocol, knockPort, forceIPv4)
             if not self.verify:
                 LOG.info("Port-knocking finished. Verification of target port is disabled.")
                 return True
@@ -55,7 +54,7 @@ class Connection:
         return False
 
 
-    def sendKnockPacket(self, targetHost, requestedPort, requestedProtocol, knockPort):
+    def sendKnockPacket(self, targetHost, requestedPort, requestedProtocol, knockPort, forceIPv4):
 
         LOG.debug('Knock Target Port: %s, Requested Application Port: %s', requestedProtocol, requestedPort)
 
@@ -64,7 +63,8 @@ class Connection:
         socketToServer = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
 
         try:
-            socketToServer.connect((targetHost,knockPort))
+            if not forceIPv4:
+                socketToServer.connect((targetHost,knockPort))
         except socket.error: pass
         localIPString = socketToServer.getsockname()[0]
 
