@@ -18,17 +18,17 @@
 
 import logging, os, random
 
-from definitions.Constants import PROTOCOL
-from CertUtil import CertUtil
-from Connection import Connection, MIN_PORT, MAX_PORT
+from knock_client.definitions.Constants import PROTOCOL
+from knock_client.modules.CertUtil import CertUtil
+from knock_client.modules.Connection import Connection, MIN_PORT, MAX_PORT
 
 LOG = logging.getLogger(__name__)
 
 class ClientInterface:
 
     def __init__(self, timeout=10, numRetries=3, verify=True,
-                 serverCertFile=os.path.join(os.path.dirname(__file__), os.pardir, 'certificates', 'devserver.cer'),
-                 clientPFXFile=os.path.join(os.path.dirname(__file__), os.pardir, 'certificates', 'devclient.pfx'),
+                 serverCertFile=os.path.join(os.path.dirname(__file__), 'certificates', 'devserver.cer'),
+                 clientPFXFile=os.path.join(os.path.dirname(__file__), 'certificates', 'devclient.pfx'),
                  PFXPasswd='portknocking'):
         """
         This function initializes the Port-Knocking client library \"knock\"

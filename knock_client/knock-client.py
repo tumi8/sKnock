@@ -26,7 +26,7 @@ import logging, os, getopt, sys
 
 from struct import *
 
-from modules.ClientInterface import ClientInterface
+from knock_client.ClientInterface import ClientInterface
 
 def usage():
     print "Usage: knock-client.py -p <portToOpen> <host>"
@@ -63,7 +63,7 @@ def main(argv):
 
     (port, host) = parseArguments(argv)
 
-    knockClient = ClientInterface(numRetries=1)
+    knockClient = ClientInterface()
     knockClient.knockOnPort(host, port)
 
 
