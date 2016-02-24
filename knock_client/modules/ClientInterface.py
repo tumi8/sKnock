@@ -18,7 +18,7 @@
 
 import logging, os, random
 
-from definitions.Constants import PROTOCOL
+from ..definitions.Constants import PROTOCOL
 from CertUtil import CertUtil
 from Connection import Connection, MIN_PORT, MAX_PORT
 

@@ -25,8 +25,6 @@ import time
 from M2Crypto import *
 from hkdf import hkdf_expand, hkdf_extract
 
-from definitions import Constants
-
 SIGNATURE_SIZE = 73
 
 LOG = logging.getLogger(__name__)
