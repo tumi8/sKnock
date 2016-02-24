@@ -47,7 +47,7 @@ class ClientInterface:
                                             timeout, numRetries, verify)
 
 
-    def knockOnPort(self, host, port, protocol=PROTOCOL.TCP, knockPort = random.randint(MIN_PORT, MAX_PORT), forceIPv4 = False):
+    def knockOnPort(self, host, port, protocol=PROTOCOL.TCP, knockPort = random.randint(MIN_PORT, MAX_PORT), forceIPv4 = False, clientIP = None):
         """
         Actual port-knocking function
 
@@ -63,7 +63,7 @@ class ClientInterface:
         """
 
         LOG.debug('Knocking %s on port %s', host, port)
-        self.connectionHandler.knockOnPort(host, port, protocol, knockPort, forceIPv4)
+        self.connectionHandler.knockOnPort(host, port, protocol, knockPort, forceIPv4, clientIP)
 
 
 def init(timeout, numRetries, verify,

@@ -36,10 +36,10 @@ class Connection:
         self.cryptoEngine = cryptoEngine
         self.verify = verify
 
-    def knockOnPort(self, targetHost, requestedPort, requestedProtocol, knockPort, forceIPv4):
+    def knockOnPort(self, targetHost, requestedPort, requestedProtocol, knockPort, forceIPv4, clientIP):
 
         for i in range(0, self.numberOfRetries):
-            self.sendKnockPacket(targetHost, requestedPort, requestedProtocol, knockPort, forceIPv4)
+            self.sendKnockPacket(targetHost, requestedPort, requestedProtocol, knockPort, forceIPv4, clientIP)
             if not self.verify:
                 LOG.info("Port-knocking finished. Verification of target port is disabled.")
                 return True
@@ -54,44 +54,41 @@ class Connection:
         return False
 
 
-    def sendKnockPacket(self, targetHost, requestedPort, requestedProtocol, knockPort, forceIPv4):
+    def sendKnockPacket(self, targetHost, requestedPort, requestedProtocol, knockPort, forceIPv4, clientIP):
 
-        LOG.debug('Knock Target Port: %s, Requested Application Port: %s', requestedProtocol, requestedPort)
+        LOG.debug('Knock Target Protocol: %s, Requested Application Port: %s', requestedProtocol, requestedPort)
 
         targetInfo = socket.getaddrinfo(targetHost, knockPort)
 
-        socketToServer = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
+        for i in xrange(len(targetInfo)):
+            if targetInfo[i][:3] == (socket.AF_INET6, socket.SOCK_DGRAM, socket.AF_PACKET) and not forceIPv4:
+                socketToServer = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
+                if clientIP is None:
+                    try: socketToServer.connect((targetInfo[i][4][0], knockPort))
+                    except socket.error:
+                        LOG.error('Could not determine IP of network interface. Please check network configuration and internet connectivity!')
+                        return
 
-        try:
-            if not forceIPv4:
-                socketToServer.connect((targetHost,knockPort))
-        except socket.error: pass
-        localIPString = socketToServer.getsockname()[0]
+                    clientIP = socketToServer.getsockname()[0]
+                    LOG.debug("Determined client ip: %s", clientIP)
+                    clientIP_binary = socket.inet_pton(socket.AF_INET6, clientIP) # 16 bytes IPv6 address
+                    break
 
-        if localIPString == '::':
-            LOG.warn('IPV6 not supported in current environment, using IPv4...')
-            socketToServer = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-            try:
-                socketToServer.connect((targetHost,knockPort))
-            except socket.error: pass
-            localIPString = socketToServer.getsockname()[0]
-
-            if localIPString == '0.0.0.0':
-                LOG.error('Could not determine IP of network interface. Please check network configuration and internet connectivity!')
-                sys.exit(2)
-
-            else:
-                LOG.debug("Determined client ip: %s", localIPString)
-                localIP = ''.join((socket.inet_pton(socket.AF_INET, localIPString), struct.pack('xxxxxxxxxxxx'))) # 4 bytes IPv4 address + padding
-
-        else:
-            LOG.debug("Determined client ip: %s", localIPString)
-            localIP = socket.inet_pton(socket.AF_INET6, localIPString) # 16 bytes IPv6 address
+            elif targetInfo[i][:3] == (socket.AF_INET, socket.SOCK_DGRAM, socket.AF_PACKET):
+                socketToServer = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                if clientIP is None:
+                    try: socketToServer.connect((targetInfo[i][4][0], knockPort))
+                    except socket.error:
+                        LOG.error('Could not determine IP of network interface. Please check network configuration and internet connectivity!')
+                        return
+                    clientIP = socketToServer.getsockname()[0]
+                    LOG.debug("Determined client ip: %s", clientIP)
+                    clientIP_binary = ''.join((socket.inet_pton(socket.AF_INET, clientIP), struct.pack('xxxxxxxxxxxx'))) # 4 bytes IPv4 address + padding
 
 
 
-        encryptedRequest = self.cryptoEngine.signAndEncryptRequest(PROTOCOL.getId(requestedProtocol), requestedPort, localIP)
+        encryptedRequest = self.cryptoEngine.signAndEncryptRequest(PROTOCOL.getId(requestedProtocol), requestedPort, clientIP_binary)
         socketToServer.sendto(PROTOCOL_INFORMATION + encryptedRequest, (targetHost, knockPort))
 
         LOG.info('Knock Packet sent to %s:%s', targetHost, knockPort)

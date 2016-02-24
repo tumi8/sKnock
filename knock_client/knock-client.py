@@ -36,11 +36,14 @@ def parseArguments(argv):
     try:
         port       = 0
         host       = ""
-        opts, args = getopt.getopt(argv, "h:p:")
+        ipv4   = False
+        opts, args = getopt.getopt(argv, "h:p:4")
         
         for opt, arg in opts:
             if opt in ("-p"):
                 port = arg
+            elif opt in ('-4'):
+                ipv4 = True
             else:
                 usage()
                 
@@ -55,16 +58,16 @@ def parseArguments(argv):
     if port == 0 or host == "":
         usage()
 
-    return (port, host)
+    return (port, host, ipv4)
 
 def main(argv):
 
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
 
-    (port, host) = parseArguments(argv)
+    (port, host, ipv4) = parseArguments(argv)
 
     knockClient = ClientInterface()
-    knockClient.knockOnPort(host, port)
+    knockClient.knockOnPort(host, port, forceIPv4=ipv4)
 
 
     sys.exit(0)
