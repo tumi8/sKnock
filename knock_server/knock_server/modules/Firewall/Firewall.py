@@ -21,6 +21,7 @@ import logging
 import random
 import string
 import sys
+import atexit
 from multiprocessing import Process, Pipe
 
 import LinuxServiceWrapper
@@ -40,7 +41,16 @@ class Firewall:
 
         if(self.platform == PlatformUtils.LINUX):
             self.firewallService = Process(target=LinuxServiceWrapper.processFirewallCommands, args=((remotePipeEnd),))
-            self.firewallService.daemon = True
+
+        elif self.platform == PlatformUtils.WINDOWS:
+            # TODO: implement for windows
+            pass
+
+        atexit.register(self.shutdown)
+
+    def startup(self):
+        print 'starting firewall'
+        if(self.platform == PlatformUtils.LINUX):
             self.firewallService.start()
 
         elif self.platform == PlatformUtils.WINDOWS:
@@ -50,10 +60,9 @@ class Firewall:
         self._executeTask(["startService", self.config.firewallPolicy])
         self.openPortsList = list()
 
-    def __enter__(self):
-        return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def shutdown(self):
+        print 'shutting down firewall'
         self._executeTask(["stopService"])
         self.firewallServicePipe.close()
 
@@ -63,6 +72,8 @@ class Firewall:
         elif self.platform == PlatformUtils.WINDOWS:
             # TODO: implement for windows
             pass
+
+        print 'IT WORKED, BITCHES'
 
     def openPortForClient(self, port, ipVersion, protocol, addr):
 

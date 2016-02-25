@@ -18,27 +18,34 @@
 
 import logging
 import socket
-
+from threading import Thread
 from NewPacketThread import NewPacketThread
 
 LOG = logging.getLogger(__name__)
 
 ETH_P_ALL = 3
 
-class KnockProcessor:
 
+class KnockProcessorThread(Thread):
     def __init__(self, config, cryptoEngine, firewallHandler):
+        self.shutdown = False
         self.config = config
         self.cryptoEngine = cryptoEngine
         self.firewallHandler = firewallHandler
         self.runningPortOpenTasks = list()
         self.socket = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.htons(ETH_P_ALL))
+        Thread.__init__(self)
 
         LOG.debug("Sockets initialized")
 
-    def processPossibleKnockPackets(self):
+    def run(self):
+        while not self.shutdown:
+            #packet = self.socket.recv(self.config.RECV_BUFFER)
+            print 'hui' if self.shutdown else 'aww'
+            #if len(packet) >= self.config.KNOCKPACKET_MIN_LENGTH:
+             #   pass  # NewPacketThread(self, packet).start()
 
-        while True:
-            packet = self.socket.recv(self.config.RECV_BUFFER)
-            if len(packet) >= self.config.KNOCKPACKET_MIN_LENGTH:
-                NewPacketThread(self, packet).start()
+        print 'buhja'
+
+    def stop(self):
+        self.shutdown = True

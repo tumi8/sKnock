@@ -18,7 +18,7 @@
 
 import logging
 import os
-
+import signal
 from lib import daemonize
 
 from modules import Configuration
@@ -26,7 +26,7 @@ from modules.Configuration import config
 
 from modules.CertUtil import CertUtil
 from modules.Firewall.Firewall import Firewall
-from modules.Listener.KnockProcessor import KnockProcessor
+from modules.Listener.KnockProcessorThread import KnockProcessorThread
 from modules.Platform.LinuxUtils import dropPrivileges
 
 
@@ -38,11 +38,28 @@ class ServerInterface:
                  configFilePath = os.path.join(os.path.dirname(__file__), os.pardir, 'config.ini')):
 
         Configuration.initialize(configFilePath)
-        self.cryptoEngine = CertUtil(config).initializeCryptoEngine()
+        cryptoEngine = CertUtil(config).initializeCryptoEngine()
+        self.firewallHandler = Firewall(config)
+        self.knockProcessor = KnockProcessorThread(config, cryptoEngine, self.firewallHandler)
+
+        signal.signal(signal.SIGINT, self.gracefulShutdown)
+        signal.signal(signal.SIGTERM, self.gracefulShutdown)
 
     def runKnockDaemon(self):
-        with Firewall(config) as firewallHandler:
-            knockProcessor = KnockProcessor(config, self.cryptoEngine, firewallHandler)
-            daemonize.createDaemon()
-            dropPrivileges()
-            knockProcessor.processPossibleKnockPackets()
+        #self.firewallHandler.startup()
+        self.knockProcessor.start()
+
+
+    def gracefulShutdown(self, sig, frame):
+        LOG.debug('Signal %s received', sig)
+        LOG.info('Stopping port-knocking server...')
+
+        print 'shutting down'
+        print 'alive = %s', self.knockProcessor.isAlive()
+        print 'self.knockProcessor.shutdown = %s', self.knockProcessor.shutdown
+        self.knockProcessor.stop()
+
+        print 'self.knockProcessor.shutdown = %s', self.knockProcessor.shutdown
+        print 'alive = %s', self.knockProcessor.isAlive()
+        self.knockProcessor.join()
+        #self.knockProcessor.firewallHandler.shutdown()
