@@ -26,10 +26,13 @@ import grp
 import logging
 import os
 import pwd
-import sys
+import sys, signal
 
 from knock_server.ServerInterface import ServerInterface
 
+
+def shutdownHandler(sgnl, frame):
+    print "BOOM"
 
 def checkPrivileges():
     if (not os.geteuid() == 0):
@@ -39,15 +42,13 @@ def checkPrivileges():
 def main(argv):
     checkPrivileges()
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG, filename=os.path.join(os.path.dirname(__file__), 'portknocking.log'))
-    #signal.signal(signal.SIGINT, shutdownHandler)
-    #signal.signal(signal.SIGTERM, shutdownHandler)
+    signal.signal(signal.SIGINT, shutdownHandler)
+    signal.signal(signal.SIGTERM, shutdownHandler)
     knockServer = ServerInterface()
     knockServer.runKnockDaemon()
 
     print os.getpid()
 
-    import signal
-    import time
 
     #time.sleep(30)
     #os.kill(os.getpid(), signal.SIGINT)

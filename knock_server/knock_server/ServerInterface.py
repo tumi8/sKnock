@@ -42,11 +42,11 @@ class ServerInterface:
         self.firewallHandler = Firewall(config)
         self.knockProcessor = KnockProcessorThread(config, cryptoEngine, self.firewallHandler)
 
-        signal.signal(signal.SIGINT, self.gracefulShutdown)
-        signal.signal(signal.SIGTERM, self.gracefulShutdown)
+  #      signal.signal(signal.SIGINT, self.gracefulShutdown)
+  #      signal.signal(signal.SIGTERM, self.gracefulShutdown)
 
     def runKnockDaemon(self):
-        self.firewallHandler.startup()
+        #self.firewallHandler.startup()
         self.knockProcessor.start()
 
 
