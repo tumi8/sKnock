@@ -27,7 +27,6 @@ import logging
 import os
 import pwd
 import sys
-import signal
 
 from knock_server.ServerInterface import ServerInterface
 
@@ -37,9 +36,6 @@ def checkPrivileges():
          print "Sorry, you have to run knock-server as root."
          sys.exit(3)
 
-def shutdownHandler(signal, frame):
-    print "Shutdown signal received"
-
 def main(argv):
     checkPrivileges()
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG, filename=os.path.join(os.path.dirname(__file__), 'portknocking.log'))
@@ -47,6 +43,14 @@ def main(argv):
     #signal.signal(signal.SIGTERM, shutdownHandler)
     knockServer = ServerInterface()
     knockServer.runKnockDaemon()
+
+    print os.getpid()
+
+    import signal
+    import time
+
+    #time.sleep(30)
+    #os.kill(os.getpid(), signal.SIGINT)
                 
 if __name__ == '__main__':
     main(sys.argv[1:])

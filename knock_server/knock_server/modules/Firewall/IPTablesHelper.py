@@ -31,7 +31,7 @@ IPTABLES_CHAIN_INPUT = 'INPUT'
 def getIPTablesRuleForClient(port, ipVersion, protocol, addr):
     if ipVersion == IP_VERSION.V4 and iptc.is_table_available(iptc.Table.FILTER):
         rule = iptc.Rule()
-        rule.create_target(rule, 'RETURN')
+        rule.create_target('ACCEPT')
         rule.src = addr
         rule.protocol = protocol
         rule.create_match(protocol).dport = str(port)
@@ -39,7 +39,7 @@ def getIPTablesRuleForClient(port, ipVersion, protocol, addr):
 
     elif ipVersion == IP_VERSION.V6 and iptc.is_table_available(iptc.Table6.FILTER):
         rule = iptc.Rule6()
-        rule.create_target(rule, 'RETURN')
+        rule.create_target('ACCEPT')
         rule.src = addr
         rule.protocol = protocol
         rule.create_match(protocol).dport = str(port)
@@ -190,7 +190,7 @@ def restoreIPTablesState():
     if iptc.is_table_available(iptc.Table6.FILTER):
         subprocess.call('ip6tables-restore < /tmp/ip6tables.bak', shell=True)
         LOG.debug("Restored IPTables Rules from /tmp/ip6tables.bak")
-        subprocess.call('rm /tmp/iptables.bak', shell=True)
+        subprocess.call('rm /tmp/ip6tables.bak', shell=True)
         LOG.debug("Cleaned up backup file /tmp/ip6tables.bak")
 
 def deleteIPTablesRuleIgnoringError(rule, chain):

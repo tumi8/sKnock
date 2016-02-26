@@ -104,9 +104,17 @@ class Firewall:
         taskMsg = [taskId]
         taskMsg.extend(msg)
 
-        self.firewallServicePipe.send(taskMsg)
-        if self.firewallServicePipe.recv() != taskId:
-            Firewall._crashRaceCondition()
+        try:
+            self.firewallServicePipe.send(taskMsg)
+            if self.firewallServicePipe.poll(2):
+                if self.firewallServicePipe.recv() != taskId:
+                    Firewall._crashRaceCondition()
+            else:
+                Firewall._crashNotResponding()
+
+        except IOError:
+            LOG.error('Firewall service not running!')
+            LOG.debug('Can\'t execute requested task: %s', msg)
 
 
     @staticmethod
@@ -115,5 +123,12 @@ class Firewall:
 
     @staticmethod
     def _crashRaceCondition():
-        LOG.error("Tasks executed in wrong order - possible race condition or vulnerability!")
-        sys.exit("Tasks executed in wrong order - possible race condition or vulnerability!")
+        message = "Tasks executed in wrong order - possible race condition or vulnerability!"
+        LOG.error(message)
+        sys.exit(message)
+
+    @staticmethod
+    def _crashNotResponding():
+        message = "Firewall service not responding!"
+        LOG.error(message)
+        sys.exit(message)

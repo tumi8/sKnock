@@ -39,8 +39,10 @@ class KnockProcessorThread(Thread):
         LOG.debug("Sockets initialized")
 
     def run(self):
+        import time
         while not self.shutdown:
             #packet = self.socket.recv(self.config.RECV_BUFFER)
+            time.sleep(2)
             print 'hui' if self.shutdown else 'aww'
             #if len(packet) >= self.config.KNOCKPACKET_MIN_LENGTH:
              #   pass  # NewPacketThread(self, packet).start()

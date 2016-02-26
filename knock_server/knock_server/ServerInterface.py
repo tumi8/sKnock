@@ -46,7 +46,7 @@ class ServerInterface:
         signal.signal(signal.SIGTERM, self.gracefulShutdown)
 
     def runKnockDaemon(self):
-        #self.firewallHandler.startup()
+        self.firewallHandler.startup()
         self.knockProcessor.start()
 
 
