@@ -21,6 +21,7 @@ import logging
 import random
 import string
 import sys
+import atexit
 from multiprocessing import Process, Pipe
 
 import LinuxServiceWrapper
@@ -40,7 +41,17 @@ class Firewall:
 
         if(self.platform == PlatformUtils.LINUX):
             self.firewallService = Process(target=LinuxServiceWrapper.processFirewallCommands, args=((remotePipeEnd),))
-            self.firewallService.daemon = True
+
+        elif self.platform == PlatformUtils.WINDOWS:
+            # TODO: implement for windows
+            pass
+
+        atexit.register(self.shutdown)
+
+    def startup(self):
+        LOG.info("Starting Firewall handling service...")
+
+        if(self.platform == PlatformUtils.LINUX):
             self.firewallService.start()
 
         elif self.platform == PlatformUtils.WINDOWS:
@@ -50,10 +61,10 @@ class Firewall:
         self._executeTask(["startService", self.config.firewallPolicy])
         self.openPortsList = list()
 
-    def __enter__(self):
-        return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def shutdown(self):
+        LOG.info("Stopping Firewall handling service...")
+
         self._executeTask(["stopService"])
         self.firewallServicePipe.close()
 
@@ -63,6 +74,7 @@ class Firewall:
         elif self.platform == PlatformUtils.WINDOWS:
             # TODO: implement for windows
             pass
+
 
     def openPortForClient(self, port, ipVersion, protocol, addr):
 
@@ -93,9 +105,17 @@ class Firewall:
         taskMsg = [taskId]
         taskMsg.extend(msg)
 
-        self.firewallServicePipe.send(taskMsg)
-        if self.firewallServicePipe.recv() != taskId:
-            Firewall._crashRaceCondition()
+        try:
+            self.firewallServicePipe.send(taskMsg)
+            if self.firewallServicePipe.poll(2):
+                if self.firewallServicePipe.recv() != taskId:
+                    Firewall._crashRaceCondition()
+            else:
+                Firewall._crashNotResponding()
+
+        except IOError:
+            LOG.error('Firewall handling service not running!')
+            LOG.debug('Can\'t execute requested task: %s', msg)
 
 
     @staticmethod
@@ -104,5 +124,12 @@ class Firewall:
 
     @staticmethod
     def _crashRaceCondition():
-        LOG.error("Tasks executed in wrong order - possible race condition or vulnerability!")
-        sys.exit("Tasks executed in wrong order - possible race condition or vulnerability!")
+        message = "Tasks executed in wrong order - possible race condition or vulnerability!"
+        LOG.error(message)
+        sys.exit(message)
+
+    @staticmethod
+    def _crashNotResponding():
+        message = "Firewall service not responding!"
+        LOG.error(message)
+        sys.exit(message)

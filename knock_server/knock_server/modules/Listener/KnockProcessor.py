@@ -17,17 +17,17 @@
 #
 
 import logging
-import socket
-
+import socket, errno
 from NewPacketThread import NewPacketThread
 
 LOG = logging.getLogger(__name__)
 
 ETH_P_ALL = 3
 
-class KnockProcessor:
 
+class KnockProcessor():
     def __init__(self, config, cryptoEngine, firewallHandler):
+        self.shutdown = False
         self.config = config
         self.cryptoEngine = cryptoEngine
         self.firewallHandler = firewallHandler
@@ -36,9 +36,18 @@ class KnockProcessor:
 
         LOG.debug("Sockets initialized")
 
-    def processPossibleKnockPackets(self):
+    def run(self):
+        while not self.shutdown:
+            try:
+                packet = self.socket.recv(self.config.RECV_BUFFER)
+            except socket.error, e:
+                if e.errno != errno.EINTR:
+                    raise e
+                else:
+                    return
 
-        while True:
-            packet = self.socket.recv(self.config.RECV_BUFFER)
             if len(packet) >= self.config.KNOCKPACKET_MIN_LENGTH:
                 NewPacketThread(self, packet).start()
+
+    def stop(self):
+        self.shutdown = True
