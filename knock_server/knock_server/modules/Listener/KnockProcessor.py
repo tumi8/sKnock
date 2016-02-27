@@ -17,8 +17,7 @@
 #
 
 import logging
-import socket
-from threading import Thread
+import socket, errno
 from NewPacketThread import NewPacketThread
 
 LOG = logging.getLogger(__name__)
@@ -26,7 +25,7 @@ LOG = logging.getLogger(__name__)
 ETH_P_ALL = 3
 
 
-class KnockProcessorThread(Thread):
+class KnockProcessor():
     def __init__(self, config, cryptoEngine, firewallHandler):
         self.shutdown = False
         self.config = config
@@ -34,20 +33,21 @@ class KnockProcessorThread(Thread):
         self.firewallHandler = firewallHandler
         self.runningPortOpenTasks = list()
         self.socket = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.htons(ETH_P_ALL))
-        Thread.__init__(self)
 
         LOG.debug("Sockets initialized")
 
     def run(self):
-        import time
         while not self.shutdown:
-            #packet = self.socket.recv(self.config.RECV_BUFFER)
-            time.sleep(2)
-            print 'hui' if self.shutdown else 'aww'
-            #if len(packet) >= self.config.KNOCKPACKET_MIN_LENGTH:
-             #   pass  # NewPacketThread(self, packet).start()
+            try:
+                packet = self.socket.recv(self.config.RECV_BUFFER)
+            except socket.error, e:
+                if e.errno != errno.EINTR:
+                    raise e
+                else:
+                    return
 
-        print 'buhja'
+            if len(packet) >= self.config.KNOCKPACKET_MIN_LENGTH:
+                NewPacketThread(self, packet).start()
 
     def stop(self):
         self.shutdown = True

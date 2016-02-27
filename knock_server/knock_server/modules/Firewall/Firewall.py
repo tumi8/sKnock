@@ -49,7 +49,8 @@ class Firewall:
         atexit.register(self.shutdown)
 
     def startup(self):
-        print 'starting firewall'
+        LOG.info("Starting Firewall handling service...")
+
         if(self.platform == PlatformUtils.LINUX):
             self.firewallService.start()
 
@@ -62,7 +63,8 @@ class Firewall:
 
 
     def shutdown(self):
-        print 'shutting down firewall'
+        LOG.info("Stopping Firewall handling service...")
+
         self._executeTask(["stopService"])
         self.firewallServicePipe.close()
 
@@ -73,7 +75,6 @@ class Firewall:
             # TODO: implement for windows
             pass
 
-        print 'IT WORKED, BITCHES'
 
     def openPortForClient(self, port, ipVersion, protocol, addr):
 
@@ -113,7 +114,7 @@ class Firewall:
                 Firewall._crashNotResponding()
 
         except IOError:
-            LOG.error('Firewall service not running!')
+            LOG.error('Firewall handling service not running!')
             LOG.debug('Can\'t execute requested task: %s', msg)
 
 

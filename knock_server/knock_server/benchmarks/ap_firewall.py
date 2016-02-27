@@ -45,7 +45,7 @@ def benchmark(ipv4 = True, ipv6 = False, tcp = True, udp = False, csvOutput = '/
             currTime = time.time()
             computationTime = (currTime-prev_time) * 1000 - perTimingError
             approxTotalTime += computationTime
-            LOG.info('Computation Time for Operation: %f' , computationTime)
+            LOG.info('Computation Time for Operation: %f', computationTime)
             baconFile.write("%d,%s\n" % (i, round(computationTime, 2)))
         v4_rulesetSize += 65536
         LOG.info('Approximate total time for opening 65536 IPv4 TCP ports: %s', round(approxTotalTime, 2))
@@ -62,7 +62,7 @@ def benchmark(ipv4 = True, ipv6 = False, tcp = True, udp = False, csvOutput = '/
             currTime = time.time()
             computationTime = (currTime-prev_time) * 1000 - perTimingError
             approxTotalTime += computationTime
-            LOG.info('Computation Time for Operation: %f' , computationTime)
+            LOG.info('Computation Time for Operation: %f', computationTime)
             baconFile.write("%d,%s\n" % (i, round(computationTime, 2)))
         v4_rulesetSize += 65536
         LOG.info('Approximate total time for opening 65536 IPv4 UDP ports: %s', round(approxTotalTime, 2))
@@ -74,11 +74,11 @@ def benchmark(ipv4 = True, ipv6 = False, tcp = True, udp = False, csvOutput = '/
         approxTotalTime = 0
         for i in xrange(0, 65536):
             prev_time = time.time()
-            firewallHandler.openPortForClient(i, IP_VERSION.V6, PROTOCOL.TCP, '1111:1')
+            firewallHandler.openPortForClient(i, IP_VERSION.V6, PROTOCOL.TCP, '1111::1')
             currTime = time.time()
             computationTime = (currTime-prev_time) * 1000 - perTimingError
             approxTotalTime += computationTime
-            LOG.info('Computation Time for Operation: %f' , computationTime)
+            LOG.info('Computation Time for Operation: %f', computationTime)
             baconFile.write("%d,%s\n" % (i, round(computationTime, 2)))
         v6_rulesetSize += 65536
         LOG.info('Approximate total time for opening 65536 IPv6 TCP ports: %s', round(approxTotalTime, 2))
@@ -90,11 +90,11 @@ def benchmark(ipv4 = True, ipv6 = False, tcp = True, udp = False, csvOutput = '/
         approxTotalTime = 0
         for i in xrange(0, 65536):
             prev_time = time.time()
-            firewallHandler.openPortForClient(i, IP_VERSION.V6, PROTOCOL.UDP, '1111:1')
+            firewallHandler.openPortForClient(i, IP_VERSION.V6, PROTOCOL.UDP, '1111::1')
             currTime = time.time()
             computationTime = (currTime-prev_time) * 1000 - perTimingError
             approxTotalTime += computationTime
-            LOG.info('Computation Time for Operation: %f' , computationTime)
+            LOG.info('Computation Time for Operation: %f', computationTime)
             baconFile.write("%d,%s\n" % (i, round(computationTime, 2)))
         v6_rulesetSize += 65536
         LOG.info('Approximate total time for opening 65536 IPv6 UDP ports: %s', round(approxTotalTime, 2))
@@ -111,7 +111,7 @@ def benchmark(ipv4 = True, ipv6 = False, tcp = True, udp = False, csvOutput = '/
             currTime = time.time()
             computationTime = (currTime-prev_time) * 1000 - perTimingError
             approxTotalTime += computationTime
-            LOG.info('Computation Time for Operation: %f' , computationTime)
+            LOG.info('Computation Time for Operation: %f', computationTime)
             baconFile.write("%d,%s\n" % (v4_rulesetSize - i, round(computationTime, 2)))
         v4_rulesetSize -= 65536
         LOG.info('Approximate total time for closing 65536 IPv4 TCP ports: %s', round(approxTotalTime, 2))
@@ -127,7 +127,7 @@ def benchmark(ipv4 = True, ipv6 = False, tcp = True, udp = False, csvOutput = '/
             currTime = time.time()
             computationTime = (currTime-prev_time) * 1000 - perTimingError
             approxTotalTime += computationTime
-            LOG.info('Computation Time for Operation: %f' , computationTime)
+            LOG.info('Computation Time for Operation: %f', computationTime)
             baconFile.write("%d,%s\n" % (v4_rulesetSize - i, round(computationTime, 2)))
         v4_rulesetSize -= 65536
         LOG.info('Approximate total time for closing 65536 IPv4 UDP ports: %s', round(approxTotalTime, 2))
@@ -139,11 +139,11 @@ def benchmark(ipv4 = True, ipv6 = False, tcp = True, udp = False, csvOutput = '/
         approxTotalTime = 0
         for i in xrange(0, 65536):
             prev_time = time.time()
-            firewallHandler.closePortForClient(i, IP_VERSION.V6, PROTOCOL.TCP, '1111:1')
+            firewallHandler.closePortForClient(i, IP_VERSION.V6, PROTOCOL.TCP, '1111::1')
             currTime = time.time()
             computationTime = (currTime-prev_time) * 1000 - perTimingError
             approxTotalTime += computationTime
-            LOG.info('Computation Time for Operation: %f' , computationTime)
+            LOG.info('Computation Time for Operation: %f', computationTime)
             baconFile.write("%d,%s\n" % (v4_rulesetSize - i, round(computationTime, 2)))
         v6_rulesetSize -= 65536
         LOG.info('Approximate total time for closing 65536 IPv6 TCP ports: %s', round(approxTotalTime, 2))
@@ -155,11 +155,11 @@ def benchmark(ipv4 = True, ipv6 = False, tcp = True, udp = False, csvOutput = '/
         approxTotalTime = 0
         for i in xrange(0, 65536):
             prev_time = time.time()
-            firewallHandler.closePortForClient(i, IP_VERSION.V6, PROTOCOL.UDP, '1111:1')
+            firewallHandler.closePortForClient(i, IP_VERSION.V6, PROTOCOL.UDP, '1111::1')
             currTime = time.time()
             computationTime = (currTime-prev_time) * 1000 - perTimingError
             approxTotalTime += computationTime
-            LOG.info('Computation Time for Operation: %f' , computationTime)
+            LOG.info('Computation Time for Operation: %f', computationTime)
             baconFile.write("%d,%s\n" % (v4_rulesetSize - i, round(computationTime, 2)))
         v6_rulesetSize -= 65536
         LOG.info('Approximate total time for closing 65536 IPv6 UDP ports: %s', round(approxTotalTime, 2))

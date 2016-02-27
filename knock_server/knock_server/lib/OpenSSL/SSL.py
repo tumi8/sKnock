@@ -20,7 +20,7 @@ from _util import (
     UNSPECIFIED as _UNSPECIFIED,
 )
 
-from OpenSSL.crypto import (
+from .crypto import (
     FILETYPE_PEM, _PassphraseHelper, PKey, X509Name, X509, X509Store)
 
 try:

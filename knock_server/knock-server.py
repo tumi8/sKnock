@@ -22,36 +22,29 @@ USA
 
 """
 
-import grp
 import logging
 import os
-import pwd
-import sys, signal
+import sys
+import signal
 
 from knock_server.ServerInterface import ServerInterface
-
-
-def shutdownHandler(sgnl, frame):
-    print "BOOM"
 
 def checkPrivileges():
     if (not os.geteuid() == 0):
          print "Sorry, you have to run knock-server as root."
          sys.exit(3)
 
+
 def main(argv):
     checkPrivileges()
-    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG, filename=os.path.join(os.path.dirname(__file__), 'portknocking.log'))
-    signal.signal(signal.SIGINT, shutdownHandler)
-    signal.signal(signal.SIGTERM, shutdownHandler)
+    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG, filename='/var/log/portknocking.log')
     knockServer = ServerInterface()
-    knockServer.runKnockDaemon()
 
-    print os.getpid()
+    signal.signal(signal.SIGINT, knockServer.gracefulShutdown)
+    signal.signal(signal.SIGTERM, knockServer.gracefulShutdown)
 
+    knockServer.listenForKnockRequests()
 
-    #time.sleep(30)
-    #os.kill(os.getpid(), signal.SIGINT)
-                
 if __name__ == '__main__':
+
     main(sys.argv[1:])
