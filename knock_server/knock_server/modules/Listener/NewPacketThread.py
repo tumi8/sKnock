@@ -21,7 +21,7 @@ import struct
 import socket
 from threading import Thread
 
-from ProcessRequestThread import ProcessRequestThread
+import ProcessRequestThread
 from ...definitions.Constants import *
 
 LOG = logging.getLogger(__name__)
@@ -72,4 +72,4 @@ class NewPacketThread(Thread):
 
         if not isPossibleKnockPacket: return
         LOG.debug("Possible port-knocking request received from: %s")
-        ProcessRequestThread(self.knockProcessor, ipVersion, sourceIP, packet[4:]).start()
+        ProcessRequestThread.ProcessRequestThread(self.knockProcessor, ipVersion, sourceIP, packet[4:]).start()
