@@ -23,7 +23,7 @@ def benchmark():
         cryptoEngine.decryptAndVerifyRequest(v4packet, IP_VERSION.V4)
         cryptoEngine.decryptAndVerifyRequest(v6packet, IP_VERSION.V6)
 
-    number_packets = 1000000
+    number_packets = 300000
     LOG.info('Computing CryptoEngine performance based on data set of %s packets', number_packets)
 
     time_result = timeit.timeit(eval_func, number=number_packets/2)

@@ -46,7 +46,7 @@ def benchmark(ipv4 = True, ipv6 = False, tcp = True, udp = False, csvOutput = '/
             computationTime = (currTime-prev_time) * 1000 - perTimingError
             approxTotalTime += computationTime
             LOG.info('Computation Time for Operation: %f', computationTime)
-            baconFile.write("%d,%s\n" % (i, round(computationTime, 2)))
+            baconFile.write("%d,%s\n" % (v4_rulesetSize + i, round(computationTime, 2)))
         v4_rulesetSize += 65536
         LOG.info('Approximate total time for opening 65536 IPv4 TCP ports: %s', round(approxTotalTime, 2))
         baconFile.close()
@@ -63,7 +63,7 @@ def benchmark(ipv4 = True, ipv6 = False, tcp = True, udp = False, csvOutput = '/
             computationTime = (currTime-prev_time) * 1000 - perTimingError
             approxTotalTime += computationTime
             LOG.info('Computation Time for Operation: %f', computationTime)
-            baconFile.write("%d,%s\n" % (i, round(computationTime, 2)))
+            baconFile.write("%d,%s\n" % (v4_rulesetSize + i, round(computationTime, 2)))
         v4_rulesetSize += 65536
         LOG.info('Approximate total time for opening 65536 IPv4 UDP ports: %s', round(approxTotalTime, 2))
         baconFile.close()
@@ -79,7 +79,7 @@ def benchmark(ipv4 = True, ipv6 = False, tcp = True, udp = False, csvOutput = '/
             computationTime = (currTime-prev_time) * 1000 - perTimingError
             approxTotalTime += computationTime
             LOG.info('Computation Time for Operation: %f', computationTime)
-            baconFile.write("%d,%s\n" % (i, round(computationTime, 2)))
+            baconFile.write("%d,%s\n" % (v6_rulesetSize + i, round(computationTime, 2)))
         v6_rulesetSize += 65536
         LOG.info('Approximate total time for opening 65536 IPv6 TCP ports: %s', round(approxTotalTime, 2))
         baconFile.close()
@@ -95,7 +95,7 @@ def benchmark(ipv4 = True, ipv6 = False, tcp = True, udp = False, csvOutput = '/
             computationTime = (currTime-prev_time) * 1000 - perTimingError
             approxTotalTime += computationTime
             LOG.info('Computation Time for Operation: %f', computationTime)
-            baconFile.write("%d,%s\n" % (i, round(computationTime, 2)))
+            baconFile.write("%d,%s\n" % (v6_rulesetSize + i, round(computationTime, 2)))
         v6_rulesetSize += 65536
         LOG.info('Approximate total time for opening 65536 IPv6 UDP ports: %s', round(approxTotalTime, 2))
         baconFile.close()
@@ -144,7 +144,7 @@ def benchmark(ipv4 = True, ipv6 = False, tcp = True, udp = False, csvOutput = '/
             computationTime = (currTime-prev_time) * 1000 - perTimingError
             approxTotalTime += computationTime
             LOG.info('Computation Time for Operation: %f', computationTime)
-            baconFile.write("%d,%s\n" % (v4_rulesetSize - i, round(computationTime, 2)))
+            baconFile.write("%d,%s\n" % (v6_rulesetSize - i, round(computationTime, 2)))
         v6_rulesetSize -= 65536
         LOG.info('Approximate total time for closing 65536 IPv6 TCP ports: %s', round(approxTotalTime, 2))
         baconFile.close()
@@ -160,7 +160,7 @@ def benchmark(ipv4 = True, ipv6 = False, tcp = True, udp = False, csvOutput = '/
             computationTime = (currTime-prev_time) * 1000 - perTimingError
             approxTotalTime += computationTime
             LOG.info('Computation Time for Operation: %f', computationTime)
-            baconFile.write("%d,%s\n" % (v4_rulesetSize - i, round(computationTime, 2)))
+            baconFile.write("%d,%s\n" % (v6_rulesetSize - i, round(computationTime, 2)))
         v6_rulesetSize -= 65536
         LOG.info('Approximate total time for closing 65536 IPv6 UDP ports: %s', round(approxTotalTime, 2))
         baconFile.close()

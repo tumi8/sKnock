@@ -43,7 +43,7 @@ def benchmark():
         t1.start()
         t2.start()
 
-    number_packets = 1000000
+    number_packets = 300000
     LOG.warn('Computing CryptoEngine performance based on data set of %s packets', number_packets)
 
     compute_time_result = timeit.timeit(eval_func, number=number_packets/2)
