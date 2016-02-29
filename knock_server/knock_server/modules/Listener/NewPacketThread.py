@@ -45,9 +45,15 @@ class NewPacketThread(Thread):
         ipVersion = ipVersionLengthByte >> 4
 
         if ipVersion == IP_VERSION.V4:
+            ipProtocol = struct.unpack('!B', packet[9])[0]
+            if not ipProtocol == socket.IPPROTO_UDP:
+                return
             ipHeaderLength = (ipVersionLengthByte & 0xF) * 4
             sourceIP = socket.inet_ntop(socket.AF_INET, packet[12:16])
         elif ipVersion == IP_VERSION.V6:
+            ipProtocol = struct.unpack('!B', packet[6])[0]
+            if not ipProtocol == socket.IPPROTO_UDP:
+                return
             ipHeaderLength = 40
             sourceIP = socket.inet_ntop(socket.AF_INET6, packet[8:24])
         else:
