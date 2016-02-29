@@ -77,5 +77,5 @@ class NewPacketThread(Thread):
         isPossibleKnockPacket = knockVersion <= KNOCK_VERSION
 
         if not isPossibleKnockPacket: return
-        LOG.debug("Possible port-knocking request received from: %s")
+        LOG.debug("Possible port-knocking request received from: %s", sourceIP)
         ProcessRequestThread.ProcessRequestThread(self.knockProcessor, ipVersion, sourceIP, packet[4:]).start()

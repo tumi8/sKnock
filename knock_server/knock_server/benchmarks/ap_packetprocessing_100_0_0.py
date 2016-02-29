@@ -48,8 +48,8 @@ def benchmark():
 
     time_result = compute_time_result + thread_wait_time
 
-    LOG.debug("Compute Time: %f", compute_time_result)
-    LOG.debug("Thread wait time: %f", thread_wait_time)
+    LOG.info("Compute Time: %f", compute_time_result)
+    LOG.info("Thread wait time: %f", thread_wait_time)
 
 
     pps = number_packets / time_result

@@ -61,7 +61,7 @@ def benchmark():
     number_packets = 50000000
     LOG.info('Computing PacketProcessor performance based on data set of %s packets', number_packets)
 
-    compute_time_result = timeit.timeit(eval_func, number=number_packets/2)
+    compute_time_result = timeit.timeit(eval_func, number=number_packets/200)
 
     # We still need to wait for all threads to finish and calculate the time
     prev_time = time.time()
@@ -71,8 +71,8 @@ def benchmark():
 
     time_result = compute_time_result + thread_wait_time
 
-    LOG.debug("Compute Time: %f", compute_time_result)
-    LOG.debug("Thread wait time: %f", thread_wait_time)
+    LOG.info("Compute Time: %f", compute_time_result)
+    LOG.info("Thread wait time: %f", thread_wait_time)
 
 
     pps = number_packets / time_result
