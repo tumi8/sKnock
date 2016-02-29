@@ -58,9 +58,6 @@ def benchmark():
             threadList.append(t)
             t.start()
 
-
-
-
     number_packets = 50000000
     LOG.info('Computing PacketProcessor performance based on data set of %s packets', number_packets)
 
@@ -74,8 +71,8 @@ def benchmark():
 
     time_result = compute_time_result + thread_wait_time
 
-    print "Compute Time: %f" % compute_time_result
-    print "Thread wait time: %f" % thread_wait_time
+    LOG.debug("Compute Time: %f", compute_time_result)
+    LOG.debug("Thread wait time: %f", thread_wait_time)
 
 
     pps = number_packets / time_result
