@@ -58,7 +58,7 @@ def benchmark():
             threadList.append(t)
             t.start()
 
-    number_packets = 50000000
+    number_packets = 5000000
     LOG.info('Computing PacketProcessor performance based on data set of %s packets', number_packets)
 
     compute_time_result = timeit.timeit(eval_func, number=number_packets/200)
