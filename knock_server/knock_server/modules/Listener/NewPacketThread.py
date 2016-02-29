@@ -41,6 +41,7 @@ class NewPacketThread(Thread):
         # Skip Ethernet Hedaer
         packet = self.packet[ETHERNET_HEADER_LENGTH:]
 
+        # Determine IP version
         ipVersionLengthByte = struct.unpack('!B', packet[0])[0]
         ipVersion = ipVersionLengthByte >> 4
 
@@ -57,14 +58,12 @@ class NewPacketThread(Thread):
             ipHeaderLength = 40
             sourceIP = socket.inet_ntop(socket.AF_INET6, packet[8:24])
         else:
-            LOG.error('Malformed packet received!')
+            LOG.error('Malformed packet received! (Or maybe it is just a huge non-IP packet...)')
             return
 
         # We processed IP Hedaer -> skip
         packet = packet[ipHeaderLength:]
-
-        udpHeader = packet[:UDP_HEADER_LENGTH]
-        payloadLength = struct.unpack('!H', udpHeader[4:6])[0] - UDP_HEADER_LENGTH
+        payloadLength = struct.unpack('!H', packet[4:6])[0] - UDP_HEADER_LENGTH
 
         # We don't need no ... UDP Header ... or the rest
         packet = packet[UDP_HEADER_LENGTH : UDP_HEADER_LENGTH + payloadLength]
