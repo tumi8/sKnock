@@ -33,6 +33,7 @@ class KnockProcessor:
         self.firewallHandler = firewallHandler
         self.runningPortOpenTasks = list()
         self.socket = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.htons(ETH_P_ALL))
+        self.socket.settimeout(5)
 
         LOG.debug("Sockets initialized")
 
@@ -40,6 +41,8 @@ class KnockProcessor:
         while not self.shutdown:
             try:
                 packet = self.socket.recv(self.config.RECV_BUFFER)
+            except socket.timeout:
+                continue
             except socket.error, e:
                 if e.errno != errno.EINTR:
                     raise e
