@@ -5,14 +5,14 @@ requestLOG = logging.getLogger('requests')
 [requestLOG.removeHandler(handler) for handler in requestLOG.handlers[:]]
 requestLOG.addHandler(logging.FileHandler('requests.log'))
 
-PRECONF_DELAY_IN_SECONDS = 0
-
 shutdown = False
 
 class ConnectionThread(threading.Thread):
-    def __init__(self, conn, addr = None):
+    def __init__(self, conn, delay_compensation, callback, addr = None):
         self.conn = conn
         self.client_addr = addr
+        self.delay_compensation = delay_compensation
+        self.callback = callback
         self.shutdown = False
         threading.Thread.__init__(self)
 
@@ -42,8 +42,11 @@ class ConnectionThread(threading.Thread):
             packetTimestamp  = struct.unpack('!d', packet)[0]
             #print 'packetTime: %s' % packetTimestamp
             #print 'serverTime: %s' % time_now
-            delay = time_now - PRECONF_DELAY_IN_SECONDS - packetTimestamp
+            delay = time_now - self.delay_compensation - packetTimestamp
             requestLOG.debug("Delay for client %s was %sms", client_addr, delay * 1000)
+
+            if self.callback is not None:
+                self.callback(delay)
 
             self.conn.sendto(struct.pack('!d', time_now), client_addr)
         self.conn.close()
@@ -51,7 +54,7 @@ class ConnectionThread(threading.Thread):
     def stop(self):
         shutdown = True
 
-def startTCPServer():
+def startTCPServer(delay_compensation, callback):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
     server_socket.settimeout(5)
     server_socket.bind(('0.0.0.0', 60000))
@@ -71,7 +74,7 @@ def startTCPServer():
                         return
         LOG.debug('Connection from %s', addr)
 
-        t = ConnectionThread(conn, addr)
+        t = ConnectionThread(conn, delay_compensation, callback, addr)
         threadList.append(t)
         t.start()
 
@@ -79,11 +82,11 @@ def startTCPServer():
         t.stop()
         t.join(7)
 
-def startUDPServer():
+def startUDPServer(delay_compensation, callback):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     server_socket.settimeout(5)
     server_socket.bind(('0.0.0.0', 60000))
-    t = ConnectionThread(server_socket)
+    t = ConnectionThread(server_socket, delay_compensation, callback)
     t.start()
 
     global shutdown
@@ -95,16 +98,16 @@ def startUDPServer():
 
 
 
-def start(udp):
+def start(udp, delay_compensation = 0, callback = None):
     signal.signal(signal.SIGTERM, stop)
     signal.signal(signal.SIGINT, stop)
 
     global shutdown
 
     if udp:
-        startUDPServer()
+        startUDPServer(delay_compensation, callback)
     else:
-        startTCPServer()
+        startTCPServer(delay_compensation, callback)
 
 def stop(sig, frame):
     LOG.debug('Signal %s received', sig)
@@ -118,13 +121,17 @@ def stop(sig, frame):
 
 
 def usage():
-    print "Usage: test-server.py <tcp | udp>"
+    print "Usage: test_server.py [-d <delay compensation in ms] <tcp | udp>"
     sys.exit(2)
 
 def parseArguments(argv):
-    proto = None
+    delay_compensation = 0
     try:
-        opts, args = getopt.getopt(argv, "")
+        opts, args = getopt.getopt(argv, "d:")
+
+        for opt, arg in opts:
+            if opt in ("-d"):
+                delay_compensation = float(arg) / float(1000)
 
         if len(args) == 1:
             proto = args[0]
@@ -142,9 +149,9 @@ def parseArguments(argv):
     else:
         usage()
 
-    return udp
+    return udp, delay_compensation
 
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG, stream=sys.stdout)
-    start(parseArguments(sys.argv[1:]))
+    start(*parseArguments(sys.argv[1:]))

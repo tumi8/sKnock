@@ -49,22 +49,17 @@ def send(target, udp, knockClient = None):
 
 
 def usage():
-    print "Usage: test-client.py -p <tcp | udp> <target host>"
+    print "Usage: test_client.py <tcp | udp> <target host>"
     sys.exit(2)
 
 def parseArguments(argv):
     proto = None
     try:
-        opts, args = getopt.getopt(argv, "p:")
+        opts, args = getopt.getopt(argv, "")
 
-        for opt, arg in opts:
-            if opt in ("-p"):
-                proto = arg
-            else:
-                usage()
-
-        if len(args) == 1:
-            host = args[0]
+        if len(args) == 2:
+            proto = args[0]
+            host = args[1]
         else:
             usage()
 
