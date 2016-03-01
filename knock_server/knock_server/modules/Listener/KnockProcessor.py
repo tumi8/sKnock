@@ -25,7 +25,7 @@ LOG = logging.getLogger(__name__)
 ETH_P_ALL = 3
 
 
-class KnockProcessor():
+class KnockProcessor:
     def __init__(self, config, cryptoEngine, firewallHandler):
         self.shutdown = False
         self.config = config
