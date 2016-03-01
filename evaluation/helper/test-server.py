@@ -54,7 +54,7 @@ class ConnectionThread(threading.Thread):
 def startTCPServer():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
     server_socket.settimeout(5)
-    server_socket.bind(('127.0.0.1', 60000))
+    server_socket.bind(('0.0.0.0', 60000))
     server_socket.listen(1)
 
     threadList = []
@@ -82,7 +82,7 @@ def startTCPServer():
 def startUDPServer():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     server_socket.settimeout(5)
-    server_socket.bind(('127.0.0.1', 60000))
+    server_socket.bind(('0.0.0.0', 60000))
     t = ConnectionThread(server_socket)
     t.start()
 
