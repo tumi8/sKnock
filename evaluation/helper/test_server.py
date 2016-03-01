@@ -42,13 +42,14 @@ class ConnectionThread(threading.Thread):
             packetTimestamp  = struct.unpack('!d', packet)[0]
             #print 'packetTime: %s' % packetTimestamp
             #print 'serverTime: %s' % time_now
-            delay = time_now - self.delay_compensation - packetTimestamp
+            time_server = time_now - self.delay_compensation
+            delay = time_server - packetTimestamp
             requestLOG.debug("Delay for client %s was %sms", client_addr, delay * 1000)
 
             if self.callback is not None:
                 self.callback(delay)
 
-            self.conn.sendto(struct.pack('!d', time_now), client_addr)
+            self.conn.sendto(struct.pack('!d', time_server), client_addr)
         self.conn.close()
 
     def stop(self):

@@ -3,7 +3,7 @@ import logging, time, struct, sys, getopt, socket
 LOG = logging.getLogger(__name__)
 
 
-def send(target, udp, knockClient = None):
+def send(target, udp, knockClient = None, callback = None):
 
     if udp:
         proto = socket.SOCK_DGRAM, socket.IPPROTO_UDP
@@ -38,6 +38,9 @@ def send(target, udp, knockClient = None):
     time_server = struct.unpack('!d', response)[0]
     LOG.info('Received packet from test server...')
     time_recv = time.time()
+
+    if callback is not None:
+        callback((time_server - time_send) * 1000)
 
     #print 'packetTime: %s' % time_server
     #print 'recvTime: %s' % time_recv
