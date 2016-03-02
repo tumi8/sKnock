@@ -17,11 +17,11 @@ def send(target, udp, knockClient = None, callback = None):
     time_send = time.time()
 
     if knockClient is not None:
-        LOG.info('Port-knocking the server before starting...')
+        #LOG.debug('Port-knocking the server before starting...')
         knockClient.knockOnPort(target, 60000, protocol=proto_str, forceIPv4=True)
 
     #print 'sendTime: %s' % time_send
-    #LOG.info('Sending packet to test server...')
+    #LOG.debug('Sending packet to test server...')
     data = struct.pack('!d', time_send)
     if udp:
         target_socket.sendto(data, (target, 60000))
@@ -36,7 +36,7 @@ def send(target, udp, knockClient = None, callback = None):
         return
 
     time_server = struct.unpack('!d', response)[0]
-    LOG.info('Received packet from test server...')
+    LOG.debug('Received packet from test server...')
     time_recv = time.time()
 
     if callback is not None:
@@ -45,8 +45,8 @@ def send(target, udp, knockClient = None, callback = None):
     #print 'packetTime: %s' % time_server
     #print 'recvTime: %s' % time_recv
 
-    LOG.info('Processing Delay      (Client -> Server [can start working on Data]:   %sms', (time_server - time_send) * 1000)
-    LOG.info('Round-Trip-Time [RTT] (Client -> Server -> Client):                    %sms', (time_recv - time_send) * 1000)
+    LOG.debug('Processing Delay      (Client -> Server [can start working on Data]:   %sms', (time_server - time_send) * 1000)
+    LOG.debug('Round-Trip-Time [RTT] (Client -> Server -> Client):                    %sms', (time_recv - time_send) * 1000)
 
 
 

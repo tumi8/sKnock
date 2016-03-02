@@ -56,6 +56,7 @@ class ConnectionThread(threading.Thread):
         shutdown = True
 
 def startTCPServer(delay_compensation, callback):
+    LOG.info('Starting TCP server...')
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
     server_socket.settimeout(5)
     server_socket.bind(('0.0.0.0', 60000))
@@ -84,6 +85,7 @@ def startTCPServer(delay_compensation, callback):
         t.join(7)
 
 def startUDPServer(delay_compensation, callback):
+    LOG.info('Starting UDP server...')
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     server_socket.settimeout(5)
     server_socket.bind(('0.0.0.0', 60000))
