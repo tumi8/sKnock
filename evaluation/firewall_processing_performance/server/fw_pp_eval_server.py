@@ -1,4 +1,4 @@
-import test_server, threading, logging, sys, getopt, signal
+import test_server, threading, logging, sys, getopt, signal, os
 
 from knock_server.definitions.Constants import *
 from knock_server.modules.Configuration import config, initialize
@@ -9,6 +9,7 @@ LOG = logging.getLogger(__name__)
 number_of_open_ports = 0
 firewallHandler = None
 serverThread = None
+baconFile = None
 shutdown = False
 
 class ServerThread(threading.Thread):
@@ -35,7 +36,7 @@ def openSomePorts():
 
 def closeSomePorts():
     global firewallHandler, number_of_open_ports, shutdown
-    for i in xrange(number_of_open_ports):
+    for i in xrange(55000):
         firewallHandler.closePortForClient(i, IP_VERSION.V4, PROTOCOL.TCP, '192.168.0.2')
         number_of_open_ports -= 1
         firewallHandler.closePortForClient(i, IP_VERSION.V4, PROTOCOL.UDP, '192.168.0.2')
@@ -48,18 +49,27 @@ def stop(sig, frame):
     shutdown = True
 
 def logProcessingDelay(delay):
+    global baconFile
+    baconFile.write("%d,%s\n" % (number_of_open_ports, round(delay, 2)))
     LOG.warn("IPTables Processing Time for chain-size of %s rules was %sms", number_of_open_ports, delay)
 
-def test(udp, delay_compensation):
-    global firewallHandler, serverThread
+def test(udp, delay_compensation, csvOutput = '/tmp'):
     initialize()
     config.firewallPolicy = 'none'
+
+    global firewallHandler
     firewallHandler = Firewall(config)
     firewallHandler.startup()
+
+    global baconFile
+    baconFile = open(os.path.join(csvOutput, 'ap_firewall_rulesetsize_vs_processing_delay.csv'), 'w')
+
+    global serverThread
     serverThread = ServerThread((udp, delay_compensation, logProcessingDelay))
     serverThread.start()
     openSomePorts()
     serverThread.stop()
+    baconFile.close()
     firewallHandler.shutdown()
 
 def usage():
