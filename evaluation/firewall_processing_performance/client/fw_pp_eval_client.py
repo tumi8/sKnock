@@ -4,19 +4,15 @@ LOG = logging.getLogger(__name__)
 shutdown = False
 
 def start(target, udp):
-    if udp:
-        LOG.error('Didn\'t get around to implement stuff yet...')
-
-    else:
-        global shutdown
-        while not shutdown:
-            try:
-                test_client.send(target, udp)
-            except socket.error, e:
-                    if e.errno != errno.ECONNREFUSED:
-                        raise e
-                    else:
-                        return
+    global shutdown
+    while not shutdown:
+        try:
+            test_client.send(target, udp)
+        except socket.error, e:
+                if e.errno != errno.ECONNREFUSED:
+                    raise e
+                else:
+                    return
 
 
 def stop(sig, frame):
