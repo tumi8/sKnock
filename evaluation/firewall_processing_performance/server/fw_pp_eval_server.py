@@ -23,9 +23,9 @@ class ServerThread(threading.Thread):
 def openSomePorts():
     global firewallHandler, number_of_open_ports, shutdown
     for i in xrange(55000):
-        firewallHandler.openPortForClient(i, IP_VERSION.V4, PROTOCOL.TCP, '1.1.1.1')
+        firewallHandler.openPortForClient(i, IP_VERSION.V4, PROTOCOL.TCP, '192.168.0.2')
         number_of_open_ports += 1
-        firewallHandler.openPortForClient(i, IP_VERSION.V4, PROTOCOL.UDP, '1.1.1.1')
+        firewallHandler.openPortForClient(i, IP_VERSION.V4, PROTOCOL.UDP, '192.168.0.2')
         number_of_open_ports += 1
 
         if shutdown:
@@ -36,9 +36,9 @@ def openSomePorts():
 def closeSomePorts():
     global firewallHandler, number_of_open_ports, shutdown
     for i in xrange(number_of_open_ports):
-        firewallHandler.closePortForClient(i, IP_VERSION.V4, PROTOCOL.TCP, '1.1.1.1')
+        firewallHandler.closePortForClient(i, IP_VERSION.V4, PROTOCOL.TCP, '192.168.0.2')
         number_of_open_ports -= 1
-        firewallHandler.closePortForClient(i, IP_VERSION.V4, PROTOCOL.UDP, '1.1.1.1')
+        firewallHandler.closePortForClient(i, IP_VERSION.V4, PROTOCOL.UDP, '192.168.0.2')
         number_of_open_ports -= 1
 
         if shutdown:
