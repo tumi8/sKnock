@@ -48,7 +48,7 @@ def send(target, udp, knockClient = None, callback = None):
     LOG.debug('Processing Delay      (Client -> Server [can start working on Data]:   %sms', (time_server - time_send) * 1000)
     LOG.debug('Round-Trip-Time [RTT] (Client -> Server -> Client):                    %sms', (time_recv - time_send) * 1000)
 
-
+    target_socket.close()
 
 
 def usage():
