@@ -16,14 +16,14 @@ class Security:
 
     def __init__(self, config):
         self.config = config
-        self.certUtil = CertUtil(pfxFile=config.serverPFXFile, pfxPasswd=config.PFXPasswd)
+        self.certUtil = CertUtil(pfxFile=config.PFX_FILE, pfxPasswd=config.PFX_PASSWD)
         self.security = CryptoEngine(self.certUtil.getPrivKeyPEM())
         self.startContinuousCRLUpdate()
 
 
     # Note: Returns a Thread that has to be stopped before program can exit
     def startContinuousCRLUpdate(self):
-        self.updateCRLThread = UpdateCRLThread(self.config.crlFile, self.config.crlUrl, importFunc=self.certUtil.importCrl)
+        self.updateCRLThread = UpdateCRLThread(self.config.CRL_FILE, self.config.CRL_URL, importFunc=self.certUtil.importCrl)
         self.updateCRLThread.start()
 
     def decryptAndVerifyRequest(self, encryptedMessage, ipVersion):

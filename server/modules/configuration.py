@@ -20,38 +20,51 @@ import logging, os, ConfigParser
 
 LOG = logging.getLogger(__name__)
 
-# Initialize
-class Settings: pass
-config = Settings()
+class Configuration:
+    STR_PACKET_MIN_LENGTH = 'KNOCKPACKET_MIN_LENGTH'
+    STR_PORT_OPEN_DURATION_IN_SECONDS = 'PORT_OPEN_DURATION_IN_SECONDS'
+    STR_TIMESTAMP_THRESHOLD_IN_SECONDS = 'TIMESTAMP_THRESHOLD_IN_SECONDS'
+    STR_SIGNATURE_SIZE = 'SIGNATURE_SIZE'
+    STR_RECV_BUFFER = 'RECV_BUFFER'
+    STR_CRL_FILE = 'CRL_FILE'
+    STR_CRL_URL = 'CRL_URL'
+    STR_PFX_FILE = 'PFX_FILE'
+    STR_PFX_PASSWD = 'PFX_PASSWD'
+    STR_FIREWALL_POLICY = 'FIREWALL_POLICY'
 
-def initialize(configFilePath = os.path.join(os.path.dirname(__file__), os.pardir, 'config.ini')):
+    def __init__(self):
+        pass
 
-    global config
-    configReader = ConfigParser.SafeConfigParser(
-        {
-            'KNOCKPACKET_MIN_LENGTH': '800',
-            'PORT_OPEN_DURATION_IN_SECONDS': '15',
-            'TIMESTAMP_THRESHOLD_IN_SECONDS': '7',
-            'SIGNATURE_SIZE': '73',
-            'RECV_BUFFER' : '1600',
-            'crlFile': os.path.join('certificates', 'devca.crl'),
-            'crlUrl' : 'https://home.in.tum.de/~sel/BA/CA/devca.crl',
-            'serverPFXFile': os.path.join('certificates', 'devserver.pfx'),
-            'PFXPasswd': 'portknocking',
-            'firewallPolicy' : 'reject'
-        }
-    )
-    configReader.read(configFilePath)
+    def load_from_file(self,
+                       configFilePath = os.path.join(os.path.dirname(__file__), os.pardir, 'config.ini')):
+        """
+        Load configuration from the given file substituting default values
+        whenever applicable.
+        """
 
-    config.KNOCKPACKET_MIN_LENGTH = configReader.getint('DEFAULT', 'KNOCKPACKET_MIN_LENGTH')
-    config.PORT_OPEN_DURATION_IN_SECONDS = configReader.getint('DEFAULT', 'PORT_OPEN_DURATION_IN_SECONDS')
-    config.TIMESTAMP_THRESHOLD_IN_SECONDS = configReader.getint('DEFAULT', 'TIMESTAMP_THRESHOLD_IN_SECONDS')
-    config.SIGNATURE_SIZE = configReader.getint('DEFAULT', 'SIGNATURE_SIZE')
-    config.RECV_BUFFER = configReader.getint('DEFAULT', 'RECV_BUFFER')
-
-    config.crlFile = os.path.join(os.path.dirname(__file__), os.pardir, configReader.get('DEFAULT', 'crlFile'))
-    config.crlUrl = configReader.get('DEFAULT', 'crlUrl')
-    config.serverPFXFile = os.path.join(os.path.dirname(__file__), os.pardir, configReader.get('DEFAULT', 'serverPFXFile'))
-    config.PFXPasswd = configReader.get('DEFAULT', 'PFXPasswd')
-
-    config.firewallPolicy = configReader.get('DEFAULT', 'firewallPolicy')
+        parser = ConfigParser.SafeConfigParser(
+            {
+                STR_PACKET_MIN_LENGTH: '800',
+                STR_PORT_OPEN_DURATION_IN_SECONDS: '15',
+                STR_TIMESTAMP_THRESHOLD_IN_SECONDS: '7',
+                STR_SIGNATURE_SIZE: '73'
+                STR_RECV_BUFFER : '1600',
+                STR_CRL_FILE: os.path.join('certificates', 'devca.crl'),
+                STR_CRL_URL : 'https://home.in.tum.de/~sel/BA/CA/devca.crl',
+                STR_PFX_FILE: os.path.join('certificates', 'devserver.pfx'),  #PKCS12 file containing the private key
+                STR_PFX_PASSWD: 'portknocking',
+                STR_FIREWALL_POLICY : 'reject'
+            }
+        )
+        parser.read(configFilePath)
+        section = 'DEFAULT'
+        self.PACKET_MIN_LENGTH = parser.getint(section, STR_PACKET_MIN_LENGTH)
+        self.PORT_OPEN_DURATION_IN_SECONDS = parser.getint(section, STR_PORT_OPEN_DURATION_IN_SECONDS)
+        self.TIMESTAMP_THRESHOLD_IN_SECONDS = parser.getint(section, STR_TIMESTAMP_THRESHOLD_IN_SECONDS)
+        self.SIGNATURE_SIZE = parser.getint(section, STR_SIGNATURE_SIZE)
+        self.RECV_BUFFER = parser.getint(section, STR_RECV_BUFFER)
+        self.CRL_FILE = os.path.join(os.path.dirname(__file__), os.pardir, parser.get(section, STR_CRL_FILE))
+        self.CRL_URL = parser.get(section, STR_CRL_URL)
+        self.PFX_FILE = os.path.join(os.path.dirname(__file__), os.pardir, parser.get(section, STR_PFX_FILE))
+        self.PFX_PASSWD = parser.get(section, STR_PFX_PASSWD)
+        self.FIREWALL_POLICY = parser.get(section, STR_FIREWALL_POLICY)

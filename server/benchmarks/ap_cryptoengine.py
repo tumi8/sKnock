@@ -5,13 +5,14 @@ import timeit
 
 from common.constants import *
 from modules.Security import Security
-from modules.Configuration import config, initialize
+from server.modules.configuration import Configuration
 
 LOG = logging.getLogger(__name__)
 
 def benchmark():
     LOG.info('Initializing...')
-    initialize()
+    config = Configuration()
+    config.load_from_file()
     with open(os.path.join(os.path.dirname(__file__), 'data', 'v4packet.enc'), 'rb') as baconFile:
         v4packet = baconFile.read()
         LOG.debug('Loaded IPv4 dummy request!')

@@ -20,9 +20,7 @@ import logging
 import os
 import pwd, grp
 
-from modules import Configuration
-from modules.Configuration import config
-
+from modules.configuration import Configuration
 from modules.Security.Security import Security
 from modules.Firewall.Firewall import Firewall
 from modules.Listener.KnockProcessor import KnockProcessor
@@ -33,8 +31,10 @@ LOG = logging.getLogger(__name__)
 class ServerInterface:
 
     def __init__(self,
-                 configFilePath = os.path.join(os.path.dirname(__file__), 'config.ini')):
-        Configuration.initialize(configFilePath)
+                 configFilePath = os.path.join(os.path.dirname(__file__),
+                 'config.ini')):
+        config = Configuration()
+        config.load_from_file(configFilePath)
         security = Security(config)
         self.firewallHandler = Firewall(config)
         self.knockProcessor = KnockProcessor(config, security, self.firewallHandler)

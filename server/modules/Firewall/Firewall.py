@@ -57,7 +57,7 @@ class Firewall:
             # TODO: implement for windows
             pass
 
-        self._executeTask(["startService", self.config.firewallPolicy])
+        self._executeTask(["startService", self.config.FIREWALL_POLICY])
         self.openPortsList = list()
 
 
