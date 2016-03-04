@@ -2,7 +2,7 @@ import os, time, datetime, logging, random, socket, urllib2, schedule, ConfigPar
 from socket import gethostname
 from config import config
 
-from knock_client.ClientInterface import ClientInterface
+from client.ClientInterface import ClientInterface
 from lib import daemonize
 
 class Job: pass

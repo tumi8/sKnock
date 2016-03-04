@@ -27,7 +27,7 @@ import os
 import sys
 import signal
 
-from server.ServerInterface import ServerInterface
+from ServerInterface import ServerInterface
 
 def checkPrivileges():
     if (not os.geteuid() == 0):

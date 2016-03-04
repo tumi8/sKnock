@@ -1,8 +1,8 @@
 import test_server, threading, logging, sys, getopt, signal, os
 
-from knock_server.definitions.Constants import *
-from knock_server.modules.Configuration import config, initialize
-from knock_server.modules.Firewall.Firewall import Firewall
+from common.definitions.Constants import *
+from server.modules.Configuration import config, initialize
+from server.modules.Firewall.Firewall import Firewall
 
 LOG = logging.getLogger(__name__)
 

@@ -1,4 +1,5 @@
-import test_client, logging, sys, getopt, signal, socket, errno
+from helper import test_client
+import logging, sys, getopt, signal, socket, errno
 
 LOG = logging.getLogger(__name__)
 shutdown = False
