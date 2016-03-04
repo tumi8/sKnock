@@ -18,7 +18,7 @@
 
 import logging
 import os
-from common.modules.Platform.LinuxUtils import dropPrivileges
+import pwd, grp
 
 from modules import Configuration
 from modules.Configuration import config
@@ -34,7 +34,6 @@ class ServerInterface:
 
     def __init__(self,
                  configFilePath = os.path.join(os.path.dirname(__file__), 'config.ini')):
-
         Configuration.initialize(configFilePath)
         security = Security(config)
         self.firewallHandler = Firewall(config)
@@ -43,11 +42,23 @@ class ServerInterface:
     def listenForKnockRequests(self):
         self.firewallHandler.startup()
         dropPrivileges()
-
         self.knockProcessor.run()
-
 
     def gracefulShutdown(self, sig, frame):
         LOG.debug('Signal %s received', sig)
         LOG.info('Stopping port-knocking server...')
         self.knockProcessor.stop()
+
+    @staticmethod
+    def dropPrivileges():
+        """
+        Drop user and group privileges to 'nobody' and 'nobody' respectively.
+
+        This function is only available on UNIX
+        """
+        nobody = pwd.getpwnam('nobody')
+        nogroup = grp.getgrnam('nobody')
+        os.setgroups([nogroup.gr_gid])
+        os.setgid(nogroup.gr_gid)
+        os.setuid(nobody.pw_uid)
+        LOG.debug("Dropped root privileges, now running as \'nobody\'")

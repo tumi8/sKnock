@@ -1,3 +1,5 @@
+import platform
+
 KNOCK_ID='a'
 KNOCK_VERSION=(0,0,1)
 
@@ -32,3 +34,23 @@ class FIREWALL_POLICY:
     DROP = 'drop'
     REJECT = 'reject'
     NONE = 'none'
+
+class PLATFORMS:
+    UNDEFINED = 0
+    WINDOWS = 1
+    LINUX = 2
+
+    @staticmethod
+    def detect():
+        """
+        classify the underlying platform into one of the above declared constants
+        """
+        platformString = platform.system();
+        if(platformString == "Windows"):
+            return WINDOWS
+        elif (platformString == "Linux"):
+            return LINUX
+        else:
+            return UNDEFINED
+
+KNOCK_PLATFORM = PLATFORMS.detect()

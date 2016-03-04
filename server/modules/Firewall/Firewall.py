@@ -24,9 +24,8 @@ import string
 import sys
 from multiprocessing import Process, Pipe
 
-from common.modules.Platform import PlatformUtils
-
 import LinuxServiceWrapper
+from common.constants import PLATFORMS, KNOCK_PLATFORM
 from common.synchronized import synchronized
 from common.exceptions import *
 
@@ -36,14 +35,13 @@ class Firewall:
 
     def __init__(self, config):
         self.config = config
-        self.platform = PlatformUtils.detectPlatform()
         self.firewallServicePipe, remotePipeEnd = Pipe()
         self.firewallService = None
 
-        if(self.platform == PlatformUtils.LINUX):
+        if(KNOCK_PLATFORM == PLATFORMS.LINUX):
             self.firewallService = Process(target=LinuxServiceWrapper.processFirewallCommands, args=((remotePipeEnd),))
 
-        elif self.platform == PlatformUtils.WINDOWS:
+        elif KNOCK_PLATFORM == PLATFORMS.WINDOWS
             # TODO: implement for windows
             pass
 
@@ -52,10 +50,10 @@ class Firewall:
     def startup(self):
         LOG.info("Starting Firewall handling service...")
 
-        if(self.platform == PlatformUtils.LINUX):
+        if(KNOCK_PLATFORM == PLATFORMS.LINUX):
             self.firewallService.start()
 
-        elif self.platform == PlatformUtils.WINDOWS:
+        elif KNOCK_PLATFORM == PLATFORMS.WINDOWS:
             # TODO: implement for windows
             pass
 
@@ -69,10 +67,10 @@ class Firewall:
         self._executeTask(["stopService"])
         self.firewallServicePipe.close()
 
-        if(self.platform == PlatformUtils.LINUX):
+        if(KNOCK_PLATFORM == PLATFORMS.LINUX):
             self.firewallService.join()
 
-        elif self.platform == PlatformUtils.WINDOWS:
+        elif KNOCK_PLATFORM == PLATFORMS.WINDOWS:
             # TODO: implement for windows
             pass
 
