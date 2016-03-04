@@ -30,7 +30,7 @@ class Security:
 
     def __init__(self, pfxFile, pfxPasswd, serverCertFile):
         self.certUtil = CertUtil(pfxFile, pfxPasswd)
-        self.security = CryptoEngine(self.certUtil.getPrivKeyPEM())
+        self.cryptoEngine = CryptoEngine(self.certUtil.getPrivKeyPEM())
         self.serverPublicKey = CryptoEngine.loadPubKeyFromPEM(CertUtil.loadPubKeyPEMFromCert(serverCertFile))
 
 
@@ -42,6 +42,6 @@ class Security:
         LOG.debug("Added timestamp: %s", packetTime)
 
         signedMessage = self.certUtil.signIncludingCertificate(request)
-        signedAndEncryptedMessage, ephPubKey = self.security.encryptWithECIES(signedMessage, self.serverPublicKey)
+        signedAndEncryptedMessage, ephPubKey = self.cryptoEngine.encryptWithECIES(signedMessage, self.serverPublicKey)
         signedAndEncryptedMessage += ephPubKey
         return signedAndEncryptedMessage

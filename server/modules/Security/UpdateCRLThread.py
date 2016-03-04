@@ -1,4 +1,4 @@
-import logging, os, socket, urllib2, calendar, schedule, time
+import logging, os, socket, urllib2, calendar, schedule, time, atexit
 from threading import Thread
 
 LOG = logging.getLogger(__name__)
@@ -10,6 +10,7 @@ class UpdateCRLThread(Thread):
         self.importFunc = importFunc
         self.shutdown = False
         Thread.__init__(self)
+        self.daemon = True
 
     def updateCRL(self):
         LOG.debug("Checking for new CRL on CA Server...")
@@ -50,9 +51,10 @@ class UpdateCRLThread(Thread):
                         LOG.error("Error downloading CRL file!")
 
     def run(self):
-        self.importFunc(self.crlFile)
+        atexit.register(self.stop)
+
         self.updateCRL()
-        schedule.every(30).minutes.do(self.updateCRL)
+        self.updateJob = schedule.every(30).minutes.do(self.updateCRL)
 
         while not self.shutdown:
             schedule.run_pending()
@@ -60,5 +62,5 @@ class UpdateCRLThread(Thread):
 
 
     def stop(self):
-        schedule.cancel_job()
+        schedule.cancel_job(self.updateJob)
         self.shutdown = True

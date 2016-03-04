@@ -18,7 +18,7 @@
 
 import logging, os, random
 
-from common.constants import PROTOCOL
+from definitions.Constants import PROTOCOL
 from modules.Security import Security
 from modules.Connection import Connection, MIN_PORT, MAX_PORT
 

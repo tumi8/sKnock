@@ -20,9 +20,9 @@ import logging
 import subprocess
 
 import iptc
-from common.exceptions import *
+from common.definitions.Exceptions import *
 
-from common.constants import *
+from definitions.Constants import *
 
 LOG = logging.getLogger(__name__)
 

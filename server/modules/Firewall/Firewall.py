@@ -24,10 +24,11 @@ import string
 import sys
 from multiprocessing import Process, Pipe
 
+from common.modules.Platform import PlatformUtils
+
 import LinuxServiceWrapper
-from common.constants import PLATFORMS, KNOCK_PLATFORM
-from common.synchronized import synchronized
-from common.exceptions import *
+from common.decorators.synchronized import synchronized
+from common.definitions.Exceptions import *
 
 LOG = logging.getLogger(__name__)
 
@@ -35,13 +36,14 @@ class Firewall:
 
     def __init__(self, config):
         self.config = config
+        self.platform = PlatformUtils.detectPlatform()
         self.firewallServicePipe, remotePipeEnd = Pipe()
         self.firewallService = None
 
-        if(KNOCK_PLATFORM == PLATFORMS.LINUX):
+        if(self.platform == PlatformUtils.LINUX):
             self.firewallService = Process(target=LinuxServiceWrapper.processFirewallCommands, args=((remotePipeEnd),))
 
-        elif KNOCK_PLATFORM == PLATFORMS.WINDOWS
+        elif self.platform == PlatformUtils.WINDOWS:
             # TODO: implement for windows
             pass
 
@@ -50,14 +52,14 @@ class Firewall:
     def startup(self):
         LOG.info("Starting Firewall handling service...")
 
-        if(KNOCK_PLATFORM == PLATFORMS.LINUX):
+        if(self.platform == PlatformUtils.LINUX):
             self.firewallService.start()
 
-        elif KNOCK_PLATFORM == PLATFORMS.WINDOWS:
+        elif self.platform == PlatformUtils.WINDOWS:
             # TODO: implement for windows
             pass
 
-        self._executeTask(["startService", self.config.FIREWALL_POLICY])
+        self._executeTask(["startService", self.config.firewallPolicy])
         self.openPortsList = list()
 
 
@@ -67,10 +69,10 @@ class Firewall:
         self._executeTask(["stopService"])
         self.firewallServicePipe.close()
 
-        if(KNOCK_PLATFORM == PLATFORMS.LINUX):
+        if(self.platform == PlatformUtils.LINUX):
             self.firewallService.join()
 
-        elif KNOCK_PLATFORM == PLATFORMS.WINDOWS:
+        elif self.platform == PlatformUtils.WINDOWS:
             # TODO: implement for windows
             pass
 

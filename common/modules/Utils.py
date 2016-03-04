@@ -1,4 +1,4 @@
-from common.OpenSSL import crypto
+from common.lib.OpenSSL import crypto
 
 def convertDERtoPEM(key):
     return crypto.dump_publickey(crypto.FILETYPE_PEM, crypto.load_publickey(crypto.FILETYPE_ASN1, key))

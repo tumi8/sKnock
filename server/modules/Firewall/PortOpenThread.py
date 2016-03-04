@@ -18,8 +18,8 @@
 
 from threading import Thread
 
-from common.synchronized import synchronized
-from common.exceptions import *
+from common.decorators.synchronized import synchronized
+from common.definitions.Exceptions import *
 from PortCloseThread import PortCloseThread
 
 class PortOpenThread(Thread):

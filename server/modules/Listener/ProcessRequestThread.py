@@ -19,7 +19,7 @@
 import logging
 from threading import Thread
 
-from modules.Firewall import PortOpenThread
+from server.modules.Firewall import PortOpenThread
 
 LOG = logging.getLogger(__name__)
 

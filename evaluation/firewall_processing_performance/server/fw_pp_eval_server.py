@@ -1,8 +1,8 @@
 import test_server, threading, logging, sys, getopt, signal, os
 
-from common.constants import *
-from server.modules.configuration import Configuration
-from server.modules.Firewall.Firewall import Firewall
+from knock_server.definitions.Constants import *
+from knock_server.modules.Configuration import config, initialize
+from knock_server.modules.Firewall.Firewall import Firewall
 
 LOG = logging.getLogger(__name__)
 
@@ -54,9 +54,8 @@ def logProcessingDelay(delay):
     LOG.warn("IPTables Processing Time for chain-size of %s rules was %sms", number_of_open_ports, delay)
 
 def test(udp, delay_compensation, csvOutput = '/tmp'):
-    config = Configuration()
-    config.load_from_file()
-    config.FIREWALL_POLICY = 'none'
+    initialize()
+    config.firewallPolicy = 'none'
 
     global firewallHandler
     firewallHandler = Firewall(config)
