@@ -3,7 +3,7 @@ import logging
 import socket
 import struct
 
-from common.definitions.Constants import *
+from common.constants import *
 from common.modules.CertUtil import CertUtil
 from common.modules.CryptoEngine import CryptoEngine
 
@@ -16,14 +16,14 @@ class Security:
 
     def __init__(self, config):
         self.config = config
-        self.certUtil = CertUtil(pfxFile=config.serverPFXFile, pfxPasswd=config.PFXPasswd)
+        self.certUtil = CertUtil(pfxFile=config.PFX_FILE, pfxPasswd=config.PFX_PASSWD)
         self.security = CryptoEngine(self.certUtil.getPrivKeyPEM())
         self.startContinuousCRLUpdate()
 
 
     # Note: Returns a Thread that has to be stopped before program can exit
     def startContinuousCRLUpdate(self):
-        self.updateCRLThread = UpdateCRLThread(self.config.crlFile, self.config.crlUrl, importFunc=self.certUtil.importCrl)
+        self.updateCRLThread = UpdateCRLThread(self.config.CRL_FILE, self.config.CRL_URL, importFunc=self.certUtil.importCrl)
         self.updateCRLThread.start()
 
     def decryptAndVerifyRequest(self, encryptedMessage, ipVersion):

@@ -2,17 +2,18 @@ import logging
 import os
 import time
 
-from definitions.Constants import *
-from modules.Configuration import config, initialize
+from common.constants import *
+from server.modules.configuration import Configuration
 from modules.Firewall.Firewall import Firewall
 
 
 LOG = logging.getLogger(__name__)
 
 def benchmark(ipv4 = True, ipv6 = False, tcp = True, udp = False, csvOutput = '/tmp'):
-    initialize()
+    config = Configuration()
+    config.load_from_file()
     config.PORT_OPEN_DURATION_IN_SECONDS = 100
-    config.firewallPolicy = 'none'
+    config.FIREWALL_POLICY = 'none'
 
     firewallHandler = Firewall(config)
     firewallHandler.startup()

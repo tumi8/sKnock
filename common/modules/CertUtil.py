@@ -1,7 +1,7 @@
 import logging, sys, struct, datetime
-from common.lib.OpenSSL import crypto
-from common.decorators.synchronized import synchronized
-from common.definitions.Exceptions import *
+from common.OpenSSL import crypto
+from common.synchronized import synchronized
+from common.exceptions import *
 from Platform import PlatformUtils
 
 

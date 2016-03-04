@@ -4,9 +4,9 @@ import sys
 import time
 import timeit
 
-from definitions.Constants import *
+from common.constants import *
 from modules.Security import Security
-from modules.Configuration import config, initialize
+from server.modules.configuration import Configuration
 from modules.Firewall import PortOpenThread
 from modules.Listener.ProcessRequestThread import ProcessRequestThread
 
@@ -23,7 +23,8 @@ PortOpenThread.PortOpenThread = PortOpenThread_stub
 
 def benchmark():
     LOG.warn('Initializing...')
-    initialize()
+    config = Configuration()
+    config.load_from_file()
     with open(os.path.join(os.path.dirname(__file__), 'data', 'v4packet.enc'), 'rb') as baconFile:
         v4packet = baconFile.read()
         LOG.debug('Loaded IPv4 dummy request!')
