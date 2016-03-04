@@ -1,7 +1,7 @@
 from unittest import TestCase
 import os, logging
-from knock_client.knock_client.modules.CertUtil import CertUtil as CertUtilClient
-from knock_server.knock_server.modules.CertUtil import CertUtil as CertUtilServer
+from client.modules.Security import Security as SecurityClient
+from server.modules.Security.Security import Security as SecurityServer
 from configurations import config_server_valid
 
 class TestCryptoEngine_VALID(TestCase):
@@ -10,17 +10,17 @@ class TestCryptoEngine_VALID(TestCase):
     def setUpClass(cls):
         logging.basicConfig()
 
-        cls.cryptoEngineClient = CertUtilClient(
+        cls.securityClient = SecurityClient(
             serverCertFile=os.path.join(os.path.dirname(__file__), 'data', 'devserver_valid.cer'),
             pfxFile=os.path.join(os.path.dirname(__file__), 'data', 'devclient_valid.pfx'),
-            pfxPasswd='portknocking').initializeCryptoEngine()
+            pfxPasswd='portknocking')
 
-        cls.cryptoEngineServer = CertUtilServer(
-            config_server_valid).initializeCryptoEngine()
+        cls.cryptoEngineServer = SecurityServer(
+            config_server_valid).cryptoEngine
 
     def test_encryption(self):
         original_message = "Writing tests makes me want to jump out of the window..."
-        encryptedMessage, ephPubKey = self.cryptoEngineClient.encryptWithECIES(original_message, self.cryptoEngineClient.serverPublicKey)
+        encryptedMessage, ephPubKey = self.securityClient.cryptoEngine.encryptWithECIES(original_message, self.securityClient.serverPublicKey)
         encryptedMessage += ephPubKey
 
         evaluate_message = self.cryptoEngineServer.decryptWithECIES(encryptedMessage)
