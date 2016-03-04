@@ -3,7 +3,7 @@ import logging
 import socket
 import struct
 
-from common.definitions.Constants import *
+from common.constants import *
 from common.modules.CertUtil import CertUtil
 from common.modules.CryptoEngine import CryptoEngine
 

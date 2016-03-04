@@ -1,5 +1,5 @@
 from configurations import config_server_valid
-from knock_server.knock_server.definitions.Constants import *
+from common.constants import *
 from knock_server.knock_server.modules.CertUtil import CertUtil as CertUtil_Server
 # Mocks / Stubs
 

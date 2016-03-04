@@ -1,6 +1,6 @@
 import test_server, threading, logging, sys, getopt, signal, os
 
-from knock_server.definitions.Constants import *
+from common.constants import *
 from knock_server.modules.Configuration import config, initialize
 from knock_server.modules.Firewall.Firewall import Firewall
 

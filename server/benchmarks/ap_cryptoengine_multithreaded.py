@@ -4,7 +4,7 @@ import sys
 import time
 import timeit
 
-from definitions.Constants import *
+from common.constants import *
 from modules.Security import Security
 from modules.Configuration import config, initialize
 from modules.Firewall import PortOpenThread

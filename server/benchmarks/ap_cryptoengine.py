@@ -3,7 +3,7 @@ import os
 import sys
 import timeit
 
-from common.definitions.Constants import *
+from common.constants import *
 from modules.Security import Security
 from modules.Configuration import config, initialize
 

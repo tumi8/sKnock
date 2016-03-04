@@ -1,7 +1,7 @@
 from unittest import TestCase
 import os, logging
-from knock_client.knock_client.modules.CertUtil import CertUtil as CertUtilClient
-from knock_server.knock_server.modules.CertUtil import CertUtil as CertUtilServer
+from common.modules.CertUtil import CertUtil as CertUtilClient
+from common.modules.CertUtil import CertUtil as CertUtilServer
 from configurations import config_server_valid
 
 class TestCryptoEngine_VALID(TestCase):

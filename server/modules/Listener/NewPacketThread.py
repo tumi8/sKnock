@@ -21,7 +21,7 @@ import socket
 import struct
 from threading import Thread
 
-from common.definitions.Constants import *
+from common.constants import *
 import ProcessRequestThread
 
 LOG = logging.getLogger(__name__)

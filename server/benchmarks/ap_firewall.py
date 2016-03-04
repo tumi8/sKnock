@@ -2,7 +2,7 @@ import logging
 import os
 import time
 
-from definitions.Constants import *
+from common.constants import *
 from modules.Configuration import config, initialize
 from modules.Firewall.Firewall import Firewall
 

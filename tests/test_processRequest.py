@@ -1,7 +1,7 @@
 import time, logging
 from unittest import TestCase
 
-from knock_server.knock_server.definitions.Constants import *
+from common.constants import *
 from knock_server.knock_server.modules.Listener.ProcessRequestThread import ProcessRequestThread
 
 from stubs import *

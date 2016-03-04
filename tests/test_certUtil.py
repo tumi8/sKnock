@@ -1,6 +1,6 @@
 from unittest import TestCase
 import os, struct, logging
-from knock_client.knock_client.modules.CertUtil import CertUtil as CertUtilClient
+from common.modules.CertUtil import CertUtil as CertUtilClient
 
 from configurations import config_server_valid
 

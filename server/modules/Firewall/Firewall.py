@@ -27,8 +27,8 @@ from multiprocessing import Process, Pipe
 from common.modules.Platform import PlatformUtils
 
 import LinuxServiceWrapper
-from common.decorators.synchronized import synchronized
-from common.definitions.Exceptions import *
+from common.synchronized import synchronized
+from common.exceptions import *
 
 LOG = logging.getLogger(__name__)
 
