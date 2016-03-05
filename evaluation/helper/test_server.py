@@ -9,7 +9,7 @@ thread = None
 shutdown = False
 
 class ServerThread(threading.Thread):
-    def __init__(self, args):
+    def __init__(self, *args):
         self.args = args
         threading.Thread.__init__(self)
 
@@ -133,7 +133,7 @@ def stop(sig, frame):
 
 def start_threaded(udp, delay_compensation = 0, port = 60000, callback = None):
     global thread
-    thread = ServerThread((udp, delay_compensation, port, callback))
+    thread = ServerThread(udp, delay_compensation, port, callback)
     thread.start()
     return thread
 
