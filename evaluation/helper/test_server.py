@@ -114,9 +114,12 @@ def startUDPServer(port, delay_compensation, callback):
 
 
 def start(udp, delay_compensation = 0, port = 60000, callback = None):
+    LOG.info('Starting test server...')
     if udp:
+        LOG.debug('On UDP port %s', port)
         startUDPServer(port, delay_compensation, callback)
     else:
+        LOG.debug('On TCP port %s', port)
         startTCPServer(port, delay_compensation, callback)
 
 def stop(sig, frame):
@@ -128,7 +131,7 @@ def stop(sig, frame):
 
 def start_threaded(udp, delay_compensation = 0, port = 60000, callback = None):
     global thread
-    thread = ServerThread((udp, port, delay_compensation, callback))
+    thread = ServerThread((udp, delay_compensation, port, callback))
     thread.start()
     return thread
 
