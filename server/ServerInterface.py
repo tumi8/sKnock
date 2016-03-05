@@ -21,8 +21,7 @@ import os
 import threading
 from common.modules.Platform.LinuxUtils import dropPrivileges
 
-from modules import Configuration
-from modules.Configuration import config
+from modules.Configuration import config, initialize
 
 from modules.Security.Security import Security
 from modules.Firewall.Firewall import Firewall
@@ -35,7 +34,8 @@ class ServerInterface:
 
     def __init__(self, configFilePath = os.path.join(os.path.dirname(__file__), 'config.ini')):
 
-        Configuration.initialize(configFilePath)
+        initialize(configFilePath)
+        self.config = config
         security = Security(config)
         self.firewallHandler = Firewall(config)
         self.knockProcessor = KnockProcessor(config, security, self.firewallHandler)
