@@ -61,7 +61,7 @@ def test(udp, delay_compensation, csvOutput = '/tmp'):
     global baconFile
     baconFile = open(os.path.join(csvOutput, 'ap_firewall_rulesetsize_vs_processing_delay.csv'), 'w')
 
-    test_server.start_threaded((udp, delay_compensation, logProcessingDelay))
+    test_server.start_threaded((udp, delay_compensation, 60000, logProcessingDelay))
     openSomePorts()
     test_server.stop_threaded()
     baconFile.close()
