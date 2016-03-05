@@ -67,6 +67,9 @@ def test(udp, delay_compensation, csvOutput = '/tmp'):
     baconFile.close()
     firewallHandler.shutdown()
 
+
+
+
 def usage():
     print "Usage: fw_pp_eval_server.py [-d <delay compensation in ms] <tcp | udp>"
     sys.exit(2)
