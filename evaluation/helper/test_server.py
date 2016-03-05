@@ -122,6 +122,9 @@ def start(udp, delay_compensation = 0, port = 60000, callback = None):
         LOG.debug('On TCP port %s', port)
         startTCPServer(port, delay_compensation, callback)
 
+    LOG.debug('Delay compensation: %s', delay_compensation)
+    LOG.debug('Callback: %s', callback)
+
 def stop(sig, frame):
     LOG.debug('Signal %s received', sig)
     LOG.info('Stopping server...')
