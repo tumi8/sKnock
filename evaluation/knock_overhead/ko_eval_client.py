@@ -1,29 +1,55 @@
 from helper import test_client
-import logging, sys, getopt, signal, socket, errno
+import logging, sys, getopt, signal, socket, errno, time
 
 from client.ClientInterface import ClientInterface
+
+import ko_eval_client_calibration as kecc
 
 LOG = logging.getLogger(__name__)
 shutdown = False
 
-def start(target, udp):
+numRequests = 0
+numFailedRequests = 0
+
+def start(target, udp, waitTime):
     knockClient =  ClientInterface(timeout=2, verify=False)
 
+    if waitTime is None:
+        waitTime = kecc.calibration(target, udp, knockClient, precision=0.1)
+
+    global numRequests
+    global numFailedRequests
     global shutdown
     while not shutdown:
         try:
+            numRequests += 1
             test_client.send(target, udp, 60001)
-            test_client.send(target, udp, 60000, knockClient)
-        except socket.error, e:
-                if e.errno != errno.ECONNREFUSED:
-                    raise e
-                else:
-                    return
+            time.sleep(1)
+            test_client.send(target, udp, 5000, knockClient=knockClient, knockWaitTimeMS=waitTime)
+            time.sleep(2)
 
+        except socket.timeout:
+            LOG.info("Request timed out.")
+            numFailedRequests += 1
+            continue
+
+        except socket.error, e:
+            if e.errno == errno.ECONNREFUSED:
+                LOG.info("Connection refused.")
+                numFailedRequests += 1
+                continue
+            else:
+                raise e
 
 def stop(sig, frame):
     LOG.debug('Signal %s received', sig)
-    LOG.info('Stopping server...')
+    LOG.info('Stopping client...')
+
+    global numRequests
+    LOG.info('Total number of sent port-knocking requests: %s', numRequests)
+    global numFailedRequests
+    LOG.info('Total number of failed port-knocking requests: %s', numFailedRequests)
+
     global shutdown
     shutdown = True
 
@@ -31,13 +57,17 @@ def stop(sig, frame):
 
 
 def usage():
-    print "Usage: ko_eval_client.py <tcp | udp> <target host>"
+    print "Usage: ko_eval_client.py -w <wait-time> <tcp | udp> <target host>"
     sys.exit(2)
 
 def parseArguments(argv):
     proto = None
+    wait_time = None
     try:
-        opts, args = getopt.getopt(argv, "")
+        opts, args = getopt.getopt(argv, "w:")
+        for opt, arg in opts:
+            if opt in ("-w"):
+                wait_time = float(arg)
 
         if len(args) == 2:
             proto = args[0]
@@ -56,11 +86,13 @@ def parseArguments(argv):
     else:
         usage()
 
-    return (host, udp)
+    return (host, udp, wait_time)
 
 
 if __name__ == '__main__':
-    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG, stream=sys.stdout)
+    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.WARN, stream=sys.stdout)
+    kecc.LOG.setLevel(logging.INFO)
+    LOG.setLevel(logging.DEBUG)
     signal.signal(signal.SIGTERM, stop)
     signal.signal(signal.SIGINT, stop)
     start(*parseArguments(sys.argv[1:]))

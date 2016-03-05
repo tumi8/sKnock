@@ -1,11 +1,10 @@
-import logging, time, struct, sys, getopt, socket
+import logging, time, struct, sys, getopt, socket, errno
 
 LOG = logging.getLogger(__name__)
 
-KNOCK_WAIT_TIME = 0
 
-
-def send(target, udp, port = 60000, knockClient = None, callback = None):
+def send(target, udp, port = 60000, timeout = 2, knockClient = None, knockWaitTimeMS = 50, callback = None):
+    knock_wait_time_seconds = knockWaitTimeMS / float(1000)
 
     if udp:
         proto = socket.SOCK_DGRAM, socket.IPPROTO_UDP
@@ -15,24 +14,32 @@ def send(target, udp, port = 60000, knockClient = None, callback = None):
         proto_str = 'tcp'
 
     target_socket = socket.socket(socket.AF_INET, *proto)
-    target_socket.settimeout(10)
+    target_socket.settimeout(timeout)
     time_send = time.time()
 
     if knockClient is not None:
         #LOG.debug('Port-knocking the server before starting...')
         knockClient.knockOnPort(target, port, protocol=proto_str, forceIPv4=True)
-        time.sleep(KNOCK_WAIT_TIME)
+        time.sleep(knock_wait_time_seconds)
 
     #print 'sendTime: %s' % time_send
     #LOG.debug('Sending packet to test server...')
     data = struct.pack('!d', time_send)
-    if udp:
-        target_socket.sendto(data, (target, port))
-    else:
-        target_socket.connect((target, port))
-        target_socket.send(data)
+    try:
+        if udp:
+            target_socket.sendto(data, (target, port))
+        else:
+            target_socket.connect((target, port))
+            target_socket.send(data)
 
-    response = target_socket.recv(8)
+        response = target_socket.recv(8)
+
+    except socket.error, e:
+            if e.errno == errno.EINTR:
+                LOG.info("Operation canceled.")
+                return
+            else:
+                raise e
 
     if len(response) != 8:
         LOG.error('BOOM, something went wrong...')

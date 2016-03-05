@@ -10,15 +10,19 @@ baconFile = None
 knock_server = None
 testServerThreads = []
 
+# Hack?
+par_clientIP = None
+par_proto = None
+
 def log_knocked(delay):
     global baconFile
     baconFile.write("%d,%s\n" % (1, round(delay, 2)))
-    LOG.warn("Processing Time for request protected by port-knocking was %sms", delay)
+    LOG.info("Processing Time for request protected by port-knocking was %sms", delay)
 
 def log_open(delay):
     global baconFile
     baconFile.write("%d,%s\n" % (0, round(delay, 2)))
-    LOG.warn("Processing Time for unportected request was %sms", delay)
+    LOG.info("Processing Time for unprotected request was %sms", delay)
 
 def test(udp, delay_compensation, client_ip, csvOutput = '/tmp'):
     global baconFile
@@ -26,24 +30,37 @@ def test(udp, delay_compensation, client_ip, csvOutput = '/tmp'):
 
     global knock_server
     knock_server = ServerThread()
+    knock_server.serverInterface.config.firewallPolicy = 'reject'
+    knock_server.serverInterface.config.PORT_OPEN_DURATION_IN_SECONDS = 1
     knock_server.start()
+    LOG.info("Knock Server started.")
 
     time.sleep(2)
     knock_server.serverInterface.firewallHandler.openPortForClient(60001, IP_VERSION.V4, PROTOCOL.getById(not udp), client_ip)
-    knock_server.proto = PROTOCOL.getById(not udp)
-    knock_server.client_ip = client_ip
+    global par_proto
+    par_proto = PROTOCOL.getById(not udp)
+    global par_clientIP
+    par_clientIP = client_ip
+    LOG.info("Added firewall exception for reference client (port 60001)")
 
     global testServerThreads
-    test_server_knocked = test_server.ServerThread(udp, delay_compensation, 60000, log_knocked)
+    test_server_knocked = test_server.ServerThread(udp, delay_compensation, 5000, log_knocked)
     test_server_knocked.start()
     testServerThreads.append(test_server_knocked)
+    LOG.info("Started test server for port-knocking protected requests (port 5000)")
 
     test_server_open = test_server.ServerThread(udp, delay_compensation, 60001, log_open)
     test_server_open.start()
     testServerThreads.append(test_server_open)
+    LOG.info("Started test server for (reference) un-protected requests (port 60001)")
 
 
 def stop(sig, frame):
+    LOG.debug('Signal %s received', sig)
+    LOG.info('Stopping server...')
+    global baconFile
+    baconFile.close()
+
     global testServerThreads
     for t in testServerThreads:
         t.stop()
@@ -51,8 +68,10 @@ def stop(sig, frame):
     for t in testServerThreads:
         t.join()
 
+    global par_proto
+    global par_clientIP
     global knock_server
-    knock_server.serverInterface.firewallHandler.closePortForClient(60001, IP_VERSION.V4, knock_server.proto, knock_server.client_ip)
+    knock_server.serverInterface.firewallHandler.closePortForClient(60001, IP_VERSION.V4, par_proto, par_clientIP)
 
 
 
@@ -91,6 +110,7 @@ if __name__ == '__main__':
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         level=logging.WARNING,
         stream=sys.stdout)
+    LOG.setLevel(logging.DEBUG)
     signal.signal(signal.SIGTERM, stop)
     signal.signal(signal.SIGINT, stop)
     test(*parseArguments(sys.argv[1:]))
