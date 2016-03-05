@@ -36,9 +36,9 @@ class ProcessRequestThread(Thread):
     def run(self):
         success, protocol, port, addr = self.knockProcessor.security.decryptAndVerifyRequest(self.request, self.ipVersion)
 
-        if success:
-            # Check if the source ip in the header was changed in the mean time
-            success = addr == self.addr
+        if not success: return
+        # Check if the source ip in the header was changed in the mean time
+        success = addr == self.addr
 
 
         if success:

@@ -39,6 +39,7 @@ class Firewall:
         self.platform = PlatformUtils.detectPlatform()
         self.firewallServicePipe, remotePipeEnd = Pipe()
         self.firewallService = None
+        self.openPortsList = list()
 
         if(self.platform == PlatformUtils.LINUX):
             self.firewallService = Process(target=LinuxServiceWrapper.processFirewallCommands, args=((remotePipeEnd),))
