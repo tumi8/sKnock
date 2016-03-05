@@ -67,11 +67,11 @@ class ConnectionThread(threading.Thread):
     def stop(self):
         shutdown = True
 
-def startTCPServer(delay_compensation, callback):
+def startTCPServer(port, delay_compensation, callback):
     LOG.info('Starting TCP server...')
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
     server_socket.settimeout(5)
-    server_socket.bind(('0.0.0.0', 60000))
+    server_socket.bind(('0.0.0.0', port))
     server_socket.listen(1)
 
     threadList = []
@@ -96,11 +96,11 @@ def startTCPServer(delay_compensation, callback):
         t.stop()
         t.join(7)
 
-def startUDPServer(delay_compensation, callback):
+def startUDPServer(port, delay_compensation, callback):
     LOG.info('Starting UDP server...')
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     server_socket.settimeout(5)
-    server_socket.bind(('0.0.0.0', 60000))
+    server_socket.bind(('0.0.0.0', port))
     t = ConnectionThread(server_socket, delay_compensation, callback)
     t.start()
 
@@ -113,11 +113,11 @@ def startUDPServer(delay_compensation, callback):
 
 
 
-def start(udp, delay_compensation = 0, callback = None):
+def start(udp, port = 60000, delay_compensation = 0, callback = None):
     if udp:
-        startUDPServer(delay_compensation, callback)
+        startUDPServer(port, delay_compensation, callback)
     else:
-        startTCPServer(delay_compensation, callback)
+        startTCPServer(port, delay_compensation, callback)
 
 def stop(sig, frame):
     LOG.debug('Signal %s received', sig)
@@ -126,9 +126,9 @@ def stop(sig, frame):
     shutdown = True
 
 
-def start_threaded(udp, delay_compensation = 0, callback = None):
+def start_threaded(udp, port = 60000, delay_compensation = 0, callback = None):
     global thread
-    thread = ServerThread((udp, delay_compensation, callback))
+    thread = ServerThread((udp, port, delay_compensation, callback))
     thread.start()
     return thread
 

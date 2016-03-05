@@ -3,7 +3,7 @@ import logging, time, struct, sys, getopt, socket
 LOG = logging.getLogger(__name__)
 
 
-def send(target, udp, knockClient = None, callback = None):
+def send(target, udp, port = 60000, knockClient = None, callback = None):
 
     if udp:
         proto = socket.SOCK_DGRAM, socket.IPPROTO_UDP
@@ -18,15 +18,15 @@ def send(target, udp, knockClient = None, callback = None):
 
     if knockClient is not None:
         #LOG.debug('Port-knocking the server before starting...')
-        knockClient.knockOnPort(target, 60000, protocol=proto_str, forceIPv4=True)
+        knockClient.knockOnPort(target, port, protocol=proto_str, forceIPv4=True)
 
     #print 'sendTime: %s' % time_send
     #LOG.debug('Sending packet to test server...')
     data = struct.pack('!d', time_send)
     if udp:
-        target_socket.sendto(data, (target, 60000))
+        target_socket.sendto(data, (target, port))
     else:
-        target_socket.connect((target, 60000))
+        target_socket.connect((target, port))
         target_socket.send(data)
 
     response = target_socket.recv(8)

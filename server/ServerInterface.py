@@ -18,6 +18,7 @@
 
 import logging
 import os
+import threading
 from common.modules.Platform.LinuxUtils import dropPrivileges
 
 from modules import Configuration
@@ -32,8 +33,7 @@ LOG = logging.getLogger(__name__)
 
 class ServerInterface:
 
-    def __init__(self,
-                 configFilePath = os.path.join(os.path.dirname(__file__), 'config.ini')):
+    def __init__(self, configFilePath = os.path.join(os.path.dirname(__file__), 'config.ini')):
 
         Configuration.initialize(configFilePath)
         security = Security(config)
@@ -51,3 +51,15 @@ class ServerInterface:
         LOG.debug('Signal %s received', sig)
         LOG.info('Stopping port-knocking server...')
         self.knockProcessor.stop()
+
+
+class ServerThread(threading.Thread):
+    def __init__(self, configFilePath = os.path.join(os.path.dirname(__file__), 'config.ini')):
+        self.serverInterface = ServerInterface(configFilePath)
+        threading.Thread.__init__(self)
+
+    def run(self):
+        self.serverInterface.listenForKnockRequests()
+
+    def stop(self):
+        self.serverInterface.gracefulShutdown(None, None)
