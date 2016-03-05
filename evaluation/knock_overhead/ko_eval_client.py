@@ -12,8 +12,8 @@ def start(target, udp):
     global shutdown
     while not shutdown:
         try:
-            test_client.send(target, udp, 60000)
-            test_client.send(target, udp, 60001, knockClient)
+            test_client.send(target, udp, 60001)
+            test_client.send(target, udp, 60000, knockClient)
         except socket.error, e:
                 if e.errno != errno.ECONNREFUSED:
                     raise e

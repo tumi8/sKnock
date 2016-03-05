@@ -1,4 +1,4 @@
-import logging, os, sys, getopt, signal
+import logging, os, sys, getopt, signal, time
 
 from common.definitions.Constants import IP_VERSION, PROTOCOL
 from server.ServerInterface import ServerThread
@@ -28,21 +28,22 @@ def test(udp, delay_compensation, client_ip, csvOutput = '/tmp'):
     knock_server = ServerThread()
     knock_server.start()
 
+    time.sleep(2)
     knock_server.serverInterface.firewallHandler.openPortForClient(60001, IP_VERSION.V4, PROTOCOL.getById(not udp), client_ip)
     knock_server.proto = PROTOCOL.getById(not udp)
     knock_server.client_ip = client_ip
 
     global testServerThreads
-    test_server_knocked = test_server.ServerThread((udp, 60000, delay_compensation, log_knocked))
+    test_server_knocked = test_server.ServerThread(udp, delay_compensation, 60000, log_knocked)
     test_server_knocked.start()
     testServerThreads.append(test_server_knocked)
 
-    test_server_open = test_server.ServerThread((udp, 60001, delay_compensation, log_open))
+    test_server_open = test_server.ServerThread(udp, delay_compensation, 60001, log_open)
     test_server_open.start()
     testServerThreads.append(test_server_open)
 
 
-def stop():
+def stop(sig, frame):
     global testServerThreads
     for t in testServerThreads:
         t.stop()

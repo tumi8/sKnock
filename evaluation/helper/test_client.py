@@ -2,6 +2,8 @@ import logging, time, struct, sys, getopt, socket
 
 LOG = logging.getLogger(__name__)
 
+KNOCK_WAIT_TIME = 0
+
 
 def send(target, udp, port = 60000, knockClient = None, callback = None):
 
@@ -19,6 +21,7 @@ def send(target, udp, port = 60000, knockClient = None, callback = None):
     if knockClient is not None:
         #LOG.debug('Port-knocking the server before starting...')
         knockClient.knockOnPort(target, port, protocol=proto_str, forceIPv4=True)
+        time.sleep(KNOCK_WAIT_TIME)
 
     #print 'sendTime: %s' % time_send
     #LOG.debug('Sending packet to test server...')
