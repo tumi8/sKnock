@@ -2,7 +2,7 @@ import logging, os, sys, getopt, signal, time
 
 from common.definitions.Constants import IP_VERSION, PROTOCOL
 from server.ServerInterface import ServerThread
-from helper import test_server
+from evaluation.helper import test_server
 
 LOG = logging.getLogger(__name__)
 

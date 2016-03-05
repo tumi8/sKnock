@@ -1,4 +1,4 @@
-from helper import test_client
+from evaluation.helper import test_client
 import logging, sys, getopt, signal, socket, errno, time
 
 from client.ClientInterface import ClientInterface
