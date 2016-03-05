@@ -5,7 +5,19 @@ requestLOG = logging.getLogger('requests')
 [requestLOG.removeHandler(handler) for handler in requestLOG.handlers[:]]
 requestLOG.addHandler(logging.FileHandler('requests.log'))
 
+thread = None
 shutdown = False
+
+class ServerThread(threading.Thread):
+    def __init__(self, args):
+        self.args = args
+        threading.Thread.__init__(self)
+
+    def run(self):
+        start(*self.args)
+
+    def stop(self):
+        stop(None, None)
 
 class ConnectionThread(threading.Thread):
     def __init__(self, conn, delay_compensation, callback, addr = None):
@@ -102,8 +114,6 @@ def startUDPServer(delay_compensation, callback):
 
 
 def start(udp, delay_compensation = 0, callback = None):
-    global shutdown
-
     if udp:
         startUDPServer(delay_compensation, callback)
     else:
@@ -116,7 +126,15 @@ def stop(sig, frame):
     shutdown = True
 
 
+def start_threaded(udp, delay_compensation = 0, callback = None):
+    global thread
+    thread = ServerThread((udp, delay_compensation, callback))
+    thread.start()
+    return thread
 
+def stop_threaded():
+    global thread
+    thread.stop()
 
 
 

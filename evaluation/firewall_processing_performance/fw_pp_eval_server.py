@@ -9,20 +9,8 @@ LOG = logging.getLogger(__name__)
 
 number_of_open_ports = 0
 firewallHandler = None
-serverThread = None
 baconFile = None
 shutdown = False
-
-class ServerThread(threading.Thread):
-    def __init__(self, args):
-        self.args = args
-        threading.Thread.__init__(self)
-
-    def run(self):
-        test_server.start(*self.args)
-
-    def stop(self):
-        test_server.stop(None, None)
 
 def openSomePorts():
     global firewallHandler, number_of_open_ports, shutdown
@@ -30,6 +18,10 @@ def openSomePorts():
         firewallHandler.openPortForClient(i, IP_VERSION.V4, PROTOCOL.TCP, '192.168.0.2')
         number_of_open_ports += 1
         firewallHandler.openPortForClient(i, IP_VERSION.V4, PROTOCOL.UDP, '192.168.0.2')
+        number_of_open_ports += 1
+        firewallHandler.openPortForClient(i, IP_VERSION.V4, PROTOCOL.TCP, '192.168.0.3')
+        number_of_open_ports += 1
+        firewallHandler.openPortForClient(i, IP_VERSION.V4, PROTOCOL.UDP, '192.168.0.3')
         number_of_open_ports += 1
         if shutdown:
             return
@@ -41,6 +33,10 @@ def closeSomePorts():
         firewallHandler.closePortForClient(i, IP_VERSION.V4, PROTOCOL.TCP, '192.168.0.2')
         number_of_open_ports -= 1
         firewallHandler.closePortForClient(i, IP_VERSION.V4, PROTOCOL.UDP, '192.168.0.2')
+        number_of_open_ports -= 1
+        firewallHandler.closePortForClient(i, IP_VERSION.V4, PROTOCOL.TCP, '192.168.0.3')
+        number_of_open_ports -= 1
+        firewallHandler.closePortForClient(i, IP_VERSION.V4, PROTOCOL.UDP, '192.168.0.3')
         number_of_open_ports -= 1
         if shutdown:
             return
@@ -65,11 +61,9 @@ def test(udp, delay_compensation, csvOutput = '/tmp'):
     global baconFile
     baconFile = open(os.path.join(csvOutput, 'ap_firewall_rulesetsize_vs_processing_delay.csv'), 'w')
 
-    global serverThread
-    serverThread = ServerThread((udp, delay_compensation, logProcessingDelay))
-    serverThread.start()
+    test_server.start_threaded((udp, delay_compensation, logProcessingDelay))
     openSomePorts()
-    serverThread.stop()
+    test_server.stop_threaded()
     baconFile.close()
     firewallHandler.shutdown()
 
