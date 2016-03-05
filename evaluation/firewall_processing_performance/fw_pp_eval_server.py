@@ -1,6 +1,6 @@
-import threading, logging, sys, getopt, signal, os
+import logging, sys, getopt, signal, os
 
-from helper import test_server
+from evaluation.helper import test_server
 from common.definitions.Constants import *
 from server.modules.Configuration import config, initialize
 from server.modules.Firewall.Firewall import Firewall
