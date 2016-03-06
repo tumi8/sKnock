@@ -1,4 +1,4 @@
-import logging, sys, getopt, signal, os
+import logging, sys, getopt, signal, os, time
 
 from evaluation.helper import test_server
 from common.definitions.Constants import *
@@ -7,37 +7,56 @@ from server.modules.Firewall.Firewall import Firewall
 
 LOG = logging.getLogger(__name__)
 
+number_of_ports_to_open = 10000
 number_of_open_ports = 0
+loggedPackets = 0
+packets_to_log_per_port = 10
 firewallHandler = None
 baconFile = None
 shutdown = False
 
+
+def openAPortAndMeasureStuff(port, ipVersion, protocol, addr):
+    global loggedPackets
+    global packets_to_log_per_port
+    while loggedPackets < packets_to_log_per_port:
+        time.sleep(0.1)
+
+    firewallHandler.openPortForClient(port, ipVersion, protocol, addr)
+    LOG.debug("Opened port (%s, %s, %s, %s)", port, protocol, addr, ipVersion)
+    global number_of_open_ports
+    number_of_open_ports += 1
+    loggedPackets = 0
+
+def closeAPortAndMeasureStuff(port, ipVersion, protocol, addr):
+    global loggedPackets
+    while loggedPackets < packets_to_log_per_port:
+        time.sleep(0.1)
+
+    firewallHandler.closePortForClient(port, ipVersion, protocol, addr)
+    LOG.debug("Closed port (%s, %s, %s, %s)", port, protocol, addr, ipVersion)
+    global number_of_open_ports
+    number_of_open_ports -= 1
+    loggedPackets = 0
+
 def openSomePorts():
     global firewallHandler, number_of_open_ports, shutdown
-    for i in xrange(55000):
-        firewallHandler.openPortForClient(i, IP_VERSION.V4, PROTOCOL.TCP, '192.168.0.2')
-        number_of_open_ports += 1
-        firewallHandler.openPortForClient(i, IP_VERSION.V4, PROTOCOL.UDP, '192.168.0.2')
-        number_of_open_ports += 1
-        firewallHandler.openPortForClient(i, IP_VERSION.V4, PROTOCOL.TCP, '192.168.0.3')
-        number_of_open_ports += 1
-        firewallHandler.openPortForClient(i, IP_VERSION.V4, PROTOCOL.UDP, '192.168.0.3')
-        number_of_open_ports += 1
+    for i in xrange(number_of_ports_to_open/4):
+        openAPortAndMeasureStuff(i, IP_VERSION.V4, PROTOCOL.TCP, '192.168.0.2')
+        openAPortAndMeasureStuff(i, IP_VERSION.V4, PROTOCOL.UDP, '192.168.0.2')
+        openAPortAndMeasureStuff(i, IP_VERSION.V4, PROTOCOL.TCP, '192.168.0.3')
+        openAPortAndMeasureStuff(i, IP_VERSION.V4, PROTOCOL.UDP, '192.168.0.3')
         if shutdown:
             return
     closeSomePorts()
 
 def closeSomePorts():
     global firewallHandler, number_of_open_ports, shutdown
-    for i in xrange(55000):
-        firewallHandler.closePortForClient(i, IP_VERSION.V4, PROTOCOL.TCP, '192.168.0.2')
-        number_of_open_ports -= 1
-        firewallHandler.closePortForClient(i, IP_VERSION.V4, PROTOCOL.UDP, '192.168.0.2')
-        number_of_open_ports -= 1
-        firewallHandler.closePortForClient(i, IP_VERSION.V4, PROTOCOL.TCP, '192.168.0.3')
-        number_of_open_ports -= 1
-        firewallHandler.closePortForClient(i, IP_VERSION.V4, PROTOCOL.UDP, '192.168.0.3')
-        number_of_open_ports -= 1
+    for i in xrange(number_of_ports_to_open/4):
+        closeAPortAndMeasureStuff(i, IP_VERSION.V4, PROTOCOL.TCP, '192.168.0.2')
+        closeAPortAndMeasureStuff(i, IP_VERSION.V4, PROTOCOL.UDP, '192.168.0.2')
+        closeAPortAndMeasureStuff(i, IP_VERSION.V4, PROTOCOL.TCP, '192.168.0.3')
+        closeAPortAndMeasureStuff(i, IP_VERSION.V4, PROTOCOL.UDP, '192.168.0.3')
         if shutdown:
             return
 
@@ -46,9 +65,14 @@ def stop(sig, frame):
     shutdown = True
 
 def logProcessingDelay(delay):
-    global baconFile
-    baconFile.write("%d,%s\n" % (number_of_open_ports, round(delay, 2)))
-    LOG.warn("IPTables Processing Time for chain-size of %s rules was %sms", number_of_open_ports, delay)
+    global loggedPackets
+    global packets_to_log_per_port
+
+    if loggedPackets < packets_to_log_per_port:
+        global baconFile
+        baconFile.write("%d,%s\n" % (number_of_open_ports, round(delay, 2)))
+        LOG.info("IPTables Processing Time for chain-size of %s rules was %sms", number_of_open_ports, delay)
+        loggedPackets += 1
 
 def test(udp, delay_compensation, csvOutput = '/tmp'):
     initialize()
@@ -71,16 +95,23 @@ def test(udp, delay_compensation, csvOutput = '/tmp'):
 
 
 def usage():
-    print "Usage: fw_pp_eval_server.py [-d <delay compensation in ms] <tcp | udp>"
+    print "Usage: fw_pp_eval_server.py [-d delay compensation in ms] [-p precision] [-n number of ports] <tcp | udp>"
     sys.exit(2)
 
 def parseArguments(argv):
     delay_compensation = 0
     try:
-        opts, args = getopt.getopt(argv, "d:")
+        opts, args = getopt.getopt(argv, "d:p:")
         for opt, arg in opts:
             if opt in ("-d"):
                 delay_compensation = float(arg) / float(1000)
+            elif opt in ("-p"):
+                global packets_to_log_per_port
+                packets_to_log_per_port = int(arg)
+            elif opt in ("-n"):
+                global number_of_ports_to_open
+                number_of_ports_to_open = int(arg)
+
         if len(args) == 1:
             proto = args[0]
         else:
@@ -102,6 +133,7 @@ if __name__ == '__main__':
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         level=logging.WARNING,
         stream=sys.stdout)
+    LOG.setLevel(logging.DEBUG)
     signal.signal(signal.SIGTERM, stop)
     signal.signal(signal.SIGINT, stop)
     test(*parseArguments(sys.argv[1:]))
