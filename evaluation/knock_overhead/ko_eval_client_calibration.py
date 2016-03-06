@@ -21,24 +21,12 @@ def stop(sig, frame):
 
 
 
-def calibration(target, udp, knockClient, startWaitTime = 20, failureRateLimit = 0.05, precision = 0.01, no_recursion = False):
+def calibration(target, udp, knockClient, startWaitTime = 20, failureRateLimit = 0.05, precision = 0.01):
     LOG.info("Calibrating wait time...")
     waitTime = -1
     newWaitTime = startWaitTime
     numFailures = 0
     numRuns = int(1 / float(precision))
-
-    LOG.debug("Required precision: %s", precision)
-
-    # Iteratively approximate requested precision
-    approxPrecision = 0.1
-    while precision < approxPrecision:
-        LOG.debug("Refining by approximating precision to: %s", approxPrecision)
-        newWaitTime = calibration(target, udp, knockClient, newWaitTime, failureRateLimit, precision = approxPrecision, no_recursion=True)
-        approxPrecision /= 3
-
-
-
 
     iteration = 0
     global shutdown
