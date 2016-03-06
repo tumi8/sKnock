@@ -19,7 +19,7 @@ def normalize_time(file, column):
         baconFile.seek(0)
         for row in reader:
             new_row = row
-            new_row[column] = float(row[column]) + minTime
+            new_row[column] = round(float(row[column]) - minTime, 2)
             new_rows.append(new_row)
 
     print "Normalized data in RAM"
