@@ -13,6 +13,10 @@ numFailedRequests = 0
 
 def start(target, udp, waitTime):
     knockClient =  ClientInterface(timeout=2, verify=False)
+    if udp:
+        port = 5000
+    else:
+        port = 2000
 
     if waitTime is None:
         waitTime = kecc.calibration(target, udp, knockClient, precision=0.1)
@@ -25,7 +29,7 @@ def start(target, udp, waitTime):
             numRequests += 1
             test_client.send(target, udp, 60001)
             time.sleep(1)
-            test_client.send(target, udp, 5000, knockClient=knockClient, knockWaitTimeMS=waitTime)
+            test_client.send(target, udp, port, knockClient=knockClient, knockWaitTimeMS=waitTime)
             time.sleep(2)
 
         except socket.timeout:

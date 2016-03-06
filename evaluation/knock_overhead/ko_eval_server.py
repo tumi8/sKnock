@@ -43,11 +43,16 @@ def test(udp, delay_compensation, client_ip, csvOutput = '/tmp'):
     par_clientIP = client_ip
     LOG.info("Added firewall exception for reference client (port 60001)")
 
+    if udp:
+        port = 5000
+    else:
+        port = 2000
+
     global testServerThreads
-    test_server_knocked = test_server.ServerThread(udp, delay_compensation, 5000, log_knocked)
+    test_server_knocked = test_server.ServerThread(udp, delay_compensation, 2000, log_knocked)
     test_server_knocked.start()
     testServerThreads.append(test_server_knocked)
-    LOG.info("Started test server for port-knocking protected requests (port 5000)")
+    LOG.info("Started test server for port-knocking protected requests (port %s)", port)
 
     test_server_open = test_server.ServerThread(udp, delay_compensation, 60001, log_open)
     test_server_open.start()
