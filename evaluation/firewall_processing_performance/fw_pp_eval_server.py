@@ -1,4 +1,4 @@
-import logging, sys, getopt, signal, os, time
+import logging, sys, getopt, signal, os, time, csv
 
 from evaluation.helper import test_server
 from common.definitions.Constants import *
@@ -11,8 +11,11 @@ number_of_ports_to_open = 10000
 number_of_open_ports = 0
 loggedPackets = 0
 packets_to_log_per_port = 10
+
+currentCSVRow = [0]
+baconCSV = None
+
 firewallHandler = None
-baconFile = None
 shutdown = False
 
 
@@ -22,10 +25,15 @@ def openAPortAndMeasureStuff(port, ipVersion, protocol, addr):
     while loggedPackets < packets_to_log_per_port:
         time.sleep(0.1)
 
+    global currentCSVRow
+    baconCSV.writerow(currentCSVRow)
+    currentCSVRow = []
+
     firewallHandler.openPortForClient(port, ipVersion, protocol, addr)
     LOG.debug("Opened port (%s, %s, %s, %s)", port, protocol, addr, ipVersion)
     global number_of_open_ports
     number_of_open_ports += 1
+    currentCSVRow.append(number_of_open_ports)
     loggedPackets = 0
 
 def closeAPortAndMeasureStuff(port, ipVersion, protocol, addr):
@@ -33,10 +41,15 @@ def closeAPortAndMeasureStuff(port, ipVersion, protocol, addr):
     while loggedPackets < packets_to_log_per_port:
         time.sleep(0.1)
 
+    global currentCSVRow
+    baconCSV.writerow(currentCSVRow)
+    currentCSVRow = []
+
     firewallHandler.closePortForClient(port, ipVersion, protocol, addr)
     LOG.debug("Closed port (%s, %s, %s, %s)", port, protocol, addr, ipVersion)
     global number_of_open_ports
     number_of_open_ports -= 1
+    currentCSVRow.append(number_of_open_ports)
     loggedPackets = 0
 
 def openSomePorts():
@@ -69,8 +82,8 @@ def logProcessingDelay(delay):
     global packets_to_log_per_port
 
     if loggedPackets < packets_to_log_per_port:
-        global baconFile
-        baconFile.write("%d,%s\n" % (number_of_open_ports, round(delay, 2)))
+        global currentCSVRow
+        currentCSVRow.append(round(delay, 2))
         LOG.info("IPTables Processing Time for chain-size of %s rules was %sms", number_of_open_ports, delay)
         loggedPackets += 1
 
@@ -82,8 +95,9 @@ def test(udp, delay_compensation, csvOutput = '/tmp'):
     firewallHandler = Firewall(config)
     firewallHandler.startup()
 
-    global baconFile
+    global baconCSV
     baconFile = open(os.path.join(csvOutput, 'ap_firewall_rulesetsize_vs_processing_delay.csv'), 'w')
+    baconCSV = csv.writer(baconFile)
 
     test_server.start_threaded(udp, delay_compensation, 60000, logProcessingDelay)
     openSomePorts()
