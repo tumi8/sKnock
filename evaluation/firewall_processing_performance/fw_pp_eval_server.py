@@ -101,7 +101,7 @@ def usage():
 def parseArguments(argv):
     delay_compensation = 0
     try:
-        opts, args = getopt.getopt(argv, "d:p:")
+        opts, args = getopt.getopt(argv, "d:p:n:")
         for opt, arg in opts:
             if opt in ("-d"):
                 delay_compensation = float(arg) / float(1000)
