@@ -18,7 +18,7 @@ class UpdateCRLThread(Thread):
         try:
             # TODO: get this from Certificate + CRL-specific cache
             remoteCRL = urllib2.urlopen(self.crlUrl, timeout=2)
-        except (socket.timeout, urllib2.URLError, urllib2.HTTPError):
+        except (socket.timeout, socket.sslerror, urllib2.URLError, urllib2.HTTPError):
             LOG.warning("CA Server seems to be offline")
 
         if remoteCRL is not None:
