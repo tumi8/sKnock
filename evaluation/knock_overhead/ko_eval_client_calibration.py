@@ -28,6 +28,18 @@ def calibration(target, udp, knockClient, startWaitTime = 20, failureRateLimit =
     numFailures = 0
     numRuns = int(1 / float(precision))
 
+    LOG.debug("Required precision: %s", precision)
+
+    # Iteratively approximate requested precision
+    approxPrecision = 0.1
+    while precision < approxPrecision:
+        LOG.debug("Refining by approximating precision to: %s", approxPrecision)
+        newWaitTime = calibration(target, udp, knockClient, newWaitTime, failureRateLimit, precision = approxPrecision)
+        approxPrecision /= 3
+
+
+
+
     iteration = 0
     global shutdown
 
