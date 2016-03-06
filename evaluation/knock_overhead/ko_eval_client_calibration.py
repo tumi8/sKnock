@@ -42,9 +42,11 @@ def calibration(target, udp, knockClient, startWaitTime = 20, failureRateLimit =
                 time.sleep(1.2)
             except socket.timeout:
                 numFailures +=1
+                LOG.info("Request timed out.")
                 continue
             except socket.error, e:
                 if e.errno == errno.ECONNREFUSED:
+                    LOG.info("Connection refused.")
                     numFailures +=1
                     continue
                 else:
