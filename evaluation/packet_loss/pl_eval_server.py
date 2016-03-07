@@ -8,6 +8,7 @@ from common.definitions.Constants import *
 
 LOG = logging.getLogger(__name__)
 
+shutdown = False
 baconFile = None
 knock_server = None
 testServerThreads = []
@@ -42,15 +43,24 @@ def test(packet_loss_percent = 0, delay_compensation = 0, csvOutput = '/tmp'):
     LOG.info("Started test server for port-knocking protected TCP requests (port 2000)")
 
 
-    test_server_udp = test_server.ServerThread(True, delay_compensation, 5000, log_udp)
-    test_server_udp.start()
-    testServerThreads.append(test_server_udp)
-    LOG.info("Started test server for port-knocking protected UDP requests (port 5000)")
+ #   test_server_udp = test_server.ServerThread(True, delay_compensation, 5000, log_udp)
+ #   test_server_udp.start()
+ #   testServerThreads.append(test_server_udp)
+ #   LOG.info("Started test server for port-knocking protected UDP requests (port 5000)")
+
+    global shutdown
+    while not shutdown:
+        time.sleep(2)
+
+
 
 
 def stop(sig, frame):
     LOG.debug('Signal %s received', sig)
     LOG.info('Stopping server...')
+
+    global shutdown
+    shutdown = True
 
     global testServerThreads
     for t in testServerThreads:

@@ -87,6 +87,7 @@ def startTCPServer(port, delay_compensation, callback, ego_mode):
                     if e.errno != errno.EINTR:
                         raise e
                     else:
+                        raise e
                         return
         LOG.debug('Connection from %s', addr)
 
