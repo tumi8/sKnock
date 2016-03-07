@@ -49,7 +49,7 @@ def test(udp, delay_compensation, client_ip, csvOutput = '/tmp'):
         port = 2000
 
     global testServerThreads
-    test_server_knocked = test_server.ServerThread(udp, delay_compensation, 2000, log_knocked)
+    test_server_knocked = test_server.ServerThread(udp, delay_compensation, port, log_knocked)
     test_server_knocked.start()
     testServerThreads.append(test_server_knocked)
     LOG.info("Started test server for port-knocking protected requests (port %s)", port)
