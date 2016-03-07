@@ -4,11 +4,11 @@ import logging, sys, getopt, signal, socket, errno
 LOG = logging.getLogger(__name__)
 shutdown = False
 
-def start(target, udp):
+def start(target, udp, ego_mode):
     global shutdown
     while not shutdown:
         try:
-            test_client.send(target, udp)
+            test_client.send(target, udp, ego_mode=ego_mode)
         except socket.error, e:
                 if e.errno != errno.ECONNREFUSED:
                     raise e
