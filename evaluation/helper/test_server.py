@@ -176,7 +176,7 @@ if __name__ == '__main__':
     server = start_threaded(*parseArguments(sys.argv[1:]))
     while not shutdown:
         try:
-            select.select([],[],[]) # This works only on Unix
+            select.select([],[],[]) # Sleep until we receive a signal; this works only on Unix
         except select.error as exp:
             continue
     server.stop()
