@@ -1,12 +1,10 @@
 import logging, time, struct, sys, getopt, signal, socket, errno, threading
+import select
 
 LOG = logging.getLogger(__name__)
 requestLOG = logging.getLogger('requests')
 [requestLOG.removeHandler(handler) for handler in requestLOG.handlers[:]]
 requestLOG.addHandler(logging.FileHandler('requests.log'))
-
-thread = None
-shutdown = False
 
 class _ServerThread(threading.Thread):
     def __init__(self,
@@ -131,16 +129,15 @@ class ConnectionThread(threading.Thread):
     def stop(self):
         self.shutdown.set()
 
+######################################################################################
+
+shutdown = False
+
 def start_threaded(udp, delay_compensation = 0, port = 60000, callback = None, ego_mode = False):
-    global thread
     factory = UDPServerThread if udp else TCPServerThread
     thread = factory(delay_compensation, port, callback, ego_mode)
     thread.start()
     return thread
-
-def stop_threaded():
-    global thread
-    thread.stop()
 
 def usage():
     print "Usage: test_server.py [-d <delay compensation in ms] <tcp | udp>"
@@ -150,19 +147,15 @@ def parseArguments(argv):
     delay_compensation = 0
     try:
         opts, args = getopt.getopt(argv, "d:")
-
         for opt, arg in opts:
             if opt in ("-d"):
                 delay_compensation = float(arg) / float(1000)
-
         if len(args) == 1:
             proto = args[0]
         else:
             usage()
-
     except getopt.GetoptError:
         usage()
-
     udp = None
     if proto == 'tcp':
         udp = False
@@ -170,12 +163,20 @@ def parseArguments(argv):
         udp = True
     else:
         usage()
-
     return udp, delay_compensation
 
+def stop(sig, frame):
+    global shutdown
+    shutdown = True
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG, stream=sys.stdout)
     signal.signal(signal.SIGTERM, stop)
     signal.signal(signal.SIGINT, stop)
-    start(*parseArguments(sys.argv[1:]))
+    server = start_threaded(*parseArguments(sys.argv[1:]))
+    while not shutdown:
+        try:
+            select.select([],[],[]) # This works only on Unix
+        except select.error as exp:
+            continue
+    server.stop()
