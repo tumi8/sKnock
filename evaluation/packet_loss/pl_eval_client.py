@@ -26,15 +26,18 @@ def attemptConnection(knockClient, target, udp, waitTime, number_of_retries):
     else:
         port = 2000
 
-    global current_start_time
-    current_start_time = time.time()
-    global current_attempts
-    current_attempts = 0
-
     global numAttempts
     numAttempts += 1
     global numRequests
     global numFailedRequests
+
+    global current_success
+    current_success = False
+    global current_attempts
+    current_attempts = 0
+    global current_start_time
+    current_start_time = time.time()
+
     for i in xrange(number_of_retries):
         LOG.debug("Attempt %s...", i+1)
         try:

@@ -55,7 +55,7 @@ def send(target, udp, port = 60000, timeout = 2, ego_mode = False, knockClient =
 
     if callback is not None:
         # Give callback function delay & recieved time
-        callback((time_server - time_send, time_recv) * 1000)
+        callback((time_server - time_send, time_recv) * 1000, time_recv)
 
     #print 'packetTime: %s' % time_server
     #print 'recvTime: %s' % time_recv
