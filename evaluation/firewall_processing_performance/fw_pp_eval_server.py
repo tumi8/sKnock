@@ -116,7 +116,7 @@ def parseArguments(argv):
     delay_compensation = 0
     ego_mode = False
     try:
-        opts, args = getopt.getopt(argv, "d:p:n:")
+        opts, args = getopt.getopt(argv, "d:p:n:e")
         for opt, arg in opts:
             if opt in ("-e"):
                 ego_mode = True
