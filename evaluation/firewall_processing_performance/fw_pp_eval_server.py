@@ -87,7 +87,7 @@ def logProcessingDelay(delay):
         LOG.info("IPTables Processing Time for chain-size of %s rules was %sms", number_of_open_ports, delay)
         loggedPackets += 1
 
-def test(udp, delay_compensation, csvOutput = '/tmp'):
+def test(udp, delay_compensation, ego_mode, csvOutput = '/tmp'):
     initialize()
     config.firewallPolicy = 'none'
 
@@ -99,7 +99,7 @@ def test(udp, delay_compensation, csvOutput = '/tmp'):
     baconFile = open(os.path.join(csvOutput, 'ap_firewall_rulesetsize_vs_processing_delay.csv'), 'w')
     baconCSV = csv.writer(baconFile)
 
-    test_server.start_threaded(udp, delay_compensation, 60000, logProcessingDelay)
+    test_server.start_threaded(udp, delay_compensation=delay_compensation, port=60000, callback=logProcessingDelay, ego_mode=ego_mode)
     openSomePorts()
     test_server.stop_threaded()
     baconFile.close()
@@ -109,14 +109,17 @@ def test(udp, delay_compensation, csvOutput = '/tmp'):
 
 
 def usage():
-    print "Usage: fw_pp_eval_server.py [-d delay compensation in ms] [-p precision] [-n number of ports] <tcp | udp>"
+    print "Usage: fw_pp_eval_server.py [-e (\"ego-mode)\"] [-d delay compensation in ms] [-p precision] [-n number of ports] <tcp | udp>"
     sys.exit(2)
 
 def parseArguments(argv):
     delay_compensation = 0
+    ego_mode = False
     try:
         opts, args = getopt.getopt(argv, "d:p:n:")
         for opt, arg in opts:
+            if opt in ("-e"):
+                ego_mode = True
             if opt in ("-d"):
                 delay_compensation = float(arg) / float(1000)
             elif opt in ("-p"):
@@ -139,7 +142,7 @@ def parseArguments(argv):
         udp = True
     else:
         usage()
-    return udp, delay_compensation
+    return udp, delay_compensation, ego_mode
 
 
 if __name__ == '__main__':
