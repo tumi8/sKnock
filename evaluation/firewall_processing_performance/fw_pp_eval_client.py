@@ -9,7 +9,7 @@ def start(target, udp, ego_mode, rate_limit):
 
     rate_limit_wait = None
     if rate_limit is not None:
-        rate_limit_wait = 1 / rate_limit
+        rate_limit_wait = 1.0 / rate_limit
 
     while not shutdown:
         try:
