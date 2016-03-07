@@ -6,6 +6,7 @@ from evaluation.helper import test_server
 
 LOG = logging.getLogger(__name__)
 
+shutdown = False
 baconFile = None
 knock_server = None
 testServerThreads = []
@@ -59,10 +60,17 @@ def test(udp, delay_compensation, client_ip, csvOutput = '/tmp'):
     testServerThreads.append(test_server_open)
     LOG.info("Started test server for (reference) un-protected requests (port 60001)")
 
+    while not shutdown:
+        time.sleep(2)
+
 
 def stop(sig, frame):
     LOG.debug('Signal %s received', sig)
     LOG.info('Stopping server...')
+
+    global shutdown
+    shutdown = True
+
     global baconFile
     baconFile.close()
 

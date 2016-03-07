@@ -16,12 +16,12 @@ testServerThreads = []
 def log_tcp(delay):
     global baconFile
     baconFile.write("%d,%s\n" % (1, round(delay, 2)))
-    LOG.info("Processing Time for request protected by port-knocking was %sms", delay)
+    LOG.info("Processing Time for TCP request protected by port-knocking was %sms", delay)
 
 def log_udp(delay):
     global baconFile
     baconFile.write("%d,%s\n" % (0, round(delay, 2)))
-    LOG.info("Processing Time for request protected by port-knocking was %sms", delay)
+    LOG.info("Processing Time for UDP request protected by port-knocking was %sms", delay)
 
 
 def test(packet_loss_percent = 0, delay_compensation = 0, csvOutput = '/tmp'):
@@ -35,6 +35,7 @@ def test(packet_loss_percent = 0, delay_compensation = 0, csvOutput = '/tmp'):
     knock_server.start()
     LOG.info("Knock Server started.")
 
+    time.sleep(2)
 
     global testServerThreads
     test_server_tcp = test_server.ServerThread(False, delay_compensation, 2000, log_tcp)
@@ -43,10 +44,10 @@ def test(packet_loss_percent = 0, delay_compensation = 0, csvOutput = '/tmp'):
     LOG.info("Started test server for port-knocking protected TCP requests (port 2000)")
 
 
- #   test_server_udp = test_server.ServerThread(True, delay_compensation, 5000, log_udp)
- #   test_server_udp.start()
- #   testServerThreads.append(test_server_udp)
- #   LOG.info("Started test server for port-knocking protected UDP requests (port 5000)")
+    test_server_udp = test_server.ServerThread(True, delay_compensation, 5000, log_udp)
+    test_server_udp.start()
+    testServerThreads.append(test_server_udp)
+    LOG.info("Started test server for port-knocking protected UDP requests (port 5000)")
 
     global shutdown
     while not shutdown:
