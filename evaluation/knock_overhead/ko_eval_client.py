@@ -49,13 +49,13 @@ def stop(sig, frame):
     LOG.debug('Signal %s received', sig)
     LOG.info('Stopping client...')
 
+    global shutdown
+    shutdown = True
+
     global numRequests
     LOG.info('Total number of sent port-knocking requests: %s', numRequests)
     global numFailedRequests
     LOG.info('Total number of failed port-knocking requests: %s', numFailedRequests)
-
-    global shutdown
-    shutdown = True
 
 
 

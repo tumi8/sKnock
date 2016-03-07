@@ -96,7 +96,7 @@ def test(udp, delay_compensation, ego_mode, csvOutput = '/tmp'):
     firewallHandler.startup()
 
     global baconCSV
-    baconFile = open(os.path.join(csvOutput, 'ap_firewall_rulesetsize_vs_processing_delay.csv'), 'w')
+    baconFile = open(os.path.join(csvOutput, 'ap_firewall_rulesetsize_vs_processing_delay.csv'), 'wb')
     baconCSV = csv.writer(baconFile)
 
     test_server.start_threaded(udp, delay_compensation=delay_compensation, port=60000, callback=logProcessingDelay, ego_mode=ego_mode)

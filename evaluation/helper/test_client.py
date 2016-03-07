@@ -49,12 +49,13 @@ def send(target, udp, port = 60000, timeout = 2, ego_mode = False, knockClient =
         LOG.error('BOOM, something went wrong...')
         return
 
+    time_recv = time.time()
     time_server = struct.unpack('!d', response)[0]
     LOG.debug('Received packet from test server...')
-    time_recv = time.time()
 
     if callback is not None:
-        callback((time_server - time_send) * 1000)
+        # Give callback function delay & recieved time
+        callback((time_server - time_send, time_recv) * 1000)
 
     #print 'packetTime: %s' % time_server
     #print 'recvTime: %s' % time_recv

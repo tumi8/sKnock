@@ -5,7 +5,7 @@ LOG = logging.getLogger(__name__)
 def calibrate(target, udp):
     delays_list = []
 
-    def add_delay(delay):
+    def add_delay(delay, time_recv):
         delays_list.append(delay)
 
     for i in xrange(10000):
