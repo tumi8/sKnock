@@ -77,6 +77,7 @@ def stop(sig, frame):
     global par_clientIP
     global knock_server
     knock_server.serverInterface.firewallHandler.closePortForClient(60001, IP_VERSION.V4, par_proto, par_clientIP)
+    knock_server.stop()
 
 
 
