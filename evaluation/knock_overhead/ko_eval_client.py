@@ -19,7 +19,7 @@ def start(target, udp, waitTime):
         port = 2000
 
     if waitTime is None:
-        waitTime = kecc.calibration(target, udp, knockClient, precision=0.1)
+        waitTime = kecc.calibration(target, udp, knockClient=knockClient, precision=0.1)
 
     global numRequests
     global numFailedRequests
@@ -27,9 +27,9 @@ def start(target, udp, waitTime):
     while not shutdown:
         try:
             numRequests += 1
-            test_client.send(target, udp, 60001)
+            test_client.send(target, udp, port=60001)
             time.sleep(1)
-            test_client.send(target, udp, port, knockClient=knockClient, knockWaitTimeMS=waitTime)
+            test_client.send(target, udp, port=port, knockClient=knockClient, knockWaitTimeMS=waitTime)
             time.sleep(2)
 
         except socket.timeout:

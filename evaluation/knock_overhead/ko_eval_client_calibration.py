@@ -43,7 +43,7 @@ def calibration(target, udp, knockClient, startWaitTime = 20, failureRateLimit =
             if shutdown: return
             try:
                 LOG.debug("Iteration %s, Run %s", iteration, i+1)
-                test_client.send(target, udp, port, knockClient=knockClient, knockWaitTimeMS=waitTime)
+                test_client.send(target, udp, port=port, knockClient=knockClient, knockWaitTimeMS=waitTime)
                 time.sleep(1.2)
             except socket.timeout:
                 numFailures +=1

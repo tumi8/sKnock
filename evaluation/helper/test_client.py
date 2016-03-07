@@ -3,7 +3,7 @@ import logging, time, struct, sys, getopt, socket, errno
 LOG = logging.getLogger(__name__)
 
 
-def send(target, udp, port = 60000, timeout = 2, knockClient = None, knockWaitTimeMS = 50, callback = None):
+def send(target, udp, port = 60000, timeout = 2, ego_mode = False, knockClient = None, knockWaitTimeMS = 50, callback = None):
     knock_wait_time_seconds = knockWaitTimeMS / float(1000)
 
     if udp:
@@ -31,6 +31,10 @@ def send(target, udp, port = 60000, timeout = 2, knockClient = None, knockWaitTi
         else:
             target_socket.connect((target, port))
             target_socket.send(data)
+
+        if ego_mode:
+            target_socket.close()
+            return
 
         response = target_socket.recv(8)
 
