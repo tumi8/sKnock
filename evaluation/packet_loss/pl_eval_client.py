@@ -42,7 +42,8 @@ def attemptConnection(knockClient, target, udp, waitTime, number_of_retries):
         LOG.debug("Attempt %s...", i+1)
         try:
             numRequests += 1
-            test_client.send(target, udp, port=port, knockWaitTimeMS=waitTime, knockClient= knockClient, callback=connectionSuccessCallback)
+            test_client.send(target, udp, port=port, knockWaitTimeMS=waitTime,
+                             knockClient= knockClient, callback=connectionSuccessCallback)
             break
 
         except socket.timeout:
@@ -77,9 +78,15 @@ def processResult(packet_loss_percent, udp):
     global numFailedAttempts
 
     if current_success:
-        LOG.info("%d%% Percent Packet-Loss: Successfully established %s connection after %s attempts taking (in total) %sms", packet_loss_percent, PROTOCOL.getById(not udp), current_attempts, current_time_delta)
+        LOG.info("%d%% Percent Packet-Loss: Successfully established %s
+        connection after %s attempts taking (in total) %sms",
+                 packet_loss_percent, PROTOCOL.getById(not udp), current_attempts,
+                 current_time_delta)
     else:
-        LOG.info("%d%% Percent Packet-Loss: %s Connection attempt still failed after %s attempts", packet_loss_percent, PROTOCOL.getById(not udp), current_attempts)
+        LOG.info("%d%% Percent Packet-Loss: %s Connection attempt still failed \
+        after %s attempts",
+                 packet_loss_percent, PROTOCOL.getById(not udp),
+                 current_attempts)
         current_time_delta = -1
         numFailedAttempts += 1
 
@@ -134,7 +141,9 @@ def stop(sig, frame):
 
 
 def usage():
-    print "Usage: pl_eval_client.py [-w <wait-time>] [-n <number of repetitions>] [-a <number of attempts per repetition>] <target host> <packet loss in percent>"
+    print "Usage: pl_eval_client.py [-w <wait-time>] [-n <number of \
+    repetitions>] [-a <number of attempts per repetition>] \
+    <target host> <packet loss in percent>"
     sys.exit(2)
 
 def parseArguments(argv):

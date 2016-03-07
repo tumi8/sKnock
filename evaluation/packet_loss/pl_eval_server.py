@@ -56,9 +56,6 @@ def stop(sig, frame):
     for t in testServerThreads:
         t.stop()
 
-    for t in testServerThreads:
-        t.join()
-
     global baconFile
     baconFile.close()
 
@@ -102,3 +99,4 @@ if __name__ == '__main__':
     signal.signal(signal.SIGTERM, stop)
     signal.signal(signal.SIGINT, stop)
     test(*parseArguments(sys.argv[1:]))
+
