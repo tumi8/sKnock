@@ -97,6 +97,7 @@ if __name__ == '__main__':
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         level=logging.WARNING,
         stream=sys.stdout)
+    test_server.LOG.setLevel(logging.INFO)
     LOG.setLevel(logging.DEBUG)
     signal.signal(signal.SIGTERM, stop)
     signal.signal(signal.SIGINT, stop)

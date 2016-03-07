@@ -55,6 +55,7 @@ def attemptConnection(knockClient, target, udp, waitTime, number_of_retries):
                 numFailedRequests += 1
                 continue
             else:
+                numFailedRequests += 1
                 raise e
 
 def connectionSuccessCallback(delay, time_recv):
@@ -162,6 +163,7 @@ def parseArguments(argv):
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.WARN, stream=sys.stdout)
+    test_client.LOG.setLevel(logging.INFO)
     LOG.setLevel(logging.DEBUG)
     signal.signal(signal.SIGTERM, stop)
     signal.signal(signal.SIGINT, stop)
