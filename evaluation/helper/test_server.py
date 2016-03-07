@@ -133,9 +133,9 @@ def stop(sig, frame):
     shutdown = True
 
 
-def start_threaded(udp, delay_compensation = 0, port = 60000, callback = None):
+def start_threaded(udp, delay_compensation = 0, port = 60000, callback = None, ego_mode = False):
     global thread
-    thread = ServerThread(udp, delay_compensation, port, callback)
+    thread = ServerThread(udp, delay_compensation, port, callback, ego_mode)
     thread.start()
     return thread
 
