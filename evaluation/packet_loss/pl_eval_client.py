@@ -31,21 +31,28 @@ def attemptConnection(knockClient, target, udp, waitTime, number_of_retries):
     global current_attempts
     current_attempts = 0
 
+    global numAttempts
+    numAttempts += 1
+    global numRequests
+    global numFailedRequests
     for i in xrange(number_of_retries):
         LOG.debug("Attempt %s...", i+1)
         try:
-            test_client.send(target, udp, port=port, knockWaitTimeMS=waitTime, callback=connectionSuccessCallback)
+            numRequests += 1
+            test_client.send(target, udp, port=port, knockWaitTimeMS=waitTime, knockClient= knockClient, callback=connectionSuccessCallback)
             break
 
         except socket.timeout:
             LOG.info("Request timed out.")
             current_attempts += 1
+            numFailedRequests += 1
             continue
 
         except socket.error, e:
             if e.errno == errno.ECONNREFUSED:
                 LOG.info("Connection refused.")
                 current_attempts += 1
+                numFailedRequests += 1
                 continue
             else:
                 raise e
@@ -63,11 +70,14 @@ def processResult(packet_loss_percent, udp):
     global current_attempts
     global current_time_delta
 
+    global numFailedAttempts
+
     if current_success:
         LOG.info("%d%% Percent Packet-Loss: Successfully established %s connection after %s attempts taking (in total) %sms", packet_loss_percent, PROTOCOL.getById(not udp), current_attempts, current_time_delta)
     else:
         LOG.info("%d%% Percent Packet-Loss: %s Connection attempt still failed after %s attempts", packet_loss_percent, PROTOCOL.getById(not udp), current_attempts)
         current_time_delta = -1
+        numFailedAttempts += 1
 
     global baconFile
     baconFile.write('%d, %d, %d, %s' % (packet_loss_percent, not udp, current_attempts, round(current_time_delta, 2)))
