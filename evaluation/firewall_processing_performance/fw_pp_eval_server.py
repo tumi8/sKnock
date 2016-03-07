@@ -61,7 +61,7 @@ def openSomePorts():
         openAPortAndMeasureStuff(i, IP_VERSION.V4, PROTOCOL.UDP, '192.168.0.3')
         if shutdown:
             return
-    closeSomePorts()
+    #closeSomePorts()
 
 def closeSomePorts():
     global firewallHandler, number_of_open_ports, shutdown
