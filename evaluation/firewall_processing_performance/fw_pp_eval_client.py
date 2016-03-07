@@ -39,6 +39,7 @@ def usage():
 def parseArguments(argv):
     proto = None
     ego_mode = False
+    rate_limit = None
     try:
         opts, args = getopt.getopt(argv, "l:e")
         for opt, arg in opts:
