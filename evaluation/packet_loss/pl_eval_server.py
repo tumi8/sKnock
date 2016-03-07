@@ -11,6 +11,7 @@ LOG = logging.getLogger(__name__)
 baconFile = None
 knock_server = None
 testServerThreads = []
+shutdown = False
 
 def log_tcp(delay):
     global baconFile
@@ -36,34 +37,32 @@ def test(packet_loss_percent = 0, delay_compensation = 0, csvOutput = '/tmp'):
 
 
     global testServerThreads
-    test_server_tcp = test_server.ServerThread(False, delay_compensation, 2000, log_tcp)
+    test_server_tcp = test_server.TCPServerThread(delay_compensation, 2000, log_tcp)
     test_server_tcp.start()
     testServerThreads.append(test_server_tcp)
     LOG.info("Started test server for port-knocking protected TCP requests (port 2000)")
 
 
-    test_server_udp = test_server.ServerThread(True, delay_compensation, 5000, log_udp)
+    test_server_udp = test_server.UDPServerThread(delay_compensation, 5000, log_udp)
     test_server_udp.start()
     testServerThreads.append(test_server_udp)
     LOG.info("Started test server for port-knocking protected UDP requests (port 5000)")
 
-
-def stop(sig, frame):
-    LOG.debug('Signal %s received', sig)
-    LOG.info('Stopping server...')
-
-    global testServerThreads
+    global shutdown
+    while not shutdown:
+        time.sleep(3000)
     for t in testServerThreads:
         t.stop()
-
-    global baconFile
+    for t in testServerThreads:
+        t.join()
+    knock_server.stop()
     baconFile.close()
 
-
-    global knock_server
-    knock_server.stop()
-
-
+def stop(sig, frame):
+    global shutdown
+    LOG.debug('Signal %s received', sig)
+    LOG.info('Stopping server...')
+    shutdown = True
 
 
 def usage():
