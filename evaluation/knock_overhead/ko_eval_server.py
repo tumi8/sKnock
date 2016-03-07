@@ -48,39 +48,35 @@ def test(udp, delay_compensation, client_ip, csvOutput = '/tmp'):
     else:
         port = 2000
 
+    server_factory = test_server.UDPServerThread if udp else test_server.TCPServerThread
     global testServerThreads
-    test_server_knocked = test_server.ServerThread(udp, delay_compensation, port, log_knocked)
+    test_server_knocked = server_factory(delay_compensation, port, log_knocked)
     test_server_knocked.start()
     testServerThreads.append(test_server_knocked)
     LOG.info("Started test server for port-knocking protected requests (port %s)", port)
 
-    test_server_open = test_server.ServerThread(udp, delay_compensation, 60001, log_open)
+    test_server_open = server_factory(delay_compensation, 60001, log_open)
     test_server_open.start()
     testServerThreads.append(test_server_open)
     LOG.info("Started test server for (reference) un-protected requests (port 60001)")
 
-
-def stop(sig, frame):
-    LOG.debug('Signal %s received', sig)
-    LOG.info('Stopping server...')
-    global baconFile
+    global shutdown
+    while not shutdown:
+        time.sleep(3000)
     baconFile.close()
-
-    global testServerThreads
     for t in testServerThreads:
         t.stop()
-
     for t in testServerThreads:
         t.join()
-
-    global par_proto
-    global par_clientIP
-    global knock_server
     knock_server.serverInterface.firewallHandler.closePortForClient(60001, IP_VERSION.V4, par_proto, par_clientIP)
     knock_server.stop()
 
 
-
+def stop(sig, frame):
+    global shutdown
+    LOG.debug('Signal %s received', sig)
+    LOG.info('Stopping server...')
+    shutdown = True
 
 def usage():
     print "Usage: ko_eval_server.py [-d <delay compensation in ms] <tcp | udp> <client ip>"
