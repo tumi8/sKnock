@@ -23,7 +23,7 @@ class Security:
 
     # Note: Returns a Thread that has to be stopped before program can exit
     def startContinuousCRLUpdate(self):
-        self.updateCRLThread = UpdateCRLThread(self.config.crlFile, self.config.crlUrl, importFunc=self.certUtil.importCrl)
+        self.updateCRLThread = UpdateCRLThread(self.config.crlFile, self.config.crlUrl, self.config.crlInterval, importFunc=self.certUtil.importCrl)
         self.updateCRLThread.importFunc(self.updateCRLThread.crlFile)
         self.updateCRLThread.start()
 
