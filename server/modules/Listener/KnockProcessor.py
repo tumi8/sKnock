@@ -31,7 +31,7 @@ class KnockProcessor:
         self.config = config
         self.security = security
         self.firewallHandler = firewallHandler
-        self.runningPortOpenTasks = list()
+        self.runningPortOpenTasks = set()
         self.socket = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.htons(ETH_P_ALL))
         self.socket.settimeout(5)
 

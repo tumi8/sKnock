@@ -37,7 +37,7 @@ class PortOpenThread(Thread):
     @synchronized
     def run(self):
         threadTaskHash = hash(str(self.port) + str(self.ipVersion) + self.protocol + self.addr)
-        self.runningOpenPortTasks.append(threadTaskHash)
+        self.runningOpenPortTasks.add(threadTaskHash)
 
         try:
             self.firewallHandler.openPortForClient(self.port, self.ipVersion, self.protocol, self.addr)

@@ -39,7 +39,7 @@ class Firewall:
         self.platform = PlatformUtils.detectPlatform()
         self.firewallServicePipe, remotePipeEnd = Pipe()
         self.firewallService = None
-        self.openPortsList = list()
+        self.openPortsList = set()
 
         if(self.platform == PlatformUtils.LINUX):
             self.firewallService = Process(target=LinuxServiceWrapper.processFirewallCommands, args=((remotePipeEnd),))
@@ -61,7 +61,7 @@ class Firewall:
             pass
 
         self._executeTask(["startService", self.config.firewallPolicy])
-        self.openPortsList = list()
+        self.openPortsList = set()
 
 
     def shutdown(self):
@@ -86,7 +86,7 @@ class Firewall:
             raise PortAlreadyOpenException
 
         self._executeTask(['openPort', port, ipVersion, protocol, addr])
-        self.openPortsList.append(openPort)
+        self.openPortsList.add(openPort)
         LOG.info('%s Port: %s opened for host: %s from: %s until: %s',
                  protocol, port, addr,
                  datetime.datetime.now(),
