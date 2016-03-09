@@ -36,19 +36,19 @@ def openNextPort():
         firewallHandler.openPortForClient(number_of_open_ports_by_id[nextPort], IP_VERSION.V4, PROTOCOL.TCP, '192.168.0.2')
         LOG.debug("Opened port (%s, %s, %s, %s)", number_of_open_ports_by_id[nextPort], PROTOCOL.TCP, '192.168.0.2', IP_VERSION.V4)
         nextPort = 1
-    if nextPort == 1:
+    elif nextPort == 1:
         number_of_open_ports += 1
         number_of_open_ports_by_id[nextPort] += 1
         firewallHandler.openPortForClient(number_of_open_ports_by_id[nextPort], IP_VERSION.V4, PROTOCOL.UDP, '192.168.0.2')
         LOG.debug("Opened port (%s, %s, %s, %s)", number_of_open_ports_by_id[nextPort], PROTOCOL.UDP, '192.168.0.2', IP_VERSION.V4)
         nextPort = 2
-    if nextPort == 2:
+    elif nextPort == 2:
         number_of_open_ports += 1
         number_of_open_ports_by_id[nextPort] += 1
         firewallHandler.openPortForClient(number_of_open_ports_by_id[nextPort], IP_VERSION.V4, PROTOCOL.TCP, '192.168.0.3')
         LOG.debug("Opened port (%s, %s, %s, %s)", number_of_open_ports_by_id[nextPort], PROTOCOL.TCP, '192.168.0.3', IP_VERSION.V4)
         nextPort = 3
-    if nextPort == 3:
+    elif nextPort == 3:
         number_of_open_ports += 1
         number_of_open_ports_by_id[nextPort] += 1
         firewallHandler.openPortForClient(number_of_open_ports_by_id[nextPort], IP_VERSION.V4, PROTOCOL.UDP, '192.168.0.3')
@@ -82,6 +82,9 @@ def openSomePorts():
         openAPortAndMeasureStuff()
         if shutdown:
             return
+
+        while loggedPackets < packets_to_log_per_port:
+            time.sleep(0.1)
 
         # Open the ports that we don't want to measure
         for x in xrange(port_open_interval -1):
