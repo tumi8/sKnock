@@ -79,15 +79,15 @@ def openSomePorts():
     global port_open_interval
 
     while number_of_open_ports < number_of_ports_to_open:
-        for x in xrange(port_open_interval -1):
-            openNextPort()
-            if shutdown:
-                return
-
         openAPortAndMeasureStuff()
         if shutdown:
             return
 
+        # Open the ports that we don't want to measure
+        for x in xrange(port_open_interval -1):
+            openNextPort()
+            if shutdown:
+                return
 def stop(sig, frame):
     global shutdown
     shutdown = True
