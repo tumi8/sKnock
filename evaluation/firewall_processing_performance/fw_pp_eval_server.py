@@ -8,9 +8,16 @@ from server.modules.Firewall.Firewall import Firewall
 LOG = logging.getLogger(__name__)
 
 number_of_ports_to_open = 10000
-number_of_open_ports = 0
-loggedPackets = 0
+port_open_interval = 1000
+start_port = 1
 packets_to_log_per_port = 10
+
+
+number_of_open_ports = 0
+number_of_open_ports_by_id = [0, 0, 0, 0]
+loggedPackets = 0
+
+nextPort = 0
 
 currentCSVRow = [0]
 baconCSV = None
@@ -19,7 +26,36 @@ firewallHandler = None
 shutdown = False
 
 
-def openAPortAndMeasureStuff(port, ipVersion, protocol, addr):
+def openNextPort():
+    global nextPort
+    global number_of_open_ports
+    global number_of_open_ports_by_id
+    if nextPort == 0:
+        number_of_open_ports += 1
+        number_of_open_ports_by_id[nextPort] += 1
+        firewallHandler.openPortForClient(number_of_open_ports_by_id[nextPort], IP_VERSION.V4, PROTOCOL.TCP, '192.168.0.2')
+        LOG.debug("Opened port (%s, %s, %s, %s)", number_of_open_ports_by_id[nextPort], PROTOCOL.TCP, '192.168.0.2', IP_VERSION.V4)
+        nextPort = 1
+    if nextPort == 1:
+        number_of_open_ports += 1
+        number_of_open_ports_by_id[nextPort] += 1
+        firewallHandler.openPortForClient(number_of_open_ports_by_id[nextPort], IP_VERSION.V4, PROTOCOL.UDP, '192.168.0.2')
+        LOG.debug("Opened port (%s, %s, %s, %s)", number_of_open_ports_by_id[nextPort], PROTOCOL.UDP, '192.168.0.2', IP_VERSION.V4)
+        nextPort = 2
+    if nextPort == 2:
+        number_of_open_ports += 1
+        number_of_open_ports_by_id[nextPort] += 1
+        firewallHandler.openPortForClient(number_of_open_ports_by_id[nextPort], IP_VERSION.V4, PROTOCOL.TCP, '192.168.0.3')
+        LOG.debug("Opened port (%s, %s, %s, %s)", number_of_open_ports_by_id[nextPort], PROTOCOL.TCP, '192.168.0.3', IP_VERSION.V4)
+        nextPort = 3
+    if nextPort == 3:
+        number_of_open_ports += 1
+        number_of_open_ports_by_id[nextPort] += 1
+        firewallHandler.openPortForClient(number_of_open_ports_by_id[nextPort], IP_VERSION.V4, PROTOCOL.UDP, '192.168.0.3')
+        LOG.debug("Opened port (%s, %s, %s, %s)", number_of_open_ports_by_id[nextPort], PROTOCOL.UDP, '192.168.0.3', IP_VERSION.V4)
+        nextPort = 0
+
+def openAPortAndMeasureStuff():
     global loggedPackets
     global packets_to_log_per_port
     while loggedPackets < packets_to_log_per_port:
@@ -29,47 +65,26 @@ def openAPortAndMeasureStuff(port, ipVersion, protocol, addr):
     baconCSV.writerow(currentCSVRow)
     currentCSVRow = []
 
-    firewallHandler.openPortForClient(port, ipVersion, protocol, addr)
-    LOG.debug("Opened port (%s, %s, %s, %s)", port, protocol, addr, ipVersion)
-    global number_of_open_ports
-    number_of_open_ports += 1
+    openNextPort()
+
     currentCSVRow.append(number_of_open_ports)
     loggedPackets = 0
 
-def closeAPortAndMeasureStuff(port, ipVersion, protocol, addr):
-    global loggedPackets
-    while loggedPackets < packets_to_log_per_port:
-        time.sleep(0.1)
-
-    global currentCSVRow
-    baconCSV.writerow(currentCSVRow)
-    currentCSVRow = []
-
-    firewallHandler.closePortForClient(port, ipVersion, protocol, addr)
-    LOG.debug("Closed port (%s, %s, %s, %s)", port, protocol, addr, ipVersion)
-    global number_of_open_ports
-    number_of_open_ports -= 1
-    currentCSVRow.append(number_of_open_ports)
-    loggedPackets = 0
 
 def openSomePorts():
-    global firewallHandler, number_of_open_ports, shutdown
-    for i in xrange(number_of_ports_to_open/4):
-        openAPortAndMeasureStuff(i, IP_VERSION.V4, PROTOCOL.TCP, '192.168.0.2')
-        openAPortAndMeasureStuff(i, IP_VERSION.V4, PROTOCOL.UDP, '192.168.0.2')
-        openAPortAndMeasureStuff(i, IP_VERSION.V4, PROTOCOL.TCP, '192.168.0.3')
-        openAPortAndMeasureStuff(i, IP_VERSION.V4, PROTOCOL.UDP, '192.168.0.3')
-        if shutdown:
-            return
-    #closeSomePorts()
+    global firewallHandler
+    global shutdown
+    global number_of_open_ports
+    global number_of_ports_to_openu
+    global port_open_interval
 
-def closeSomePorts():
-    global firewallHandler, number_of_open_ports, shutdown
-    for i in xrange(number_of_ports_to_open/4):
-        closeAPortAndMeasureStuff(i, IP_VERSION.V4, PROTOCOL.TCP, '192.168.0.2')
-        closeAPortAndMeasureStuff(i, IP_VERSION.V4, PROTOCOL.UDP, '192.168.0.2')
-        closeAPortAndMeasureStuff(i, IP_VERSION.V4, PROTOCOL.TCP, '192.168.0.3')
-        closeAPortAndMeasureStuff(i, IP_VERSION.V4, PROTOCOL.UDP, '192.168.0.3')
+    while number_of_open_ports < number_of_ports_to_open:
+        for x in xrange(port_open_interval -1):
+            openNextPort()
+            if shutdown:
+                return
+
+        openAPortAndMeasureStuff()
         if shutdown:
             return
 
@@ -109,14 +124,14 @@ def test(udp, delay_compensation, ego_mode, csvOutput = '/tmp'):
 
 
 def usage():
-    print "Usage: fw_pp_eval_server.py [-e (\"ego-mode)\"] [-d delay compensation in ms] [-p precision] [-n number of ports] <tcp | udp>"
+    print "Usage: fw_pp_eval_server.py [-e (\"ego-mode)\"] [-d delay compensation in ms] [-p precision] [-n number of ports] [-x distance between measurements] [-s start port] <tcp | udp>"
     sys.exit(2)
 
 def parseArguments(argv):
     delay_compensation = 0
     ego_mode = False
     try:
-        opts, args = getopt.getopt(argv, "d:p:n:e")
+        opts, args = getopt.getopt(argv, "d:p:n:x:s:e")
         for opt, arg in opts:
             if opt in ("-e"):
                 ego_mode = True
@@ -128,6 +143,12 @@ def parseArguments(argv):
             elif opt in ("-n"):
                 global number_of_ports_to_open
                 number_of_ports_to_open = int(arg)
+            elif opt in ("-x"):
+                global port_open_interval
+                port_open_interval = int(arg)
+            elif opt in ("-s"):
+                global start_port
+                start_port = int(arg)
 
         if len(args) == 1:
             proto = args[0]
