@@ -4,9 +4,10 @@ from threading import Thread
 LOG = logging.getLogger(__name__)
 
 class UpdateCRLThread(Thread):
-    def __init__(self, crlFile, crlUrl, importFunc = None):
+    def __init__(self, crlFile, crlUrl, crlInterval, importFunc = None):
         self.crlFile = crlFile
         self.crlUrl = crlUrl
+        self.crlInterval = crlInterval
         self.importFunc = importFunc
         self.shutdown = False
         Thread.__init__(self)
@@ -54,7 +55,7 @@ class UpdateCRLThread(Thread):
         atexit.register(self.stop)
 
         self.updateCRL()
-        self.updateJob = schedule.every(30).minutes.do(self.updateCRL)
+        self.updateJob = schedule.every(self.crlInterval).minutes.do(self.updateCRL)
 
         while not self.shutdown:
             schedule.run_pending()
