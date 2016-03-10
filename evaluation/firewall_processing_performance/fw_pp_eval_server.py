@@ -66,6 +66,9 @@ def openAPortAndMeasureStuff():
     currentCSVRow = []
 
     openNextPort()
+    
+    # Relax a little
+    time.sleep(2)
 
     currentCSVRow.append(number_of_open_ports)
     loggedPackets = 0
