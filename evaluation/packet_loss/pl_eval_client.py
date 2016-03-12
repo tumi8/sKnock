@@ -76,9 +76,15 @@ def processResult(packet_loss_percent, udp):
     global numFailedAttempts
 
     if current_success:
-        LOG.info("%d%% Percent Packet-Loss: Successfully established %s connection after %s attempts taking (in total) %sms", packet_loss_percent, PROTOCOL.getById(not udp), current_attempts, current_time_delta)
+        LOG.info("%d%% Percent Packet-Loss: Successfully established %s
+        connection after %s attempts taking (in total) %sms",
+                 packet_loss_percent, PROTOCOL.getById(not udp), current_attempts,
+                 current_time_delta)
     else:
-        LOG.info("%d%% Percent Packet-Loss: %s Connection attempt still failed after %s attempts", packet_loss_percent, PROTOCOL.getById(not udp), current_attempts)
+        LOG.info("%d%% Percent Packet-Loss: %s Connection attempt still failed \
+        after %s attempts",
+                 packet_loss_percent, PROTOCOL.getById(not udp),
+                 current_attempts)
         current_time_delta = -1
         numFailedAttempts += 1
 
