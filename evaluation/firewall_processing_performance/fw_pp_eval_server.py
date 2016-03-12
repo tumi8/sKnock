@@ -121,6 +121,11 @@ def test(udp, delay_compensation, ego_mode, csvOutput = '/tmp'):
     baconCSV = csv.writer(baconFile)
 
     server = test_server.start_threaded(udp, delay_compensation=delay_compensation, port=60000, callback=logProcessingDelay, ego_mode=ego_mode)
+
+    global start_port
+    for i in xrange(start_port):
+        openNextPort()
+
     openSomePorts()
     server.stop()
     baconFile.close()
