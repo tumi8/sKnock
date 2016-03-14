@@ -7,6 +7,8 @@ from server.modules.Firewall.Firewall import Firewall
 
 LOG = logging.getLogger(__name__)
 
+server = None
+
 number_of_ports_to_open = 10000
 port_open_interval = 1000
 start_port = 1
@@ -66,9 +68,9 @@ def openAPortAndMeasureStuff():
     currentCSVRow = []
 
     openNextPort()
-    
-    # Relax a little
-    time.sleep(2)
+
+    # Relax
+    time.sleep(0.2)
 
     currentCSVRow.append(number_of_open_ports)
     loggedPackets = 0
@@ -90,10 +92,14 @@ def openSomePorts():
             time.sleep(0.1)
 
         # Open the ports that we don't want to measure
+        global server
+        server.wait()
         for x in xrange(port_open_interval -1):
             openNextPort()
             if shutdown:
                 return
+        server.go()
+
 def stop(sig, frame):
     global shutdown
     shutdown = True
@@ -120,6 +126,7 @@ def test(udp, delay_compensation, ego_mode, csvOutput = '/tmp'):
     baconFile = open(os.path.join(csvOutput, 'ap_firewall_rulesetsize_vs_processing_delay.csv'), 'wb')
     baconCSV = csv.writer(baconFile)
 
+    global server
     server = test_server.start_threaded(udp, delay_compensation=delay_compensation, port=60000, callback=logProcessingDelay, ego_mode=ego_mode)
 
     global start_port
