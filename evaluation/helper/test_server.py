@@ -45,8 +45,8 @@ class UDPServerThread(_ServerThread):
         self.t.stop()
         self.t.join()
 
-    def wait(self):
-        self.t.wait()
+    def pause(self):
+        self.t.pause()
 
     def go(self):
         self.t.go()
@@ -139,7 +139,7 @@ class ConnectionThread(threading.Thread):
     def stop(self):
         self.shutdown.set()
 
-    def wait(self):
+    def pause(self):
         self.wait.set()
 
     def go(self):

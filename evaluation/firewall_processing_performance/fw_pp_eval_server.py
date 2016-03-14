@@ -17,7 +17,7 @@ packets_to_log_per_port = 10
 
 number_of_open_ports = 0
 number_of_open_ports_by_id = [0, 0, 0, 0]
-loggedPackets = 0
+loggedPackets = 10000000
 
 nextPort = 0
 
@@ -93,7 +93,7 @@ def openSomePorts():
 
         # Open the ports that we don't want to measure
         global server
-        server.wait()
+        server.pause()
         for x in xrange(port_open_interval -1):
             openNextPort()
             if shutdown:
@@ -130,7 +130,7 @@ def test(udp, delay_compensation, ego_mode, csvOutput = '/tmp'):
     server = test_server.start_threaded(udp, delay_compensation=delay_compensation, port=60000, callback=logProcessingDelay, ego_mode=ego_mode)
 
     global start_port
-    for i in xrange(start_port):
+    for i in xrange(start_port -1):
         openNextPort()
 
     openSomePorts()
