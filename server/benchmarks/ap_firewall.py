@@ -3,8 +3,8 @@ import os
 import time
 
 from definitions.Constants import *
-from modules.Configuration import config, initialize
-from modules.Firewall.Firewall import Firewall
+from server.modules.Configuration import config, initialize
+from server.modules.Firewall.Firewall import Firewall
 
 
 LOG = logging.getLogger(__name__)

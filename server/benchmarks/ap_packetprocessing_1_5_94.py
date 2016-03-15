@@ -4,8 +4,8 @@ import sys
 import time
 import timeit
 
-from modules.Listener import ProcessRequestThread
-from modules.Listener.NewPacketThread import NewPacketThread
+from server.modules.Listener import ProcessRequestThread
+from server.modules.Listener.NewPacketThread import NewPacketThread
 
 LOG = logging.getLogger(__name__)
 

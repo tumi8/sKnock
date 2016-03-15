@@ -4,8 +4,8 @@ import sys
 import timeit
 
 from common.definitions.Constants import *
-from modules.Security import Security
-from modules.Configuration import config, initialize
+from server.modules.Security.Security import Security
+from server.modules.Configuration import config, initialize
 
 LOG = logging.getLogger(__name__)
 
