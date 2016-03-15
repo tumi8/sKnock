@@ -8,20 +8,20 @@ from common.definitions.Constants import *
 
 LOG = logging.getLogger(__name__)
 
+shutdown = False
 baconFile = None
 knock_server = None
 testServerThreads = []
-shutdown = False
 
 def log_tcp(delay):
     global baconFile
     baconFile.write("%d,%s\n" % (1, round(delay, 2)))
-    LOG.info("Processing Time for request protected by port-knocking was %sms", delay)
+    LOG.info("Processing Time for TCP request protected by port-knocking was %sms", delay)
 
 def log_udp(delay):
     global baconFile
     baconFile.write("%d,%s\n" % (0, round(delay, 2)))
-    LOG.info("Processing Time for request protected by port-knocking was %sms", delay)
+    LOG.info("Processing Time for UDP request protected by port-knocking was %sms", delay)
 
 
 def test(packet_loss_percent = 0, delay_compensation = 0, csvOutput = '/tmp'):

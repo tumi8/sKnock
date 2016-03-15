@@ -6,6 +6,7 @@ from evaluation.helper import test_server
 
 LOG = logging.getLogger(__name__)
 
+shutdown = False
 baconFile = None
 knock_server = None
 testServerThreads = []

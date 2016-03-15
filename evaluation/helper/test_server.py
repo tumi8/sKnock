@@ -39,11 +39,17 @@ class UDPServerThread(_ServerThread):
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         server_socket.settimeout(5)
         server_socket.bind(('0.0.0.0', self.port))
-        t = ConnectionThread(server_socket, self.delay_compensation, self.callback, self.ego_mode)
-        t.start()
+        self.t = ConnectionThread(server_socket, self.delay_compensation, self.callback, self.ego_mode)
+        self.t.start()
         self.shutdown.wait()
-        t.stop()
-        t.join()
+        self.t.stop()
+        self.t.join()
+
+    def pause(self):
+        self.t.pause()
+
+    def go(self):
+        self.t.go()
 
 class TCPServerThread(_ServerThread):
     def __init__(self, *args):
@@ -87,11 +93,15 @@ class ConnectionThread(threading.Thread):
         self.callback = callback
         self.ego_mode = ego_mode
         self.shutdown = threading.Event()
+        self.wait = threading.Event()
         threading.Thread.__init__(self)
 
     def run(self):
         while not self.shutdown.is_set():
             try:
+                while self.wait.is_set():
+                    time.sleep(0.1)
+
                 packet, client_addr = self.conn.recvfrom(8)
             except socket.timeout:
                 continue
@@ -128,6 +138,12 @@ class ConnectionThread(threading.Thread):
 
     def stop(self):
         self.shutdown.set()
+
+    def pause(self):
+        self.wait.set()
+
+    def go(self):
+        self.wait.clear()
 
 ######################################################################################
 

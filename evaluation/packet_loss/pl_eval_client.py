@@ -20,7 +20,7 @@ numFailedAttempts = 0
 numRequests = 0
 numFailedRequests = 0
 
-def attemptConnection(knockClient, target, udp, waitTime, number_of_retries):
+def attemptConnection(knockClient, target, udp, waitTime, number_of_retries, timeout):
     if udp:
         port = 5000
     else:
@@ -42,20 +42,18 @@ def attemptConnection(knockClient, target, udp, waitTime, number_of_retries):
         LOG.debug("Attempt %s...", i+1)
         try:
             numRequests += 1
-            test_client.send(target, udp, port=port, knockWaitTimeMS=waitTime,
-                             knockClient= knockClient, callback=connectionSuccessCallback)
+            current_attempts += 1
+            test_client.send(target, udp, port=port, timeout=timeout, knockWaitTimeMS=waitTime, knockClient= knockClient, callback=connectionSuccessCallback)
             break
 
         except socket.timeout:
             LOG.info("Request timed out.")
-            current_attempts += 1
             numFailedRequests += 1
             continue
 
         except socket.error, e:
             if e.errno == errno.ECONNREFUSED:
                 LOG.info("Connection refused.")
-                current_attempts += 1
                 numFailedRequests += 1
                 continue
             else:
@@ -66,7 +64,7 @@ def connectionSuccessCallback(delay, time_recv):
     global current_success
     global current_start_time
     global current_time_delta
-    current_time_delta = time_recv - current_start_time
+    current_time_delta = (time_recv - current_start_time) * 1000
     current_success = True
 
 
@@ -91,9 +89,9 @@ def processResult(packet_loss_percent, udp):
         numFailedAttempts += 1
 
     global baconFile
-    baconFile.write('%d, %d, %d, %s' % (packet_loss_percent, not udp, current_attempts, round(current_time_delta, 2)))
+    baconFile.write('%d, %d, %d, %s\n' % (packet_loss_percent, not udp, current_attempts, round(current_time_delta, 2)))
 
-def start(target, packet_loss_percent, waitTime = 12, repetitions = 10, attempts_per_repetition = 3, csvOutput = '/tmp'):
+def start(target, packet_loss_percent, waitTime = 12, repetitions = 10, attempts_per_repetition = 3, timeout = 2, csvOutput = os.path.expanduser('~')):
     knockClient =  ClientInterface(verify=False)
 
     global baconFile
@@ -104,7 +102,7 @@ def start(target, packet_loss_percent, waitTime = 12, repetitions = 10, attempts
             break
 
         LOG.info("Repetition %d...", i+1)
-        attemptConnection(knockClient, target, False, waitTime, attempts_per_repetition)
+        attemptConnection(knockClient, target, False, waitTime, attempts_per_repetition, timeout)
         processResult(packet_loss_percent, False)
 
 
@@ -113,7 +111,7 @@ def start(target, packet_loss_percent, waitTime = 12, repetitions = 10, attempts
             break
 
         LOG.info("Repetition %d...", i+1)
-        attemptConnection(knockClient, target, True, waitTime, attempts_per_repetition)
+        attemptConnection(knockClient, target, True, waitTime, attempts_per_repetition, timeout)
         processResult(packet_loss_percent, True)
 
     stop(None, None)
@@ -141,17 +139,16 @@ def stop(sig, frame):
 
 
 def usage():
-    print "Usage: pl_eval_client.py [-w <wait-time>] [-n <number of \
-    repetitions>] [-a <number of attempts per repetition>] \
-    <target host> <packet loss in percent>"
+    print "Usage: pl_eval_client.py [-w <wait-time>] [-n <number of repetitions>] [-a <number of attempts per repetition>] [-t <timeout>] <target host> <packet loss in percent>"
     sys.exit(2)
 
 def parseArguments(argv):
     wait_time = 12
     number_of_repetitions = 10
     attempts_per_repetition = 3
+    timeout = 2
     try:
-        opts, args = getopt.getopt(argv, "w:n:a:")
+        opts, args = getopt.getopt(argv, "w:n:a:t:")
         for opt, arg in opts:
             if opt in ("-w"):
                 wait_time = float(arg)
@@ -159,6 +156,9 @@ def parseArguments(argv):
                 number_of_repetitions = int(arg)
             elif opt in ("-a"):
                 attempts_per_repetition = int(arg)
+            elif opt in ("-t"):
+                timeout = int(arg)
+
 
         if len(args) == 2:
             host = args[0]
@@ -170,7 +170,7 @@ def parseArguments(argv):
         usage()
 
 
-    return (host, packet_loss_percent, wait_time, number_of_repetitions, attempts_per_repetition)
+    return (host, packet_loss_percent, wait_time, number_of_repetitions, attempts_per_repetition, timeout)
 
 
 if __name__ == '__main__':
