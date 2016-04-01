@@ -21,6 +21,8 @@
  * @author Sree Harsha Totakura <sreeharsha@totakura.in>
  */
 
+ #define KNOCK_UDP 0
+ #define KNOCK_TCP 1
 
 /**
  * Opaque knock handle
