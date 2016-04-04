@@ -24,7 +24,7 @@
 #include <assert.h>
 
 /* The path of the client interface module */
-#define IMPORT_MODULE_PATH "knock_client.modules.ClientInterface"
+#define IMPORT_MODULE_PATH "client.ClientInterface"
 
 /**
  * Pointers  to the API functions
