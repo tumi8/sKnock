@@ -27,23 +27,27 @@ import logging, os, getopt, sys
 from struct import *
 
 from client.ClientInterface import ClientInterface
+from common.definitions.Constants import PROTOCOL
 
 def usage():
     print "Usage: knock-client.py -p <portToOpen> <host>"
     sys.exit(2)
 
 def parseArguments(argv):
+    port = 0
+    host = ""
+    ipv4 = False
+    udp = False
     try:
-        port       = 0
-        host       = ""
-        ipv4   = False
-        opts, args = getopt.getopt(argv, "h:p:4")
+        opts, args = getopt.getopt(argv, "uh:p:4")
         
         for opt, arg in opts:
             if opt in ("-p"):
                 port = arg
             elif opt in ('-4'):
                 ipv4 = True
+            elif opt in ('-u'):
+                udp = True
             else:
                 usage()
                 
@@ -58,16 +62,17 @@ def parseArguments(argv):
     if port == 0 or host == "":
         usage()
 
-    return (port, host, ipv4)
+    protocol = PROTOCOL.UDP if udp else PROTOCOL.TCP
+    return (port, host, protocol, ipv4)
 
 def main(argv):
 
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
 
-    (port, host, ipv4) = parseArguments(argv)
+    (port, host, protocol, ipv4) = parseArguments(argv)
 
     knockClient = ClientInterface()
-    knockClient.knockOnPort(host, port, forceIPv4=ipv4)
+    knockClient.knockOnPort(host, port, protocol, forceIPv4=ipv4)
 
 
     sys.exit(0)
