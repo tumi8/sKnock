@@ -6,11 +6,13 @@ from Platform import PlatformUtils
 
 
 LOG = logging.getLogger(__name__)
+HASH_ALGORITHM = 'sha256'
 
 class CertUtil:
     def __init__(self, pfxFile, pfxPasswd):
         self.platform = PlatformUtils.detectPlatform()
         self.revokedCertificateSerials = None
+
 
         if(self.platform == PlatformUtils.LINUX):
             LOG.debug("Loading certificates...")
@@ -32,7 +34,7 @@ class CertUtil:
 
     def signIncludingCertificate(self, message):
         messageWithCert = message + crypto.dump_certificate(crypto.FILETYPE_ASN1, self.certificate)
-        signature = crypto.sign(self.privKey, messageWithCert, self.hashAlgorithm)
+        signature = crypto.sign(self.privKey, messageWithCert, HASH_ALGORITHM)
 
         padding = ''.join(['x' for diff in xrange(72 - len(signature))])
 
@@ -72,7 +74,7 @@ class CertUtil:
     def verifySignature(self, cert, signature, message):
         if(self.platform == PlatformUtils.LINUX):
             try:
-                crypto.verify(cert, signature, message, self.hashAlgorithm)
+                crypto.verify(cert, signature, message, HASH_ALGORITHM)
                 LOG.debug("Signature OK!")
                 return True
             except:
@@ -85,13 +87,6 @@ class CertUtil:
         if len(CAcerts) != 1:
             LOG.error("Incompatible Root CA structure!")
             raise IncompatibleRootCAException
-
-        if (CAcerts[0].get_signature_algorithm() != 'ecdsa-with-SHA256'):
-            LOG.error("Incompatible Signature Algorithm!")
-            raise IncompatibleRootCAException
-
-        self.hashAlgorithm = 'sha256'
-
         self.CA = crypto.X509Store()
         self.CA.add_cert(CAcerts[0])
 
