@@ -57,12 +57,12 @@ class CertUtil:
             try:
                 CAContext.verify_certificate()
                 LOG.debug("Certificate OK!")
-                if not (self.revokedCertificateSerials is None or format(cert.get_serial_number(), 'x').upper() in self.revokedCertificateSerials):
-                    LOG.debug("Certificate Revocation Status OK")
-                    return True
-                else:
+                if (self.revokedCertificateSerials is not None and format(cert.get_serial_number(), 'x').upper() in self.revokedCertificateSerials):
                     LOG.warning("Certificate with Serial Number: %s is revoked!", cert.get_serial_number())
                     return False
+                else:
+                    LOG.debug("Certificate Revocation Status OK")
+                    return True
 
             except:
                 LOG.debug("Certificate check failed!")
