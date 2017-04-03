@@ -30,7 +30,7 @@ from client.ClientInterface import ClientInterface
 from common.definitions.Constants import PROTOCOL
 
 def usage():
-    print "Usage: knock-client.py -p <portToOpen> <host>"
+    print "Usage: knock-client.py [-u] -p <portToOpen> <host>"
     sys.exit(2)
 
 def parseArguments(argv):
