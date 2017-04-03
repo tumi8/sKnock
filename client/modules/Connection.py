@@ -16,7 +16,7 @@
 # USA
 #
 
-import logging, socket, struct, sys
+import logging, socket, struct, sys, time
 
 from common.definitions.Constants import *
 
@@ -46,7 +46,8 @@ class Connection:
             elif PROTOCOL.UDP == requestedProtocol:
                 LOG.info("Port-knocking finished. Verification of UDP Ports is not supported.")
                 return True
-            elif self.verifyTargetTCPPortIsOpen(targetHost, requestedPort):
+            time.sleep(1)
+            if self.verifyTargetTCPPortIsOpen(targetHost, requestedPort):
                 LOG.info('Port-knocking successful. Application Port %s is now open!', requestedPort)
                 return True
             LOG.info('Port still not open - maybe packet got lost. Retrying...')
@@ -98,6 +99,7 @@ class Connection:
         try:
             s = socket.create_connection((targetHost, requestedPort), timeout=self.timeout)
             s.shutdown(socket.SHUT_RDWR)
+            s.close()
             return True
         except:
             return False
