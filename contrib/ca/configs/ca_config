@@ -25,6 +25,7 @@ copy_extensions = none                 # Don't copy extensions from request
 
 crl_extensions = crl_exts
 crlnumber      = crl_serial
+
 [ policy_any ]
 countryName            = supplied
 stateOrProvinceName    = optional
@@ -59,9 +60,6 @@ organizationalUnitName_default	= sKnock
 commonName			= Common Name
 commonName_default		= sKnock Test CA
 commonName_max			= 64
-
-emailAddress			= Email Address
-emailAddress_max		= 40
 
 [ca_req]
 basicConstraints=CA:TRUE
