@@ -1,0 +1,12 @@
+certs/
+csrs/
+private/
+crl_serial
+crl_serial.old
+index.txt
+index.txt.old
+index.txt.attr
+index.txt.attr.old
+serial
+serial.old
+

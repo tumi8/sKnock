@@ -1,0 +1,100 @@
+default_md     = sha256                   # md to use
+RANDFILE       = $ENV::HOME/.rnd
+
+[ ca ]
+default_ca      = sknock            # The default ca section
+
+[ sknock ]
+dir            = ./                    # top dir
+database       = $dir/index.txt        # index file.
+new_certs_dir  = $dir/certs            # new certs dir
+
+certificate    = $dir/certs/ca.crt     # The CA cert
+serial         = $dir/serial           # serial no file
+private_key    = $dir/private/ca       # CA private key
+
+default_days   = 365                   # how long to certify for
+default_crl_days= 90                   # how long before next CRL
+
+policy         = policy_any            # default policy
+email_in_dn    = no                    # Don't add the email into cert DN
+
+name_opt       = ca_default            # Subject name display option
+cert_opt       = ca_default            # Certificate display option
+copy_extensions = none                 # Don't copy extensions from request
+
+crl_extensions = crl_exts
+crlnumber      = crl_serial
+[ policy_any ]
+countryName            = supplied
+stateOrProvinceName    = optional
+organizationName       = optional
+commonName             = supplied
+
+[req]
+x509_extensions = ca_req
+encrypt_key = no
+prompt=yes
+distinguished_name = req_distinguished_name
+
+[ req_distinguished_name ]
+countryName			= Country Name (2 letter code)
+countryName_default		= DE
+countryName_min			= 2
+countryName_max			= 2
+
+stateOrProvinceName		= State or Province Name (full name)
+stateOrProvinceName_default	= Bayern
+
+0.organizationName		= Organization Name
+0.organizationName_default	= TUM i8
+
+# we can do this but it is not needed normally :-)
+#1.organizationName		= Second Organization Name (eg, company)
+#1.organizationName_default	= World Wide Web Pty Ltd
+
+organizationalUnitName		= Organizational Unit Name (eg, section)
+organizationalUnitName_default	= sKnock
+
+commonName			= Common Name
+commonName_default		= sKnock Test CA
+commonName_max			= 64
+
+emailAddress			= Email Address
+emailAddress_max		= 40
+
+[ca_req]
+basicConstraints=CA:TRUE
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid:always,issuer:always
+keyUsage=digitalSignature,keyCertSign,cRLSign
+
+[x509v3_extensions_ca]
+
+[default_key_usage]
+keyUsage=digitalSignature, keyAgreement, keyEncipherment
+
+[x509v3_extensions_server]
+basicConstraints=critical,CA:FALSE
+keyUsage=${default_key_usage::keyUsage}
+extendedKeyUsage=critical,serverAuth
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid,issuer:always
+
+[x509v3_extensions_client]
+basicConstraints=critical,CA:FALSE
+keyUsage=${default_key_usage::keyUsage}
+extendedKeyUsage=critical,clientAuth
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid,issuer:always
+
+[crl_exts]
+authorityKeyIdentifier=keyid,issuer:always
+issuingDistributionPoint=@idp_section
+
+[idp_section]
+fullname=URI:http://home.in.tum.de/~totakura/sknock/devca.crl
+indirectCRL=FALSE
+onlysomereasons=affiliationChanged,superseded,cessationOfOperation
+
+
