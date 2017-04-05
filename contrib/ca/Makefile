@@ -1,14 +1,14 @@
 SHELL = /bin/sh
-NEW_DIRS = certs csrs private certs/server certs/client
+NEW_DIRS = certs private csrs certs/server certs/client private/server	\
+	private/client csrs/server csrs/client
 NEW_FILES = index.txt serial crl_serial
-SERVER_NAME = server
 PFX_PASSWORD = portknocking
 
 init: create-fs certs/ca.pem
 
 create-fs: serial crl_serial index.txt
-	@for dir in ${NEW_DIRS}; do \
-	  if [ ! -d "$${dir}" ]; then mkdir "$${dir}"; fi \
+	@for dir in $(NEW_DIRS); do \
+	  if [ ! -d "$${dir}" ]; then mkdir -p "$${dir}"; fi \
 	done
 
 index.txt:
@@ -32,24 +32,38 @@ csrs/%.pem:  private/%.key
 	openssl req -config configs/client_config -new\
 	  -key "$<" -out "$@"
 
-certs/server/%.pem: csrs/%.pem private/ca.key
+certs/server/%.pem: csrs/server/%.pem private/ca.key
 	openssl ca -config configs/client_config -in "$<"\
 	  -extensions server_extensions -out "$@"
 
-certs/server/%.crt: certs/server/%.pem
+certs/client/%.pem: csrs/client/%.pem private/ca.key
+	openssl ca -config configs/client_config -in "$<"\
+	  -extensions client_extensions -out "$@"
+
+certs/%.crt: certs/%.pem
 	openssl x509 -inform PEM -in "$<" -outform DER -out "$@"
 
-certs/server/%.pfx: certs/server/%.pem certs/server/%.crt private/%.key
+certs/%.pfx: certs/%.pem certs/%.crt private/%.key
 	openssl pkcs12 -export -out "$@" -inkey "private/$*.key" -in "$<"\
-	  -certfile certs/ca.pem -password "pass:${PFX_PASSWORD}"
+	  -certfile certs/ca.pem -password "pass:$(PFX_PASSWORD)"
 
-gen-server-cert: certs/server/${SERVER_NAME}.pfx
+gen-server-cert: certs/server/$(NAME).pfx
+	$(info The server PKCS12 bundle is created at "$<" with\
+		password: $(PFX_PASSWORD))
+	$(info The server certificate is available at: "certs/server/$(NAME).crt")
+
+gen-client-cert: certs/client/$(NAME).pfx
+	$(info The client PKCS12 bundle is created at: "$<" with\
+		password: $(PFX_PASSWORD))
 
 clean_no_i_am_not_drunk:
-	rm -rf ${NEW_DIRS} ${NEW_FILES}
+	rm -rf $(NEW_DIRS) $(NEW_FILES)
 	rm -rf index.txt{,.old} index.txt.attr{,.old}
+	rm -rf serial.old
 
 test:
 	@echo "Hello World"
 
-.PHONY: init create-fs generate-ca-certificate generate-ca-keys
+.PHONY: init create-fs gen-server-cert gen-client-cert
+
+.PRECIOUS: private/%.key certs/%.crt csrs/%.pem
