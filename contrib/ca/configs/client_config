@@ -62,9 +62,6 @@ commonName			= Common Name
 commonName_default		= sKnock Test CA
 commonName_max			= 64
 
-emailAddress			= Email Address
-emailAddress_max		= 40
-
 [ca_req]
 basicConstraints=CA:TRUE
 subjectKeyIdentifier=hash
