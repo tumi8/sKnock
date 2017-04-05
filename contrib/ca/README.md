@@ -4,21 +4,30 @@ The client certificates used in sKnock need to fit inside a single UDP packet.
 For this reason, sKnock restricts the client certificates to use ECC keys
 derived from the prime256v1 (X9.62/SECG curve over a 256 bit prime field) curve.
 
-This CA provides useful scripts to generate such ECC keys, certificates, and
-CRLs.  All scripts and commands documented here should be run from the directory
-where this README file is present.
+This CA is based on a Makefile and requires GNU Make and OpenSSL to be installed.
 
-## To generate the CA (self-signed) certificate:
+## Caveats
+1. On most \*NIX systems make is aliased to colormake. Since colormake interferes with output printing of interactive commands, the original make should be used instead: `alias make=/usr/bin/make`
+2. There is no support for signing CSRs; the certificates are generated after the keys for the entities are locally generated.
 
-    openssl ca -config ca_config -selfsign -keyfile private/cakey.pem -keyform PEM -out cacert.pem
+## Installation
+Copy all the files into a directory and run:
 
-## To generate pkcs12 certificate and key bundles:
+    make init
+The command generates the required directories, a CA key and a CA certificate.
 
-    openssl pkcs12 -export -out server.pfx -name "sKnock testing server" -password pass:xxxx -inkey private/server -in certs/02.pem -certfile certs/ca.crt
+## Usage
+### To generate a server certificate
+
+    make gen-server-cert NAME=somename
+Where `somename` is used as a filename for the key and certificates. The server certificate along with its private key bundled in a PKCS12 bundle whose filepath is displayed after its creation.
+
+## To generate a client certificate
+
+    make gen-client-cert NAME=somename
+This is similar to gen-server-cert.  The sKnock's authorization string is present in `configs/client_config` under the section `altNames` with the key `otherName.1`.
 
 ## TODO
-in x509v3_config(1) there is a way to include CRL distribution points
-information into a certificate.  We should explore it and include it if deemed
-fit for use.
+Add CRL support
 
 
