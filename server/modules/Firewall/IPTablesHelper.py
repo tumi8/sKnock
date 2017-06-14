@@ -94,7 +94,7 @@ def setupIPTablesPortKnockingChainAndRedirectTraffic(firewallPolicy):
         if firewallPolicy == FIREWALL_POLICY.REJECT:
             defaultPolicyRuleV4.create_target('REJECT')
         elif firewallPolicy == FIREWALL_POLICY.DROP:
-            defaultPolicyRuleV4.create_target('REJECT')
+            defaultPolicyRuleV4.create_target('DROP')
         elif firewallPolicy == FIREWALL_POLICY.NONE: pass
         else: raise InvalidConfigException
         deleteIPTablesRuleIgnoringError(defaultPolicyRuleV4, inputChainV4)
@@ -134,7 +134,7 @@ def setupIPTablesPortKnockingChainAndRedirectTraffic(firewallPolicy):
         if firewallPolicy == FIREWALL_POLICY.REJECT:
             defaultPolicyRuleV6.create_target('REJECT')
         elif firewallPolicy == FIREWALL_POLICY.DROP:
-            defaultPolicyRuleV6.create_target('REJECT')
+            defaultPolicyRuleV6.create_target('DROP')
         elif firewallPolicy == FIREWALL_POLICY.NONE: pass
         else: raise InvalidConfigException
         deleteIPTablesRuleIgnoringError(defaultPolicyRuleV6, inputChainV6)
