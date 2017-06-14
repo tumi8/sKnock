@@ -21,7 +21,7 @@ crl_serial:
 	echo 00 > crl_serial
 
 certs/ca.pem: private/ca.key
-	openssl req -config configs/ca_config -x509 -key private/ca.key\
+	openssl req -config configs/ca_config -new -x509 -key private/ca.key\
 	   -set_serial 0 -out certs/ca.pem 2>&1
 
 private/%.key:
