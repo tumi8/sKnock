@@ -22,7 +22,7 @@ crl_serial:
 
 certs/ca.pem: private/ca.key
 	openssl req -config configs/ca_config -new -x509 -key private/ca.key\
-	   -set_serial 0 -out certs/ca.pem 2>&1
+	   -set_serial 0 -days 3650 -out certs/ca.pem 2>&1
 
 private/%.key:
 	openssl ecparam -genkey -name prime256v1 -param_enc named_curve\
