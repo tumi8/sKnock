@@ -13,7 +13,7 @@ certificate    = $dir/certs/ca.pem     # The CA cert
 serial         = $dir/serial           # serial no file
 private_key    = $dir/private/ca.key   # CA private key
 
-default_days   = 365                   # how long to certify for
+default_days   = 3650                   # how long to certify for
 default_crl_days= 90                   # how long before next CRL
 
 policy         = policy_any            # default policy
@@ -56,10 +56,10 @@ stateOrProvinceName_default	= Bayern
 #1.organizationName_default	= World Wide Web Pty Ltd
 
 organizationalUnitName		= Organizational Unit Name (eg, section)
-organizationalUnitName_default	= sKnock
+organizationalUnitName_default	= SafeCloud Project
 
 commonName			= Common Name
-commonName_default		= sKnock Test CA
+commonName_default		= hostname
 commonName_max			= 64
 
 [ca_req]
