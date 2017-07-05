@@ -59,11 +59,15 @@ class ClientInterface:
         port: Port to open on target @host
         protocol: Requested Target Protocol. Default: TCP
         knockPort: (Optional) Port to use for port-knocking request. Default: Random Port between MIN_PORT and MAX_PORT
-        forceIPv4: (Optional) Force port-knocking via IPv4, even when IPv6 is available. Default: false
+        forceIPv4: (Optional) Force port-knocking via IPv4, even when IPv6 is
+        available. Default: false
+
+        For TCP, this function returns True if the port is successfully opened
+        or False if it failed.  For UDP, it always returns True
         """
 
         LOG.debug('Knocking %s on port %s', host, port)
-        self.connectionHandler.knockOnPort(host, port, protocol, knockPort, forceIPv4, clientIP)
+        return self.connectionHandler.knockOnPort(host, port, protocol, knockPort, forceIPv4, clientIP)
 
 
 def init(timeout, numRetries, verify,
