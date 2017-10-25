@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0" xmlns:ooo="http://openoffice.org/2004/office" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rpt="http://openoffice.org/2005/report" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:officeooo="http://openoffice.org/2009/office" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:drawooo="http://openoffice.org/2010/draw" xmlns:calcext="urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:css3t="http://www.w3.org/TR/css3-text/" office:version="1.2" office:mimetype="application/vnd.oasis.opendocument.text">
- <office:meta><meta:creation-date>2016-12-09T14:57:13.930309389</meta:creation-date><dc:date>2017-06-14T15:38:21.208307681</dc:date><meta:editing-duration>PT1H19M37S</meta:editing-duration><meta:editing-cycles>12</meta:editing-cycles><meta:generator>LibreOffice/5.2.7.2$Linux_X86_64 LibreOffice_project/20m0$Build-2</meta:generator><meta:document-statistic meta:table-count="3" meta:image-count="0" meta:object-count="0" meta:page-count="3" meta:paragraph-count="59" meta:word-count="894" meta:character-count="5647" meta:non-whitespace-character-count="4831"/></office:meta>
+ <office:meta><meta:creation-date>2016-12-09T14:57:13.930309389</meta:creation-date><dc:date>2017-07-05T16:23:52.819891456</dc:date><meta:editing-duration>PT1H19M53S</meta:editing-duration><meta:editing-cycles>13</meta:editing-cycles><meta:generator>LibreOffice/5.2.7.2$Linux_X86_64 LibreOffice_project/20m0$Build-2</meta:generator><meta:document-statistic meta:table-count="3" meta:image-count="0" meta:object-count="0" meta:page-count="3" meta:paragraph-count="59" meta:word-count="894" meta:character-count="5647" meta:non-whitespace-character-count="4831"/></office:meta>
  <office:settings>
   <config:config-item-set config:name="ooo:view-settings">
-   <config:config-item config:name="ViewAreaTop" config:type="long">2637</config:config-item>
+   <config:config-item config:name="ViewAreaTop" config:type="long">44986</config:config-item>
    <config:config-item config:name="ViewAreaLeft" config:type="long">0</config:config-item>
-   <config:config-item config:name="ViewAreaWidth" config:type="long">24673</config:config-item>
-   <config:config-item config:name="ViewAreaHeight" config:type="long">54566</config:config-item>
+   <config:config-item config:name="ViewAreaWidth" config:type="long">20863</config:config-item>
+   <config:config-item config:name="ViewAreaHeight" config:type="long">27331</config:config-item>
    <config:config-item config:name="ShowRedlineChanges" config:type="boolean">true</config:config-item>
    <config:config-item config:name="InBrowseMode" config:type="boolean">false</config:config-item>
    <config:config-item-map-indexed config:name="Views">
     <config:config-item-map-entry>
      <config:config-item config:name="ViewId" config:type="string">view2</config:config-item>
-     <config:config-item config:name="ViewLeft" config:type="long">14120</config:config-item>
-     <config:config-item config:name="ViewTop" config:type="long">72212</config:config-item>
+     <config:config-item config:name="ViewLeft" config:type="long">8737</config:config-item>
+     <config:config-item config:name="ViewTop" config:type="long">56631</config:config-item>
      <config:config-item config:name="VisibleLeft" config:type="long">0</config:config-item>
-     <config:config-item config:name="VisibleTop" config:type="long">2637</config:config-item>
-     <config:config-item config:name="VisibleRight" config:type="long">24672</config:config-item>
-     <config:config-item config:name="VisibleBottom" config:type="long">57201</config:config-item>
+     <config:config-item config:name="VisibleTop" config:type="long">44986</config:config-item>
+     <config:config-item config:name="VisibleRight" config:type="long">20862</config:config-item>
+     <config:config-item config:name="VisibleBottom" config:type="long">72316</config:config-item>
      <config:config-item config:name="ZoomType" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutColumns" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutBookMode" config:type="boolean">false</config:config-item>
@@ -89,7 +89,7 @@
    <config:config-item config:name="UnxForceZeroExtLeading" config:type="boolean">false</config:config-item>
    <config:config-item config:name="TabAtLeftIndentForParagraphsInList" config:type="boolean">false</config:config-item>
    <config:config-item config:name="PrintRightPages" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="Rsid" config:type="int">988218</config:config-item>
+   <config:config-item config:name="Rsid" config:type="int">1008752</config:config-item>
    <config:config-item config:name="MathBaselineAlignment" config:type="boolean">true</config:config-item>
    <config:config-item config:name="InvertBorderSpacing" config:type="boolean">false</config:config-item>
    <config:config-item config:name="EmbedFonts" config:type="boolean">false</config:config-item>
@@ -451,50 +451,71 @@
   <style:style style:name="P5" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties officeooo:rsid="000a96ad" officeooo:paragraph-rsid="000a96ad"/>
   </style:style>
-  <style:style style:name="P6" style:family="paragraph" style:parent-style-name="Heading_20_1">
-   <style:text-properties officeooo:paragraph-rsid="0009a654"/>
-  </style:style>
-  <style:style style:name="P7" style:family="paragraph" style:parent-style-name="Table_20_Contents">
-   <style:text-properties fo:font-size="2pt" style:font-size-asian="2pt" style:font-size-complex="2pt"/>
-  </style:style>
-  <style:style style:name="P8" style:family="paragraph" style:parent-style-name="Table_20_Heading">
-   <style:text-properties fo:font-size="2pt" style:font-size-asian="2pt" style:font-size-complex="2pt"/>
-  </style:style>
-  <style:style style:name="P9" style:family="paragraph" style:parent-style-name="List_20_Contents">
-   <style:paragraph-properties fo:margin-left="0in" fo:margin-right="0in" fo:text-indent="0in" style:auto-text-indent="false"/>
-  </style:style>
-  <style:style style:name="P10" style:family="paragraph" style:parent-style-name="Text_20_body" style:list-style-name="Numbering_20_1"/>
-  <style:style style:name="P11" style:family="paragraph" style:parent-style-name="Text_20_body" style:list-style-name="L3">
+  <style:style style:name="P6" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties officeooo:rsid="000c01d4" officeooo:paragraph-rsid="000c01d4"/>
   </style:style>
-  <style:style style:name="P12" style:family="paragraph" style:parent-style-name="Text_20_body">
+  <style:style style:name="P7" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties officeooo:paragraph-rsid="000c01d4"/>
   </style:style>
-  <style:style style:name="P13" style:family="paragraph" style:parent-style-name="Text_20_body" style:list-style-name="L3">
+  <style:style style:name="P8" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties fo:font-weight="normal" officeooo:rsid="000c01d4" officeooo:paragraph-rsid="000c01d4" style:font-weight-asian="normal" style:font-weight-complex="normal"/>
   </style:style>
-  <style:style style:name="P14" style:family="paragraph" style:parent-style-name="Text_20_body" style:list-style-name="L3">
+  <style:style style:name="P9" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties fo:font-weight="normal" officeooo:rsid="000d5595" officeooo:paragraph-rsid="000d5595" style:font-weight-asian="normal" style:font-weight-complex="normal"/>
   </style:style>
-  <style:style style:name="P15" style:family="paragraph" style:parent-style-name="Text_20_body" style:list-style-name="L3">
+  <style:style style:name="P10" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties officeooo:paragraph-rsid="000d5595"/>
   </style:style>
-  <style:style style:name="P16" style:family="paragraph" style:parent-style-name="Text_20_body">
+  <style:style style:name="P11" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties officeooo:rsid="000d5595" officeooo:paragraph-rsid="000d5595"/>
   </style:style>
-  <style:style style:name="P17" style:family="paragraph" style:parent-style-name="Standard" style:list-style-name="L2">
-   <style:text-properties officeooo:rsid="000a96ad" officeooo:paragraph-rsid="000a96ad"/>
+  <style:style style:name="P12" style:family="paragraph" style:parent-style-name="Heading_20_1">
+   <style:text-properties officeooo:paragraph-rsid="0009a654"/>
   </style:style>
-  <style:style style:name="P18" style:family="paragraph" style:parent-style-name="List_20_Contents" style:list-style-name="L1"/>
-  <style:style style:name="P19" style:family="paragraph" style:parent-style-name="List_20_Contents" style:list-style-name="Numbering_20_1"/>
-  <style:style style:name="P20" style:family="paragraph" style:parent-style-name="List_20_Contents" style:list-style-name="L1">
-   <style:paragraph-properties fo:margin-left="0in" fo:margin-right="0in" fo:text-indent="0in" style:auto-text-indent="false"/>
-  </style:style>
-  <style:style style:name="P21" style:family="paragraph" style:parent-style-name="Heading_20_1">
+  <style:style style:name="P13" style:family="paragraph" style:parent-style-name="Heading_20_1">
    <style:text-properties officeooo:rsid="0009a654" officeooo:paragraph-rsid="0009a654"/>
   </style:style>
-  <style:style style:name="P22" style:family="paragraph" style:parent-style-name="Heading_20_1">
+  <style:style style:name="P14" style:family="paragraph" style:parent-style-name="Heading_20_1">
    <style:text-properties officeooo:rsid="000c01d4" officeooo:paragraph-rsid="000c01d4"/>
+  </style:style>
+  <style:style style:name="P15" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+   <style:text-properties fo:font-size="2pt" style:font-size-asian="2pt" style:font-size-complex="2pt"/>
+  </style:style>
+  <style:style style:name="P16" style:family="paragraph" style:parent-style-name="Table_20_Heading">
+   <style:text-properties fo:font-size="2pt" style:font-size-asian="2pt" style:font-size-complex="2pt"/>
+  </style:style>
+  <style:style style:name="P17" style:family="paragraph" style:parent-style-name="List_20_Contents">
+   <style:paragraph-properties fo:margin-left="0in" fo:margin-right="0in" fo:text-indent="0in" style:auto-text-indent="false"/>
+  </style:style>
+  <style:style style:name="P18" style:family="paragraph" style:parent-style-name="Text_20_body" style:list-style-name="Numbering_20_1"/>
+  <style:style style:name="P19" style:family="paragraph" style:parent-style-name="Text_20_body">
+   <style:text-properties officeooo:rsid="000c01d4" officeooo:paragraph-rsid="000c01d4"/>
+  </style:style>
+  <style:style style:name="P20" style:family="paragraph" style:parent-style-name="Text_20_body" style:list-style-name="L2">
+   <style:text-properties officeooo:rsid="000c01d4" officeooo:paragraph-rsid="000c01d4"/>
+  </style:style>
+  <style:style style:name="P21" style:family="paragraph" style:parent-style-name="Text_20_body" style:list-style-name="L2">
+   <style:text-properties officeooo:paragraph-rsid="000d5595"/>
+  </style:style>
+  <style:style style:name="P22" style:family="paragraph" style:parent-style-name="Text_20_body" style:list-style-name="L2">
+   <style:text-properties fo:font-weight="normal" officeooo:rsid="000c01d4" officeooo:paragraph-rsid="000c01d4" style:font-weight-asian="normal" style:font-weight-complex="normal"/>
+  </style:style>
+  <style:style style:name="P23" style:family="paragraph" style:parent-style-name="Text_20_body" style:list-style-name="L2">
+   <style:text-properties fo:font-weight="normal" officeooo:rsid="000d5595" officeooo:paragraph-rsid="000d5595" style:font-weight-asian="normal" style:font-weight-complex="normal"/>
+  </style:style>
+  <style:style style:name="P24" style:family="paragraph" style:parent-style-name="Standard" style:list-style-name="L3">
+   <style:text-properties officeooo:rsid="000a96ad" officeooo:paragraph-rsid="000a96ad"/>
+  </style:style>
+  <style:style style:name="P25" style:family="paragraph" style:parent-style-name="List_20_Contents" style:list-style-name="L1"/>
+  <style:style style:name="P26" style:family="paragraph" style:parent-style-name="List_20_Contents" style:list-style-name="Numbering_20_1"/>
+  <style:style style:name="P27" style:family="paragraph" style:parent-style-name="List_20_Contents" style:list-style-name="L1">
+   <style:paragraph-properties fo:margin-left="0in" fo:margin-right="0in" fo:text-indent="0in" style:auto-text-indent="false"/>
+  </style:style>
+  <style:style style:name="P28" style:family="paragraph" style:parent-style-name="Heading_20_1">
+   <style:text-properties officeooo:rsid="000c01d4" officeooo:paragraph-rsid="000c01d4"/>
+  </style:style>
+  <style:style style:name="P29" style:family="paragraph" style:parent-style-name="Heading_20_1">
+   <style:text-properties officeooo:rsid="0009a654" officeooo:paragraph-rsid="0009a654"/>
   </style:style>
   <style:style style:name="T1" style:family="text">
    <style:text-properties officeooo:rsid="0004a752"/>
@@ -704,101 +725,101 @@
    </text:sequence-decls>
    <text:h text:style-name="Heading_20_1" text:outline-level="1">Setup instructions for installing sknock on <text:span text:style-name="T5">U</text:span>bu<text:span text:style-name="T5">n</text:span>tu 16.04 (C&amp;H deployment instance)</text:h>
    <text:p text:style-name="List_20_Contents"/>
-   <text:list xml:id="list712407463223247653" text:style-name="Numbering_20_1">
+   <text:list xml:id="list737892332748046049" text:style-name="Numbering_20_1">
     <text:list-item>
-     <text:p text:style-name="P10">Lau<text:span text:style-name="T1">n</text:span>ch an instance</text:p>
+     <text:p text:style-name="P18">Lau<text:span text:style-name="T1">n</text:span>ch an instance</text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P10">Clone sknock<text:span text:style-name="T1">&apos;s</text:span> source code from git: <text:a xlink:type="simple" xlink:href="https://github.com/tumi8/sKnock" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link">https://github.com/tumi8/sKnock</text:a></text:p>
+     <text:p text:style-name="P18">Clone sknock<text:span text:style-name="T1">&apos;s</text:span> source code from git: <text:a xlink:type="simple" xlink:href="https://github.com/tumi8/sKnock" text:style-name="Internet_20_link" text:visited-style-name="Visited_20_Internet_20_Link">https://github.com/tumi8/sKnock</text:a></text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P10"><text:span text:style-name="T1">S</text:span>etup python2.7</text:p>
+     <text:p text:style-name="P18"><text:span text:style-name="T1">S</text:span>etup python2.7</text:p>
     </text:list-item>
    </text:list>
    <text:p text:style-name="Text_20_body">16.04 comes with python2.7 installed as default python2.7. <text:s/>We just need to install couple of packages required for the sknock server to function. Let&apos;s install them one by one.</text:p>
-   <text:list xml:id="list6694456214506018679" text:style-name="L1">
+   <text:list xml:id="list2503273270496248943" text:style-name="L1">
     <text:list-item>
-     <text:p text:style-name="P18">Install pip: apt-get install python-pip. We will install further packages using pip</text:p>
+     <text:p text:style-name="P25">Install pip: apt-get install python-pip. We will install further packages using pip</text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P18">Install python-iptables: sudo pip install python-iptables</text:p>
+     <text:p text:style-name="P25">Install python-iptables: sudo pip install python-iptables</text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P18">We need to have python header files for the pip to compile some packages. Install them by apt-get install python-dev</text:p>
+     <text:p text:style-name="P25">We need to have python header files for the pip to compile some packages. Install them by apt-get install python-dev</text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P18">Install m2crypto: <text:span text:style-name="T1">sudo apt-get install python-m2crypto</text:span></text:p>
+     <text:p text:style-name="P25">Install m2crypto: <text:span text:style-name="T1">sudo apt-get install python-m2crypto</text:span></text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P18">Install python-cryptography; sudo apt-get install python-cryptography</text:p>
+     <text:p text:style-name="P25">Install python-cryptography; sudo apt-get install python-cryptography</text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P18">Install six: sudo pip install six</text:p>
+     <text:p text:style-name="P25">Install six: sudo pip install six</text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P18">Install hkdf: sudo pip install hkdf</text:p>
+     <text:p text:style-name="P25">Install hkdf: sudo pip install hkdf</text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P18">Install schedule: sudo <text:span text:style-name="T2">apt-get </text:span>install <text:span text:style-name="T2">python-</text:span>schedule</text:p>
-     <text:p text:style-name="P20"/>
+     <text:p text:style-name="P25">Install schedule: sudo <text:span text:style-name="T2">apt-get </text:span>install <text:span text:style-name="T2">python-</text:span>schedule</text:p>
+     <text:p text:style-name="P27"/>
     </text:list-item>
    </text:list>
-   <text:list xml:id="list153822875638338" text:continue-list="list712407463223247653" text:style-name="Numbering_20_1">
+   <text:list xml:id="list162353923620784" text:continue-list="list737892332748046049" text:style-name="Numbering_20_1">
     <text:list-item>
-     <text:p text:style-name="P10">Setup PYTHONPATH to the sKnock directory</text:p>
+     <text:p text:style-name="P18">Setup PYTHONPATH to the sKnock directory</text:p>
     </text:list-item>
    </text:list>
    <text:p text:style-name="Text_20_body">Alternatively, you can also run the setup_pythonpath.sh script in the main directory. Check to ensure that PYTHONPATH environmental variable is set after the script is executed.</text:p>
-   <text:list xml:id="list153822765769770" text:continue-numbering="true" text:style-name="Numbering_20_1">
+   <text:list xml:id="list162354435750837" text:continue-numbering="true" text:style-name="Numbering_20_1">
     <text:list-item>
-     <text:p text:style-name="P19">Start the <text:span text:style-name="T2">sknock server: python server/knock-server.py</text:span></text:p>
+     <text:p text:style-name="P26">Start the <text:span text:style-name="T2">sknock server: python server/knock-server.py</text:span></text:p>
     </text:list-item>
    </text:list>
-   <text:h text:style-name="P22" text:outline-level="1">Configuration</text:h>
-   <text:p text:style-name="P12"><text:span text:style-name="T5">The configuration for sknock server is in server/config.ini file. The options are described below:</text:span></text:p>
-   <text:list xml:id="list5251554117600114440" text:style-name="L3">
+   <text:h text:style-name="P14" text:outline-level="1">Configuration</text:h>
+   <text:p text:style-name="P6">The configuration for sknock server is in server/config.ini file. The options are described below:</text:p>
+   <text:list xml:id="list8528142264531569061" text:style-name="L2">
     <text:list-item>
-     <text:p text:style-name="P11">KNOCKPACKET_MIN_LENGTH: <text:span text:style-name="T9">T</text:span>he minimum length of the knock packet that is expected from the clients. This is used to quickly filter out all packets which are not knock packets. The value is configured to be 800 and <text:span text:style-name="T6">should not be changed</text:span>.</text:p>
+     <text:p text:style-name="P20">KNOCKPACKET_MIN_LENGTH: <text:span text:style-name="T9">T</text:span>he minimum length of the knock packet that is expected from the clients. This is used to quickly filter out all packets which are not knock packets. The value is configured to be 800 and <text:span text:style-name="T6">should not be changed</text:span>.</text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P11">PORT_OPEN_DURATION_IN_SECONDS: Number of seconds the sknock server waits before closing the port after a client has successfully portknocked for that port to be open. Any connection attempt from the client which has portknocked successfully will after these many seconds after port-knocking.</text:p>
+     <text:p text:style-name="P20">PORT_OPEN_DURATION_IN_SECONDS: Number of seconds the sknock server waits before closing the port after a client has successfully portknocked for that port to be open. Any connection attempt from the client which has portknocked successfully will after these many seconds after port-knocking.</text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P11">TIMESTAMP_THRESHOLD_IN_SECONDS: sKnock clients put a timestamp in every knock packet they send. This is used to defend against replay attacks. Since we have to account for, latency in the Internet, unsynchronized clocks, and clock skew between the client and the server, the server accepts a knock packet as valid even if the timestamp in the packet is within the interval [t – threshold, t + threshold] where t is the current time at the server. This option sets the threshold.</text:p>
+     <text:p text:style-name="P20">TIMESTAMP_THRESHOLD_IN_SECONDS: sKnock clients put a timestamp in every knock packet they send. This is used to defend against replay attacks. Since we have to account for, latency in the Internet, unsynchronized clocks, and clock skew between the client and the server, the server accepts a knock packet as valid even if the timestamp in the packet is within the interval [t – threshold, t + threshold] where t is the current time at the server. This option sets the threshold.</text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P11"><text:soft-page-break/>CRL_UPDATE_INTERVAL_IN_MINUTES: The interval after which the server checks for a CRL update</text:p>
+     <text:p text:style-name="P20"><text:soft-page-break/>CRL_UPDATE_INTERVAL_IN_MINUTES: The interval after which the server checks for a CRL update</text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P11">SIGNATURE_SIZE: <text:span text:style-name="T9">E</text:span>xpected length of signature in the knock packet. <text:span text:style-name="T6">Should not be changed.</text:span></text:p>
+     <text:p text:style-name="P20">SIGNATURE_SIZE: <text:span text:style-name="T9">E</text:span>xpected length of signature in the knock packet. <text:span text:style-name="T6">Should not be changed.</text:span></text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P13">RECV_BUFFER: <text:span text:style-name="T9">T</text:span>he size of the buffer allocated by the server to copy knock packets. <text:span text:style-name="T6">Should not be changed.</text:span></text:p>
+     <text:p text:style-name="P22">RECV_BUFFER: <text:span text:style-name="T9">T</text:span>he size of the buffer allocated by the server to copy knock packets. <text:span text:style-name="T6">Should not be changed.</text:span></text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P13">crlFile: Path to the local CRL file. The file is updated when a new CRL is published and later fetched by the server.</text:p>
+     <text:p text:style-name="P22">crlFile: Path to the local CRL file. The file is updated when a new CRL is published and later fetched by the server.</text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P13">crlUrl: URL where the CRL is published. The server perodically downloads CRL from this URL for CRL updates.</text:p>
+     <text:p text:style-name="P22">crlUrl: URL where the CRL is published. The server perodically downloads CRL from this URL for CRL updates.</text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P13"><text:span text:style-name="T9">s</text:span>erverPFXFile: <text:span text:style-name="T9">Path of the PKCS#12 file containing server private key, server certificate, and the CA certificate. PKCS#12 files typically have .pfx as extension.</text:span></text:p>
+     <text:p text:style-name="P22"><text:span text:style-name="T9">s</text:span>erverPFXFile: <text:span text:style-name="T9">Path of the PKCS#12 file containing server private key, server certificate, and the CA certificate. PKCS#12 files typically have .pfx as extension.</text:span></text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P14">PFXPasswd: The password for decrypting the serverPFXFile. A password must be given.</text:p>
+     <text:p text:style-name="P23">PFXPasswd: The password for decrypting the serverPFXFile. A password must be given.</text:p>
     </text:list-item>
     <text:list-item>
-     <text:p text:style-name="P15"><text:span text:style-name="T8">firewallPolicy: The firewall policy to handle all traffic which do not match to any rules configured in the firewall before sknock server started, and also to any rules which the sknock server inserts upon sucessful port-knocking requests. The valid options are: </text:span><text:span text:style-name="T7">none</text:span><text:span text:style-name="T8">,</text:span><text:span text:style-name="T7"> reject</text:span><text:span text:style-name="T8">, and </text:span><text:span text:style-name="T7">drop</text:span><text:span text:style-name="T8">. </text:span><text:span text:style-name="T7">None </text:span><text:span text:style-name="T8">causes all traffic to be allowed by default, even if it didn&apos;t match any rules; this is the default to prevent first-time users from locking themselves. Also, as a precaution sKnock server allows all connections to SSH service 22 by default irrespective of this setting. </text:span><text:span text:style-name="T7">reject</text:span><text:span text:style-name="T8"> causes the firewall to respond with an ICMP port unreachable message; this lets sknock clients know whether they successfully portknocked or not. </text:span><text:span text:style-name="T7">drop</text:span><text:span text:style-name="T8"> causes the packets to be dropped without telling the client why.</text:span></text:p>
+     <text:p text:style-name="P21"><text:span text:style-name="T8">firewallPolicy: The firewall policy to handle all traffic which do not match to any rules configured in the firewall before sknock server started, and also to any rules which the sknock server inserts upon sucessful port-knocking requests. The valid options are: </text:span><text:span text:style-name="T7">none</text:span><text:span text:style-name="T8">,</text:span><text:span text:style-name="T7"> reject</text:span><text:span text:style-name="T8">, and </text:span><text:span text:style-name="T7">drop</text:span><text:span text:style-name="T8">. </text:span><text:span text:style-name="T7">None </text:span><text:span text:style-name="T8">causes all traffic to be allowed by default, even if it didn&apos;t match any rules; this is the default to prevent first-time users from locking themselves. Also, as a precaution sKnock server allows all connections to SSH service 22 by default irrespective of this setting. </text:span><text:span text:style-name="T7">reject</text:span><text:span text:style-name="T8"> causes the firewall to respond with an ICMP port unreachable message; this lets sknock clients know whether they successfully portknocked or not. </text:span><text:span text:style-name="T7">drop</text:span><text:span text:style-name="T8"> causes the packets to be dropped without telling the client why.</text:span></text:p>
     </text:list-item>
    </text:list>
    <text:p text:style-name="Text_20_body">Since <text:span text:style-name="T9">sKnock client in intended to be used as a library, it does not have any configuration file. Instead the required certificates, private key are given as arguments to the corresponding library functions.</text:span></text:p>
-   <text:p text:style-name="P16">sKnock, however contains a proof-of-concept program which uses the sKnock client library to portknock sKnock server. This program is available as a python script: client/knock-client.py. This program utilises client/certificates/<text:span text:style-name="T10">devclient.pfx as the PKCS#12 bundle containing the client private key, client certificate and the CA certificate. It assumes that this bundle file is encrypted with password `portknocking&apos;. Furthermore, it assumes that the certificate of the sKnock server is present at client/certificates/devserver.cer. These values are hardcoded into the code as it is only intended to be used as proof-of-concept.</text:span></text:p>
-   <text:h text:style-name="P21" text:outline-level="1">Cavets</text:h>
-   <text:p text:style-name="P4">Before testing, make sure you are running a TCP server on the ports the client certificate is allowed to access. The certificates present in the sknock repository authorize the client to access TCP ports 2000, 3000 and <text:span text:style-name="T4">UDP port 5000 only.</text:span></text:p>
+   <text:p text:style-name="P11">sKnock, however contains a proof-of-concept program which uses the sKnock client library to portknock sKnock server. This program is available as a python script: client/knock-client.py. This program utilises client/certificates/<text:span text:style-name="T10">devclient.pfx as the PKCS#12 bundle containing the client private key, client certificate and the CA certificate. It assumes that this bundle file is encrypted with password `portknocking&apos;. Furthermore, it assumes that the certificate of the sKnock server is present at client/certificates/devserver.cer. These values are hardcoded into the code as it is only intended to be used as proof-of-concept.</text:span></text:p>
+   <text:h text:style-name="P13" text:outline-level="1">Cavets</text:h>
+   <text:p text:style-name="P4">Before testing, make sure you are running a TCP server on the ports the client certificate is allowed to access. The certificates present in the sknock repository authorize the client to access TCP ports 2000, 3000 and <text:span text:style-name="T4">UDP port 8000 only.</text:span></text:p>
    <text:p text:style-name="P5"><text:soft-page-break/>While in C&amp;H deployment using their virtual machines, ensure that C&amp;H&apos;s firewall is allowing the knock packet and TCP connections to the server. <text:s/>This is done by configuring security groups in C&amp;H&apos;s dashboad as following:</text:p>
-   <text:list xml:id="list1072884122519240600" text:style-name="L2">
+   <text:list xml:id="list6778148785760880294" text:style-name="L3">
     <text:list-item>
-     <text:p text:style-name="P17"><text:bookmark text:name="rules"/></text:p>
+     <text:p text:style-name="P24"><text:bookmark text:name="rules"/></text:p>
     </text:list-item>
    </text:list>
    <table:table table:name="Table1" table:style-name="Table1">
@@ -824,7 +845,7 @@
     <table:table-header-rows>
      <table:table-row>
       <table:table-cell table:style-name="Table2.A1" table:number-columns-spanned="7" office:value-type="string">
-       <text:p text:style-name="P8"/>
+       <text:p text:style-name="P16"/>
       </table:table-cell>
       <table:covered-table-cell/>
       <table:covered-table-cell/>
@@ -835,7 +856,7 @@
      </table:table-row>
      <table:table-row>
       <table:table-cell table:style-name="Table2.A1" office:value-type="string">
-       <text:p text:style-name="P8"/>
+       <text:p text:style-name="P16"/>
       </table:table-cell>
       <table:table-cell table:style-name="Table2.A1" office:value-type="string">
        <text:p text:style-name="Table_20_Heading">Direction</text:p>
@@ -859,7 +880,7 @@
     </table:table-header-rows>
     <table:table-row>
      <table:table-cell table:style-name="Table2.A1" office:value-type="string">
-      <text:p text:style-name="P7"/>
+      <text:p text:style-name="P15"/>
      </table:table-cell>
      <table:table-cell table:style-name="Table2.A1" office:value-type="string">
       <text:p text:style-name="Table_20_Contents">Ingress</text:p>
@@ -877,11 +898,11 @@
       <text:p text:style-name="Table_20_Contents">131.159.20.52/32 (CIDR)</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table2.A1" office:value-type="string">
-      <text:p text:style-name="P7"/>
+      <text:p text:style-name="P15"/>
      </table:table-cell>
     </table:table-row>
    </table:table>
-   <text:p text:style-name="P3"><text:bookmark text:name="rules__row__145386"/><text:bookmark text:name="rules2"/></text:p>
+   <text:p text:style-name="P3"><text:bookmark text:name="rules2"/><text:bookmark text:name="rules__row__145386"/></text:p>
    <table:table table:name="Table3" table:style-name="Table3">
     <table:table-column table:style-name="Table3.A"/>
     <table:table-column table:style-name="Table3.B"/>
@@ -892,7 +913,7 @@
     <table:table-column table:style-name="Table3.G"/>
     <table:table-row>
      <table:table-cell table:style-name="Table3.A1" office:value-type="string">
-      <text:p text:style-name="P7"/>
+      <text:p text:style-name="P15"/>
      </table:table-cell>
      <table:table-cell table:style-name="Table3.A1" office:value-type="string">
       <text:p text:style-name="Table_20_Contents">Ingress</text:p>
@@ -910,12 +931,12 @@
       <text:p text:style-name="Table_20_Contents">default</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table3.A1" office:value-type="string">
-      <text:p text:style-name="P7"><text:bookmark text:name="rules__row__145398"/></text:p>
+      <text:p text:style-name="P15"><text:bookmark text:name="rules__row__145398"/></text:p>
      </table:table-cell>
     </table:table-row>
     <table:table-row>
      <table:table-cell table:style-name="Table3.A1" office:value-type="string">
-      <text:p text:style-name="P7"/>
+      <text:p text:style-name="P15"/>
      </table:table-cell>
      <table:table-cell table:style-name="Table3.A1" office:value-type="string">
       <text:p text:style-name="Table_20_Contents">Ingress</text:p>
@@ -933,7 +954,7 @@
       <text:p text:style-name="Table_20_Contents">0.0.0.0/0 (CIDR)</text:p>
      </table:table-cell>
      <table:table-cell table:style-name="Table3.A1" office:value-type="string">
-      <text:p text:style-name="P7"/>
+      <text:p text:style-name="P15"/>
      </table:table-cell>
     </table:table-row>
    </table:table>
