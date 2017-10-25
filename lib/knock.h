@@ -57,7 +57,9 @@ knock_init();
  * Function to create a new knock handle
  *
  * @param timeout number of seconds to wait before retrying the knock attempt
- * @param retries number of times to retry
+ * @param retries number of times to retry until the knocking is successful;
+ *          this is only relevant if @a verify is set to 1 and the protocol used
+ *          in knock_knock() is @a KNOCK_TCP
  * @param verify flag to verify whether the port-knocking is successful or not
  * @param server_cert_path path of the server certificate
  * @param client_cert_path path of the client certificate
