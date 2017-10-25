@@ -21,6 +21,16 @@
  * @author Sree Harsha Totakura <sreeharsha@totakura.in>
  */
 
+/* Also support C++ to use our library  */
+#ifdef __cplusplus
+extern "C"
+{
+#if 0                           /* keep Emacsens' auto-indent happy */
+}
+#endif
+#endif
+
+
  #define KNOCK_UDP 0
  #define KNOCK_TCP 1
 
@@ -93,5 +103,11 @@ knock_knock(struct KNOCK_Handle *handle,
             unsigned short port,
             int protocol);
 
+#if 0                           /* keep Emacsens' auto-indent happy */
+{
+#endif
+#ifdef __cplusplus
+}
+#endif
 
 /* end of lib/knock.h */
