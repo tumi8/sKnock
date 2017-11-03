@@ -11,3 +11,4 @@ config_server_valid.crlFile = crlFile=os.path.join(os.path.dirname(__file__), 'd
 config_server_valid.crlUrl = "https://home.in.tum.de/~sel/BA/CA/devca.crl"
 config_server_valid.serverPFXFile = os.path.join(os.path.dirname(__file__), 'data', 'devserver_valid.pfx')
 config_server_valid.PFXPasswd = 'portknocking'
+config_server_valid.crlInterval = 1
