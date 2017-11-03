@@ -52,14 +52,3 @@ class ServerInterface:
         LOG.info('sKnock shutting down...')
         self.knockProcessor.stop()
 
-
-class ServerThread(threading.Thread):
-    def __init__(self, configFilePath = os.path.join(os.path.dirname(__file__), 'config.ini')):
-        self.serverInterface = ServerInterface(configFilePath)
-        threading.Thread.__init__(self)
-
-    def run(self):
-        self.serverInterface.listenForKnockRequests()
-
-    def stop(self):
-        self.serverInterface.gracefulShutdown(None, None)
