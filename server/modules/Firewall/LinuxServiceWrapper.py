@@ -20,8 +20,12 @@
 # THIS WRAPPER IS NEEDED TO PROVIDE PRIVILEGES DROPPING OF THE MAIN THREAD
 
 import IPTablesHelper
+import signal
 
 def processFirewallCommands(pipe):
+    # Ignore termination signals as the parents sends us termination
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
+    signal.signal(signal.SIGTERM, signal.SIG_IGN)
     while True:
         msg = pipe.recv()
         if msg[1] == 'startService' and len(msg) == 3:
