@@ -23,6 +23,7 @@ USA
 """
 
 import logging
+from logging.handlers import RotatingFileHandler
 import os
 import sys
 import signal
@@ -31,14 +32,31 @@ from ServerInterface import ServerInterface
 
 def checkPrivileges():
     if (not os.geteuid() == 0):
-         print "Sorry, you have to run knock-server as root."
+         print ("Sorry, you have to run knock-server as root.")
          sys.exit(3)
+
+
+def setup_logging():
+    # Prepare root logger to log all INFO to stderr and DEBUG to file
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)
+    stream_handler = logging.StreamHandler()
+    stream_handler.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s',
+                                  '%x %X')
+    stream_handler.setFormatter(formatter)
+    file_handler = RotatingFileHandler('knock.log', maxBytes=50000, backupCount=3)
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(logging.Formatter('%(asctime)s %(name)s %(levelname)s: %(message)s'))
+    logger.addHandler(stream_handler)
+    logger.addHandler(file_handler)
+
 
 
 def main(argv):
     checkPrivileges()
     #logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG, filename='/var/log/portknocking.log')
-    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
+    setup_logging()
     knockServer = ServerInterface()
 
     signal.signal(signal.SIGINT, knockServer.gracefulShutdown)

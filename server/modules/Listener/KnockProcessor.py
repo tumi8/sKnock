@@ -38,6 +38,7 @@ class KnockProcessor:
         LOG.debug("Sockets initialized")
 
     def run(self):
+        LOG.info("sKnock initialized successfully and is now running.")
         while not self.shutdown:
             try:
                 packet = self.socket.recv(self.config.RECV_BUFFER)

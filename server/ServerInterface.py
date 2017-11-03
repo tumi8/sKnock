@@ -49,7 +49,7 @@ class ServerInterface:
 
     def gracefulShutdown(self, sig, frame):
         LOG.debug('Signal %s received', sig)
-        LOG.info('Stopping port-knocking server...')
+        LOG.info('sKnock shutting down...')
         self.knockProcessor.stop()
 
 

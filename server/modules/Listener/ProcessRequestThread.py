@@ -42,11 +42,12 @@ class ProcessRequestThread(Thread):
 
 
         if success:
-            LOG.info('Processing decoded request for %s Port: %s from host: %s', protocol, port, addr)
+            LOG.info('Received a valid request to open %s port %s from host %s.',
+                     protocol, port, addr)
             if not hash(str(port) + str(self.ipVersion) + protocol + addr) in self.knockProcessor.runningPortOpenTasks:
                 PortOpenThread.PortOpenThread(self.knockProcessor.runningPortOpenTasks, self.knockProcessor.firewallHandler, self.ipVersion, protocol, port, addr).start()
             else:
-                LOG.info('There is already a Port-open process running for %s Port: %s for host: %s!',
+                LOG.debug('There is already a Port-open process running for %s Port: %s for host: %s!',
                             protocol, port, addr)
 
         else:
