@@ -37,19 +37,11 @@ class ProcessRequestThread(Thread):
         success, protocol, port, addr = self.knockProcessor.security.decryptAndVerifyRequest(self.request, self.ipVersion)
 
         if not success: return
-        # Check if the source ip in the header was changed in the mean time
-        success = addr == self.addr
 
-
-        if success:
-            LOG.info('Received a valid request to open %s port %s from host %s.',
-                     protocol, port, addr)
-            if not hash(str(port) + str(self.ipVersion) + protocol + addr) in self.knockProcessor.runningPortOpenTasks:
-                PortOpenThread.PortOpenThread(self.knockProcessor.runningPortOpenTasks, self.knockProcessor.firewallHandler, self.ipVersion, protocol, port, addr).start()
-            else:
-                LOG.debug('There is already a Port-open process running for %s Port: %s for host: %s!',
-                            protocol, port, addr)
-
+        LOG.info('Received a valid request to open %s port %s from host %s.',
+                 protocol, port, self.addr)
+        if not hash(str(port) + str(self.ipVersion) + protocol + self.addr) in self.knockProcessor.runningPortOpenTasks:
+            PortOpenThread.PortOpenThread(self.knockProcessor.runningPortOpenTasks, self.knockProcessor.firewallHandler, self.ipVersion, protocol, port, self.addr).start()
         else:
-            LOG.warn('Client IP of request does not match Source IP of IP Header! -> Possible Man-in-the-Middle attack for request for %s Port: %s for host: %s! Source IP from packet header: %s',
-                            protocol, port, addr, self.addr)
+            LOG.debug('There is already a Port-open process running for %s Port: %s for host: %s!',
+                      protocol, port, self.addr)
