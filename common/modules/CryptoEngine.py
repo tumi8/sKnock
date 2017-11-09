@@ -2,7 +2,10 @@ import hashlib
 import logging
 
 from M2Crypto import *
-from hkdf import hkdf_expand, hkdf_extract
+#from hkdf import hkdf_expand, hkdf_extract
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from Utils import *
 
 SIGNATURE_SIZE = 73
@@ -49,13 +52,13 @@ class CryptoEngine:
         return decryptedMessage
 
     def _hkdf(self, ecdhSecret):
-        prk = hkdf_extract(salt=b"54686579206c6976696e272069742075702061742074686520486f74656c2043616c69666f726e69610a576861742061206e6963652073757270726973652028776861742061206e696365207375727072697365290a4272696e6720796f757220616c69626973",
-                           hash=hashlib.sha256,
-                           input_key_material=ecdhSecret)
+        hkdf = HKDF(algorithm=hashes.SHA256(),
+                    length=16,
+                    salt=b"54686579206c6976696e272069742075702061742074686520486f74656c2043616c69666f726e69610a576861742061206e6963652073757270726973652028776861742061206e696365207375727072697365290a4272696e6720796f757220616c69626973",
+                    info=b"knock",
+                    backend=default_backend())
+        return hkdf.derive(ecdhSecret)
 
-        return hkdf_expand(pseudo_random_key=prk,
-                           info=b"knock",
-                           length=16)
 
     @staticmethod
     def loadPrivKeyFromPEM(pem):
