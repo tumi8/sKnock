@@ -21,11 +21,9 @@ import logging, os, pwd, grp
 LOG = logging.getLogger(__name__)
 
 def dropPrivileges():
-    nobody = pwd.getpwnam('nobody')
-    adm    = grp.getgrnam('adm')
-
-    os.setgroups([adm.gr_gid])
-    os.setgid(adm.gr_gid)
-    os.setuid(nobody.pw_uid)
-
+    user = pwd.getpwnam('nobody')
+    group = grp.getgrnam('nobody')
+    os.setgroups([group.gr_gid])
+    os.setgid(group.gr_gid)
+    os.setuid(user.pw_uid)
     LOG.debug("Dropped root privileges, now running as \'nobody\'")
