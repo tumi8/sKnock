@@ -45,7 +45,7 @@ def setup_logging():
     formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s',
                                   '%x %X')
     stream_handler.setFormatter(formatter)
-    file_handler = WatchedFileHandler('knock.log', 'a')
+    file_handler = WatchedFileHandler('/tmp/knock.log', 'a')
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(logging.Formatter('%(asctime)s %(name)s %(levelname)s: %(message)s'))
     logger.addHandler(stream_handler)
