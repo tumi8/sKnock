@@ -7,7 +7,7 @@ class stub_Firewall:
 
     def __init__(self):
         self.config = config_server_valid
-        self.config.PORT_OPEN_DURATION_IN_SECONDS = 20
+        self.config.PORT_OPEN_DURATION_IN_SECONDS = 2
         self.counter = 0
     def openPortForClient(self, port, ipVersion, protocol, addr):
         self.counter+=1
@@ -29,7 +29,7 @@ class stub_CryptoEngine_Server:
 class stub_KnockProcessor:
     def __init__(self, firewallHandler, security):
         self.config = config_server_valid
-        self.runningPortOpenTasks = list()
+        self.runningPortOpenTasks = set()
         self.firewallHandler = firewallHandler
         self.security = security
 

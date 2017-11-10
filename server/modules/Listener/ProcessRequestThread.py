@@ -17,12 +17,12 @@
 #
 
 import logging
-from threading import Thread
+from threading import Thread, Lock
 
 from server.modules.Firewall import PortOpenThread
 
 LOG = logging.getLogger(__name__)
-
+_lock = Lock()
 class ProcessRequestThread(Thread):
 
     def __init__(self, knockProcessor, ipVersion, addr, request):
@@ -44,12 +44,13 @@ class ProcessRequestThread(Thread):
         if success:
             LOG.info('Received a valid request to open %s port %s from host %s.',
                      protocol, port, addr)
+            _lock.acquire()
             if not hash(str(port) + str(self.ipVersion) + protocol + addr) in self.knockProcessor.runningPortOpenTasks:
                 PortOpenThread.PortOpenThread(self.knockProcessor.runningPortOpenTasks, self.knockProcessor.firewallHandler, self.ipVersion, protocol, port, addr).start()
             else:
                 LOG.debug('There is already a Port-open process running for %s Port: %s for host: %s!',
                             protocol, port, addr)
-
+            _lock.release()
         else:
             LOG.warn('Client IP of request does not match Source IP of IP Header! -> Possible Man-in-the-Middle attack for request for %s Port: %s for host: %s! Source IP from packet header: %s',
                             protocol, port, addr, self.addr)

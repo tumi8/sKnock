@@ -22,6 +22,6 @@ class TestCryptoEngine_VALID(TestCase):
         original_message = "Writing tests makes me want to jump out of the window..."
         encryptedMessage, ephPubKey = self.securityClient.cryptoEngine.encryptWithECIES(original_message, self.securityClient.serverPublicKey)
         encryptedMessage += ephPubKey
-
+        logging.debug("Size of serialized EC NIST-P256 pubkey: %u", len(ephPubKey))
         evaluate_message = self.cryptoEngineServer.decryptWithECIES(encryptedMessage)
         self.assertEqual(original_message, evaluate_message)

@@ -19,7 +19,6 @@ class TestProcessRequest(TestCase):
         firewallHandler = Firewall()
         security = CryptoEngine('5.5.5.5', '5555:5555:5555:5555::5555')
         knockProcessor = KnockProcessor(firewallHandler, security)
-        knockProcessor.runningPortOpenTasks = list()
 
         for x in range(1, 10):
             ProcessRequestThread(knockProcessor, IP_VERSION.V4, '5.5.5.5', 'I think I am a request?').start()

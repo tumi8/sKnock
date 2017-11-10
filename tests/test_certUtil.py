@@ -11,7 +11,6 @@ SecurityServer = stub_Security_Server
 class TestCertUtil_VALID(TestCase):
     @classmethod
     def setUpClass(cls):
-
         logging.basicConfig()
 
         cls.securityClient = SecurityClient(serverCertFile=os.path.join(os.path.dirname(__file__), 'data', 'devserver_valid.cer'),
@@ -31,5 +30,6 @@ class TestCertUtil_VALID(TestCase):
             certificate = evaluate_signedMessageWithCert[len(message):-73]
 
             self.assertTrue(self.securityServer.certUtil.verifyCertificateAndSignature(certificate, signature, signedRequest))
-        except:
+        except Exception as e:
+            logging.error(str(e))
             self.fail()

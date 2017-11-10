@@ -22,6 +22,7 @@ import logging
 import random
 import string
 import sys
+import threading
 from multiprocessing import Process, Pipe
 
 from common.modules.Platform import PlatformUtils
@@ -40,6 +41,7 @@ class Firewall:
         self.firewallServicePipe, remotePipeEnd = Pipe()
         self.firewallService = None
         self.openPortsList = set()
+        self.lock = threading.Lock()
 
         if(self.platform == PlatformUtils.LINUX):
             self.firewallService = Process(target=LinuxServiceWrapper.processFirewallCommands, args=((remotePipeEnd),))
@@ -61,7 +63,6 @@ class Firewall:
             pass
 
         self._executeTask(["startService", self.config.firewallPolicy])
-        self.openPortsList = set()
 
 
     def shutdown(self):
@@ -81,12 +82,15 @@ class Firewall:
     def openPortForClient(self, port, ipVersion, protocol, addr):
 
         openPort = hash(str(port) + str(ipVersion) + protocol + addr)
+        self.lock.acquire()
         if openPort in self.openPortsList:
             LOG.debug('%s port %s for host %s is already open.', protocol, port, addr)
+            self.lock.release()
             raise PortAlreadyOpenException
 
         self._executeTask(['openPort', port, ipVersion, protocol, addr])
         self.openPortsList.add(openPort)
+        self.lock.release()
         LOG.info('%s port %s opened for host %s; will be closed in %s seconds.',
                  protocol, port, addr,
                  self.config.PORT_OPEN_DURATION_IN_SECONDS)
@@ -94,8 +98,10 @@ class Firewall:
 
 
     def closePortForClient(self, port, ipVersion, protocol, addr):
+        self.lock.acquire()
         self._executeTask(['closePort', port, ipVersion, protocol, addr])
         self.openPortsList.remove(hash(str(port) + str(ipVersion) + protocol + addr))
+        self.lock.release()
         LOG.info('%s port %s closed for host %s.', protocol, port, addr)
 
 
