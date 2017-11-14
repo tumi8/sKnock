@@ -12,6 +12,7 @@ class UpdateCRLThread(Thread):
         self.shutdown = False
         Thread.__init__(self)
         self.daemon = True
+        self.updateJob = None
 
     def updateCRL(self):
         LOG.debug("Checking for new CRL on CA Server...")
@@ -63,5 +64,6 @@ class UpdateCRLThread(Thread):
 
 
     def stop(self):
-        schedule.cancel_job(self.updateJob)
+        if self.updateJob is not None:
+            schedule.cancel_job(self.updateJob)
         self.shutdown = True
