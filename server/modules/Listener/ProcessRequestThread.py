@@ -44,9 +44,11 @@ class ProcessRequestThread(Thread):
         if success:
             LOG.info('Received a valid request to open %s port %s from host %s.',
                      protocol, port, addr)
+            task_hash = hash(str(port) + str(self.ipVersion) + protocol + addr)
             _lock.acquire()
-            if not hash(str(port) + str(self.ipVersion) + protocol + addr) in self.knockProcessor.runningPortOpenTasks:
-                PortOpenThread.PortOpenThread(self.knockProcessor.runningPortOpenTasks, self.knockProcessor.firewallHandler, self.ipVersion, protocol, port, addr).start()
+            if not task_hash in self.knockProcessor.runningPortOpenTasks:
+                self.knockProcessor.runningPortOpenTasks.add(task_hash)
+                PortOpenThread.PortOpenThread(_lock, self.knockProcessor.runningPortOpenTasks, self.knockProcessor.firewallHandler, self.ipVersion, protocol, port, addr).start()
             else:
                 LOG.debug('There is already a Port-open process running for %s Port: %s for host: %s!',
                             protocol, port, addr)

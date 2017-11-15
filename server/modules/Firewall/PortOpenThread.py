@@ -24,24 +24,24 @@ from PortCloseThread import PortCloseThread
 
 class PortOpenThread(Thread):
 
-    def __init__(self, runningOpenPortTasks, firewallHandler, ipVersion, protocol, port, addr):
+    def __init__(self, lock, runningOpenPortTasks, firewallHandler, ipVersion, protocol, port, addr):
         self.runningOpenPortTasks = runningOpenPortTasks
         self.firewallHandler = firewallHandler
         self.ipVersion = ipVersion
         self.protocol = protocol
         self.port = port
         self.addr = addr
+        self.lock = lock
         Thread.__init__(self)
 
 
     @synchronized
     def run(self):
         threadTaskHash = hash(str(self.port) + str(self.ipVersion) + self.protocol + self.addr)
-        self.runningOpenPortTasks.add(threadTaskHash)
 
         try:
             self.firewallHandler.openPortForClient(self.port, self.ipVersion, self.protocol, self.addr)
-            PortCloseThread(self.runningOpenPortTasks, self.firewallHandler, self.ipVersion, self.protocol, self.port, self.addr).start()
+            PortCloseThread(self.lock, self.runningOpenPortTasks, self.firewallHandler, self.ipVersion, self.protocol, self.port, self.addr).start()
 
         except PortAlreadyOpenException:
             self.runningOpenPortTasks.remove(threadTaskHash)

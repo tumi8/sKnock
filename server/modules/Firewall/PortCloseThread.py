@@ -22,13 +22,14 @@ from threading import Thread
 
 class PortCloseThread(Thread):
 
-    def __init__(self, runningOpenPortTasks, firewallHandler, ipVersion, protocol, port, addr):
+    def __init__(self, lock, runningOpenPortTasks, firewallHandler, ipVersion, protocol, port, addr):
         self.runningOpenPortTasks = runningOpenPortTasks
         self.firewallHandler = firewallHandler
         self.ipVersion = ipVersion
         self.protocol = protocol
         self.port = port
         self.addr = addr
+        self.lock = lock
         Thread.__init__(self)
 
 
@@ -43,4 +44,6 @@ class PortCloseThread(Thread):
             return
 
         finally:
+            self.lock.acquire()
             self.runningOpenPortTasks.remove(threadTaskHash)
+            self.lock.release()
