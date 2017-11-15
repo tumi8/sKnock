@@ -19,15 +19,20 @@ class TestProcessRequest(TestCase):
         firewallHandler = Firewall()
         security = CryptoEngine('5.5.5.5', '5555:5555:5555:5555::5555')
         knockProcessor = KnockProcessor(firewallHandler, security)
+        threads = []
 
         for x in range(1, 10):
-            ProcessRequestThread(knockProcessor, IP_VERSION.V4, '5.5.5.5', 'I think I am a request?').start()
+            thread = ProcessRequestThread(knockProcessor, IP_VERSION.V4, '5.5.5.5', 'I think I am a request?')
+            threads.append(thread)
+            thread.start()
 
         for x in range(1, 10):
-            ProcessRequestThread(knockProcessor, IP_VERSION.V6, '5555:5555:5555:5555::5555', 'I think I am a request?').start()
-
-        if firewallHandler.counter != 2:
-            self.fail()
+            thread = ProcessRequestThread(knockProcessor, IP_VERSION.V6, '5555:5555:5555:5555::5555', 'I think I am a request?')
+            threads.append(thread)
+            thread.start()
+        for thread in threads:
+            thread.join()
+        self.assertEqual(firewallHandler.counter, 2)
 
         time.sleep(firewallHandler.config.PORT_OPEN_DURATION_IN_SECONDS + 1)
         self.assertEqual(firewallHandler.counter, 0)
