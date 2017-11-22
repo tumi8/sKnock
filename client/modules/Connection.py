@@ -16,19 +16,21 @@
 # USA
 #
 
-import logging, socket, struct, sys, time
-
-from common.definitions.Constants import *
+import logging
+import socket
+import struct
+import time
+from common.definitions.Constants import (
+    KNOCK_ID, KNOCK_VERSION, PROTOCOL)
+from common.modules.CryptoEngine import EncryptionError
 
 PROTOCOL_INFORMATION = struct.pack('!cBBB', KNOCK_ID, *KNOCK_VERSION)
 MIN_PORT = 10000
 MAX_PORT = 60000
-
 LOG = logging.getLogger(__name__)
 
+
 class Connection:
-
-
 
     def __init__(self, security, timeout, numberOfRetries, verify):
         self.timeout = timeout
@@ -36,70 +38,96 @@ class Connection:
         self.security = security
         self.verify = verify
 
-    def knockOnPort(self, targetHost, requestedPort, requestedProtocol, knockPort, forceIPv4, clientIP):
-
+    def knockOnPort(self, targetHost, requestedPort, requestedProtocol,
+                    knockPort, forceIPv4, clientIP):
         for i in range(0, self.numberOfRetries):
-            self.sendKnockPacket(targetHost, requestedPort, requestedProtocol, knockPort, forceIPv4, clientIP)
+            self.sendKnockPacket(targetHost, requestedPort, requestedProtocol,
+                                 knockPort, forceIPv4, clientIP)
             if not self.verify:
-                LOG.info("Port-knocking finished. Verification of target port is disabled.")
+                LOG.info("Port-knocking finished."
+                         " Verification of target port is disabled.")
                 return True
             elif PROTOCOL.UDP == requestedProtocol:
-                LOG.info("Port-knocking finished. Verification of UDP Ports is not supported.")
+                LOG.info("Port-knocking finished."
+                         " Verification of UDP Ports is not supported.")
                 return True
             time.sleep(1)
             if self.verifyTargetTCPPortIsOpen(targetHost, requestedPort):
-                LOG.info('Port-knocking successful. Application Port %s is now open!', requestedPort)
+                LOG.info("Port-knocking successful."
+                         " Application Port %s is now open!", requestedPort)
                 return True
             LOG.info('Port still not open - maybe packet got lost. Retrying...')
-        LOG.error('Port-knocking failed. Verify you are authorized to open the requested port and check your configuration!')
+        LOG.error("Port-knocking failed. Verify you are authorized to open the"
+                  "requested port and check your configuration!")
         return False
 
-
-    def sendKnockPacket(self, targetHost, requestedPort, requestedProtocol, knockPort, forceIPv4, clientIP):
-
-        LOG.debug('Knock Target Protocol: %s, Requested Application Port: %s', requestedProtocol, requestedPort)
-
+    def sendKnockPacket(self, targetHost, requestedPort, requestedProtocol,
+                        knockPort, forceIPv4, clientIP):
+        LOG.debug('Knock Target Protocol: %s, Requested Application Port: %s',
+                  requestedProtocol, requestedPort)
         targetInfo = socket.getaddrinfo(targetHost, knockPort)
-
         for i in xrange(len(targetInfo)):
-            if targetInfo[i][:3] == (socket.AF_INET6, socket.SOCK_DGRAM, socket.AF_PACKET) and not forceIPv4:
-                socketToServer = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
+            if targetInfo[i][:3] == (socket.AF_INET6,
+                                     socket.SOCK_DGRAM,
+                                     socket.AF_PACKET) and not forceIPv4:
+                socketToServer = socket.socket(socket.AF_INET6,
+                                               socket.SOCK_DGRAM)
                 if clientIP is None:
-                    try: socketToServer.connect((targetInfo[i][4][0], knockPort))
+                    try:
+                        socketToServer.connect((targetInfo[i][4][0],
+                                                knockPort))
                     except socket.error:
-                        LOG.error('Could not determine IP of network interface. Please check network configuration and internet connectivity!')
+                        LOG.error("Could not determine IP of network interface."
+                                  " Please check network configuration and"
+                                  " internet connectivity!")
                         return
-
                     clientIP = socketToServer.getsockname()[0]
                     LOG.debug("Determined client ip: %s", clientIP)
-                    clientIP_binary = socket.inet_pton(socket.AF_INET6, clientIP) # 16 bytes IPv6 address
+                    # 16 bytes IPv6 address
+                    clientIP_binary = socket.inet_pton(socket.AF_INET6,
+                                                       clientIP)
                     break
-
-
-            elif targetInfo[i][:3] == (socket.AF_INET, socket.SOCK_DGRAM, socket.AF_PACKET):
-                socketToServer = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            elif targetInfo[i][:3] == (socket.AF_INET,
+                                       socket.SOCK_DGRAM,
+                                       socket.AF_PACKET):
+                socketToServer = socket.socket(socket.AF_INET,
+                                               socket.SOCK_DGRAM)
                 if clientIP is None:
-                    try: socketToServer.connect((targetInfo[i][4][0], knockPort))
+                    try:
+                        socketToServer.connect((targetInfo[i][4][0],
+                                                knockPort))
                     except socket.error:
-                        LOG.error('Could not determine IP of network interface. Please check network configuration and internet connectivity!')
+                        LOG.error("Could not determine IP of network interface."
+                                  " Please check network configuration and"
+                                  " internet connectivity!")
                         return
                     clientIP = socketToServer.getsockname()[0]
                     LOG.debug("Determined client ip: %s", clientIP)
-                    clientIP_binary = ''.join((socket.inet_pton(socket.AF_INET, clientIP), struct.pack('xxxxxxxxxxxx'))) # 4 bytes IPv4 address + padding
-
-
-
-        encryptedRequest = self.security.signAndEncryptRequest(PROTOCOL.getId(requestedProtocol), requestedPort, clientIP_binary)
-        socketToServer.sendto(PROTOCOL_INFORMATION + encryptedRequest, (targetHost, knockPort))
-
+                    # 4 bytes IPv4 address + padding
+                    clientIP_binary = ''.join((socket.inet_pton(socket.AF_INET,
+                                                                clientIP),
+                                               struct.pack('xxxxxxxxxxxx')))
+        try:
+            encryptedRequest = (
+                self.security.
+                signAndEncryptRequest(
+                    PROTOCOL.getId(requestedProtocol),
+                    requestedPort,
+                    clientIP_binary)
+            )
+        except EncryptionError as e:
+            LOG.error("Encrypting message failed: %s", str(e))
+            return
+        socketToServer.sendto(PROTOCOL_INFORMATION + encryptedRequest,
+                              (targetHost, knockPort))
         LOG.info('Knock Packet sent to %s:%s', targetHost, knockPort)
-
 
     def verifyTargetTCPPortIsOpen(self, targetHost, requestedPort):
         try:
-            s = socket.create_connection((targetHost, requestedPort), timeout=self.timeout)
+            s = socket.create_connection((targetHost, requestedPort),
+                                         timeout=self.timeout)
             s.shutdown(socket.SHUT_RDWR)
             s.close()
             return True
-        except:
+        except Exception:
             return False

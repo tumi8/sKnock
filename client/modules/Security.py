@@ -20,19 +20,18 @@ import datetime
 import logging
 import struct
 import time
-
 from common.modules.CertUtil import CertUtil
 from common.modules.CryptoEngine import CryptoEngine
 
 LOG = logging.getLogger(__name__)
 
+
 class Security:
 
     def __init__(self, pfxFile, pfxPasswd, serverCertFile):
         self.certUtil = CertUtil(pfxFile, pfxPasswd)
-        self.cryptoEngine = CryptoEngine(self.certUtil.getPrivKeyPEM())
+        self.crypto = CryptoEngine(self.certUtil.getPrivKeyPEM())
         self.serverPublicKey = CryptoEngine.loadPubKeyFromPEM(CertUtil.loadPubKeyPEMFromCert(serverCertFile))
-
 
     def signAndEncryptRequest(self, protocol, port, clientIP):
         LOG.debug("Signing and encrypting request...")
@@ -42,6 +41,8 @@ class Security:
         LOG.debug("Added timestamp: %s", packetTime)
 
         signedMessage = self.certUtil.signIncludingCertificate(request)
-        signedAndEncryptedMessage, ephPubKey = self.cryptoEngine.encryptWithECIES(signedMessage, self.serverPublicKey)
-        signedAndEncryptedMessage += ephPubKey
-        return signedAndEncryptedMessage
+        message, point_encoding = (
+            self.crypto.encryptWithECIES(signedMessage, self.serverPublicKey)
+        )
+        message += point_encoding
+        return message

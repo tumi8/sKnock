@@ -1,10 +1,16 @@
-KNOCK_ID='a'
-KNOCK_VERSION=(0,0,1)
+KNOCK_ID = 'a'
+# (0,0,1) Sel's original version with 91 bytes allocated for ephemeral pub key
+#         in sKnock requests
+#
+# (1,0,0) ephemeral pub key is encoded as uncompressed point on the curve: 65
+#         bytes
+KNOCK_VERSION = (1, 0, 0)
 
 
 class IP_VERSION:
-    V4=4
-    V6=6
+    V4 = 4
+    V6 = 6
+
 
 class PROTOCOL:
     TCP = 'tcp'
@@ -27,6 +33,7 @@ class PROTOCOL:
             return 0
         else:
             return None
+
 
 class FIREWALL_POLICY:
     DROP = 'drop'
