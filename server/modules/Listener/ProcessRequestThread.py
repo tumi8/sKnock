@@ -18,11 +18,12 @@
 
 import logging
 from threading import Thread, Lock
-
 from server.modules.Firewall import PortOpenThread
 
 LOG = logging.getLogger(__name__)
 _lock = Lock()
+
+
 class ProcessRequestThread(Thread):
 
     def __init__(self, knockProcessor, ipVersion, addr, request):
@@ -32,28 +33,41 @@ class ProcessRequestThread(Thread):
         self.addr = addr
         Thread.__init__(self)
 
-
     def run(self):
         try:
-            success, protocol, port, addr = self.knockProcessor.security.decryptAndVerifyRequest(self.request, self.ipVersion)
+            success, protocol, port, addr = (
+                self.knockProcessor.security.decryptAndVerifyRequest(
+                    self.request, self.ipVersion)
+            )
         except Exception as e:
             LOG.debug("Unable to decrypt a request; ignoring")
             return
-        if not success: return
+        if not success:
+            return
         # Check if the source ip in the header was changed in the mean time
         success = addr == self.addr
         if success:
-            LOG.info('Received a valid request to open %s port %s from host %s.',
-                     protocol, port, addr)
+            LOG.info(("Received a valid request to open"
+                      " %s port %s from host %s."), protocol, port, addr)
             task_hash = hash(str(port) + str(self.ipVersion) + protocol + addr)
             _lock.acquire()
-            if not task_hash in self.knockProcessor.runningPortOpenTasks:
+            if task_hash not in self.knockProcessor.runningPortOpenTasks:
                 self.knockProcessor.runningPortOpenTasks.add(task_hash)
-                PortOpenThread.PortOpenThread(_lock, self.knockProcessor.runningPortOpenTasks, self.knockProcessor.firewallHandler, self.ipVersion, protocol, port, addr).start()
+                PortOpenThread.PortOpenThread(
+                    _lock,
+                    self.knockProcessor.runningPortOpenTasks,
+                    self.knockProcessor.firewallHandler,
+                    self.ipVersion,
+                    protocol,
+                    port,
+                    addr).start()
             else:
-                LOG.debug('There is already a Port-open process running for %s Port: %s for host: %s!',
-                            protocol, port, addr)
+                LOG.debug(("There is already a Port-open process running for"
+                           " %s Port: %s for host: %s!"), protocol, port, addr)
             _lock.release()
         else:
-            LOG.warn('Client IP of request does not match Source IP of IP Header! -> Possible Man-in-the-Middle attack for request for %s Port: %s for host: %s! Source IP from packet header: %s',
-                            protocol, port, addr, self.addr)
+            LOG.warn(("Client IP of request does not match Source IP"
+                      " of IP Header! -> Possible Man-in-the-Middle"
+                      " attack for request for %s Port: %s for host:"
+                      " %s! Source IP from packet header: %s"),
+                     protocol, port, addr, self.addr)

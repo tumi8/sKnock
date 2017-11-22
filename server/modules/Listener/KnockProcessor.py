@@ -17,24 +17,26 @@
 #
 
 import logging
-import socket, errno
+import socket
+import errno
 from NewPacketThread import NewPacketThread
 
 LOG = logging.getLogger(__name__)
-
 ETH_P_ALL = 3
 
 
 class KnockProcessor:
+
     def __init__(self, config, security, firewallHandler):
         self.shutdown = False
         self.config = config
         self.security = security
         self.firewallHandler = firewallHandler
         self.runningPortOpenTasks = set()
-        self.socket = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.htons(ETH_P_ALL))
+        self.socket = socket.socket(socket.AF_PACKET,
+                                    socket.SOCK_RAW,
+                                    socket.htons(ETH_P_ALL))
         self.socket.settimeout(5)
-
         LOG.debug("Sockets initialized")
 
     def run(self):
@@ -42,14 +44,13 @@ class KnockProcessor:
         while not self.shutdown:
             try:
                 packet = self.socket.recv(self.config.RECV_BUFFER)
-            except socket.timeout:
+            except socket.timeout as e:
                 continue
-            except socket.error, e:
+            except socket.error as e:
                 if e.errno != errno.EINTR:
                     raise e
                 else:
                     return
-
             if len(packet) >= self.config.KNOCKPACKET_MIN_LENGTH:
                 NewPacketThread(self, packet).start()
 

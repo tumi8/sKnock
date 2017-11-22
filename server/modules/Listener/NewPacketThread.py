@@ -20,14 +20,13 @@ import logging
 import socket
 import struct
 from threading import Thread
-
-from common.definitions.Constants import *
+from common.definitions.Constants import IP_VERSION, KNOCK_ID, KNOCK_VERSION
 import ProcessRequestThread
 
 LOG = logging.getLogger(__name__)
-
 ETHERNET_HEADER_LENGTH = 14
 UDP_HEADER_LENGTH = 8
+
 
 class NewPacketThread(Thread):
 
@@ -36,15 +35,12 @@ class NewPacketThread(Thread):
         self.packet = packet
         Thread.__init__(self)
 
-
     def run(self):
         # Skip Ethernet Hedaer
         packet = self.packet[ETHERNET_HEADER_LENGTH:]
-
         # Determine IP version
         ipVersionLengthByte = struct.unpack('!B', packet[0])[0]
         ipVersion = ipVersionLengthByte >> 4
-
         if ipVersion == IP_VERSION.V4:
             ipProtocol = struct.unpack('!B', packet[9])[0]
             if not ipProtocol == socket.IPPROTO_UDP:
@@ -58,23 +54,22 @@ class NewPacketThread(Thread):
             ipHeaderLength = 40
             sourceIP = socket.inet_ntop(socket.AF_INET6, packet[8:24])
         else:
-            LOG.error('Malformed packet received! (Or maybe it is just a huge non-IP packet...)')
+            LOG.error("Malformed packet received!"
+                      " (Or maybe it is just a huge non-IP packet...)")
             return
-
         # We processed IP Hedaer -> skip
         packet = packet[ipHeaderLength:]
         payloadLength = struct.unpack('!H', packet[4:6])[0] - UDP_HEADER_LENGTH
-
         # We don't need no ... UDP Header ... or the rest
-        packet = packet[UDP_HEADER_LENGTH : UDP_HEADER_LENGTH + payloadLength]
-
+        packet = packet[UDP_HEADER_LENGTH:UDP_HEADER_LENGTH + payloadLength]
         knockId = struct.unpack('!c', packet[0])[0]
-        isPossibleKnockPacket = knockId == KNOCK_ID
-
-        if not isPossibleKnockPacket: return
+        if knockId != KNOCK_ID:
+            return
         knockVersion = struct.unpack('!BBB', packet[1:4])
-        isPossibleKnockPacket = knockVersion <= KNOCK_VERSION
-
-        if not isPossibleKnockPacket: return
+        if KNOCK_VERSION < knockVersion:
+            return
         LOG.debug("Possible port-knocking request received from: %s", sourceIP)
-        ProcessRequestThread.ProcessRequestThread(self.knockProcessor, ipVersion, sourceIP, packet[4:]).start()
+        ProcessRequestThread.ProcessRequestThread(self.knockProcessor,
+                                                  ipVersion,
+                                                  sourceIP,
+                                                  packet[4:]).start()
