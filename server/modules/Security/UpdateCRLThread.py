@@ -1,18 +1,26 @@
-import logging, os, socket, urllib2, calendar, schedule, time, atexit
-from threading import Thread
+import logging
+import os
+import socket
+import urllib2
+import calendar
+import atexit
+from threading import Lock, Thread, Timer
 
 LOG = logging.getLogger(__name__)
 
+
 class UpdateCRLThread(Thread):
-    def __init__(self, crlFile, crlUrl, crlInterval, importFunc = None):
+
+    def __init__(self, crlFile, crlUrl, crlInterval, importFunc=None):
         self.crlFile = crlFile
         self.crlUrl = crlUrl
-        self.crlInterval = crlInterval
+        self.crlInterval = crlInterval * 60  # to seconds
         self.importFunc = importFunc
         self.shutdown = False
         Thread.__init__(self)
         self.daemon = True
         self.updateJob = None
+        self.lock = Lock()
 
     def updateCRL(self):
         LOG.debug("Checking for new CRL on CA Server...")
@@ -51,19 +59,29 @@ class UpdateCRLThread(Thread):
                         self.importFunc(self.crlFile)
                     except:
                         LOG.error("Error downloading CRL file!")
+    def schedule(self):
+        self.lock.acquire()
+        self.updateJob = None
+        if self.shutdown:
+            self.lock.release()
+            return
+        try:
+            self.updateCRL()
+        except Exception:
+            pass
+        self.updateJob = Timer(self.crlInterval, self.schedule)
+        self.updateJob.start()
+        self.lock.release()
 
     def run(self):
         atexit.register(self.stop)
-
-        self.updateCRL()
-        self.updateJob = schedule.every(self.crlInterval).minutes.do(self.updateCRL)
-
-        while not self.shutdown:
-            schedule.run_pending()
-            time.sleep(5)
-
+        self.schedule()
 
     def stop(self):
-        if self.updateJob is not None:
-            schedule.cancel_job(self.updateJob)
+        self.lock.acquire()
         self.shutdown = True
+        try:
+            if self.updateJob is not None:
+                self.updateJob.cancel()
+        finally:
+            self.lock.release()
