@@ -28,37 +28,43 @@ class UpdateCRLThread(Thread):
         try:
             # TODO: get this from Certificate + CRL-specific cache
             remoteCRL = urllib2.urlopen(self.crlUrl, timeout=2)
-        except (socket.timeout, socket.sslerror, urllib2.URLError, urllib2.HTTPError):
+        except (socket.timeout,
+                socket.sslerror,
+                urllib2.URLError,
+                urllib2.HTTPError):
             LOG.warning("CA Server seems to be offline")
+        if remoteCRL is None:
+            return
 
-        if remoteCRL is not None:
-            remoteCRLTimestamp = remoteCRL.info().getdate('last-modified')
-            if remoteCRLTimestamp is None:
-                remoteCRLTimestamp = remoteCRL.info().getdate('date')
+        crl_timestamp = remoteCRL.info().getdate('last-modified')
+        if crl_timestamp is None:
+            crl_timestamp = remoteCRL.info().getdate('date')
+        if crl_timestamp is None:
+            LOG.error("Cannot obtain metadata of remote CRL file")
+            return
+        crl_timestamp = calendar.timegm(crl_timestamp)
 
-            if remoteCRLTimestamp is None:
-                LOG.error("Cannot obtain metadata of remote CRL file")
-            else:
-                remoteCRLTimestamp = calendar.timegm(remoteCRLTimestamp)
+        if (os.path.isfile(self.crlFile)
+            and crl_timestamp <= os.path.getmtime(self.crlFile)):
+            # Our File is up to date -> no downloading
+            LOG.debug("CRL is up to date.")
+            return
+        if not os.path.isfile(self.crlFile):
+            # We don't have a CRL at all
+            LOG.debug("No CRL found in cache. Downloading...")
+        else:
+            # Our CRL is not up to date
+            LOG.debug("Found new CRL. Downloading...")
+        try:
+            with open(self.crlFile, 'w') as crlFileHandle:
+                crlFileHandle.write(remoteCRL.read())
+                LOG.debug("Successfully downloaded new CRL from Server")
+                self.importFunc(self.crlFile)
+        except Exception as e:
+            LOG.error("Error downloading CRL file: %s", str(e))
 
-                if os.path.isfile(self.crlFile) and not os.path.getmtime(self.crlFile) < remoteCRLTimestamp:
-                    # Our File is up to date -> no downloading
-                    LOG.debug("CRL is up to date.")
-                else:
-                    if not os.path.isfile(self.crlFile):
-                        # We don't have a CRL at all
-                        LOG.debug("No CRL found in cache. Downloading...")
-                    else:
-                        # Our CRL is not up to date
-                        LOG.debug("Found new CRL. Downloading...")
 
-                    try:
-                        with open(self.crlFile, 'w') as crlFileHandle:
-                            crlFileHandle.write(remoteCRL.read())
-                            LOG.debug("Successfully downloaded new CRL from Server")
-                        self.importFunc(self.crlFile)
-                    except:
-                        LOG.error("Error downloading CRL file!")
+
     def schedule(self):
         self.lock.acquire()
         self.updateJob = None
