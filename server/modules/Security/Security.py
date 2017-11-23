@@ -54,7 +54,14 @@ class Security:
             LOG.debug("Checking Timestamp of Request...")
             timestamp = struct.unpack('!L', signedRequest[20:24])[0]
             packetTime = datetime.datetime.utcfromtimestamp(timestamp)
-            success = packetTime <= datetime.datetime.utcnow() + datetime.timedelta(0, self.config.TIMESTAMP_THRESHOLD_IN_SECONDS)
+            threshold = self.config.TIMESTAMP_THRESHOLD_IN_SECONDS
+            delta = datetime.timedelta(0, threshold)
+            present = datetime.datetime.utcnow()
+            success = (
+                (present - delta) <= packetTime
+                and
+                packetTime <= (present + delta)
+            )
         else:
             LOG.error("Invalid Certificate or Signature!")
             return success, None, None, None
