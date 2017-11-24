@@ -1,10 +1,10 @@
 import logging
-import os
 import socket
 import urllib2
 import calendar
 import atexit
 from threading import Lock, Thread, Timer
+from common.modules.Utils import touch
 
 LOG = logging.getLogger(__name__)
 
@@ -12,15 +12,22 @@ LOG = logging.getLogger(__name__)
 class UpdateCRLThread(Thread):
 
     def __init__(self, crlFile, crlUrl, crlInterval, importFunc=None):
+        """
+        Initialises the CRL update thread.  As part of it, it tries to check for
+        the file where the CRL will be downloaded.  If the file is not present,
+        a new one will be created.  If the file is not accessible, OSError is
+        raised.
+        """
         self.crlFile = crlFile
         self.crlUrl = crlUrl
-        self.crlInterval = crlInterval * 60  # to seconds
+        self.crlInterval = 5 #crlInterval * 60  # to seconds
         self.importFunc = importFunc
         self.shutdown = False
         Thread.__init__(self)
         self.daemon = True
         self.updateJob = None
         self.lock = Lock()
+        touch(self.crlFile)
 
     def updateCRL(self):
         LOG.debug("Checking for new CRL on CA Server...")
@@ -62,8 +69,6 @@ class UpdateCRLThread(Thread):
                 self.importFunc(self.crlFile)
         except Exception as e:
             LOG.error("Error downloading CRL file: %s", str(e))
-
-
 
     def schedule(self):
         self.lock.acquire()

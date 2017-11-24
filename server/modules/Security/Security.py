@@ -14,6 +14,12 @@ LOG = logging.getLogger(__name__)
 class Security:
 
     def __init__(self, config):
+        """
+        Initializes the security module.
+
+        Raises OSError if the file for downloading CRL cannot be accessed or its
+        permissions cannot be set to nobody
+        """
         self.config = config
         self.certUtil = CertUtil(pfxFile=config.serverPFXFile,
                                  pfxPasswd=config.PFXPasswd)
